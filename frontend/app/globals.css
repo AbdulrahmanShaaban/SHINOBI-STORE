@@ -1,0 +1,81 @@
+@import url('https://fonts.googleapis.com/css2?family=Anton&family=Bebas+Neue&family=Cinzel:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap');
+@import "tailwindcss";
+
+:root {
+  /* Color Palette */
+  --bg: #0A0A0F;
+  --bg-secondary: #12121A;
+  --bg-card: #16161F;
+  --primary: #FF6B00;
+  --red: #CC0000;
+  --gold: #FFB800;
+  --text: #F0F0F0;
+  --muted: #6B6B80;
+  --glow-orange: rgba(255, 107, 0, 0.4);
+  
+  /* Typography */
+  --font-cinzel: 'Cinzel', serif;
+  --font-inter: 'Inter', sans-serif;
+  --font-bebas: 'Bebas Neue', sans-serif;
+  --font-anton: 'Anton', sans-serif;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-inter);
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Typography Classes */
+.font-cinzel {
+  font-family: var(--font-cinzel);
+}
+
+.font-inter {
+  font-family: var(--font-inter);
+}
+
+.font-bebas {
+  font-family: var(--font-bebas);
+}
+
+.font-anton {
+  font-family: var(--font-anton);
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--primary);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--red);
+}
+
+/* Selection */
+::selection {
+  background: var(--primary);
+  color: var(--bg);
+}
