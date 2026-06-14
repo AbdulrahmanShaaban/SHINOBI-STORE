@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import ShinobiLogo from './ShinobiLogo';
 
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -26,9 +27,9 @@ export default function Navbar() {
       <div className="container mx-auto px-6 h-full">
         <div className="flex items-center justify-between h-full">
           {/* Logo */}
-          <Link href="/" className="text-2xl font-cinzel font-bold text-[#FF6B00]">
-            SHINOBI STORE
-          </Link>
+          {/* <Link href="/" className="absolute top-10 left-[-50px]">
+            <ShinobiLogo />
+          </Link> */}
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex absolute right-2 gap-8 text-4xl">

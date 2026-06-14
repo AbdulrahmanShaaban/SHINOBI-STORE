@@ -6,8 +6,8 @@ export default function ShinobiLogo() {
       <Image
               src={"/logo.png"}
               alt="Shinobi Logo"
-              width={500}
-              height={500}
+              width={800}
+              height={800}
               className="object-cover"
             />
     </div>

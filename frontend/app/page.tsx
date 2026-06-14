@@ -6,6 +6,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import LoadingScreen from '@/components/LoadingScreen';
 import SlidingImage from '@/components/shared/SlidingImage';
 import Naruto1 from '@/components/characters/Naruto1';
+import CardStack from '@/components/shared/CardStack';
 import ShinobiLogo from '@/components/shared/ShinobiLogo';
 
 gsap.registerPlugin(ScrollTrigger);
@@ -64,30 +65,30 @@ export default function Home() {
         </svg> */}
 
         {/* Sakura petals */}
-        <div className="absolute z-12 inset-0 pointer-events-none">
+        <div className="absolute z-5 inset-0 pointer-events-none">
           <svg className="petal absolute w-4 h-4" style={{ left: '10%', top: '5%' }} viewBox="0 0 20 20">
-            <path d="M10 0 C15 5 15 15 10 20 C5 15 5 5 10 0" fill="#FFB7C5" opacity="0.9" />
+            <path d="M10 0 C15 5 15 15 10 20 C5 15 5 5 10 0" fill="#FFB7C5" opacity="1" />
           </svg>
           <svg className="petal absolute w-4 h-4" style={{ left: '22%', top: '15%' }} viewBox="0 0 20 20">
-            <path d="M10 0 C15 5 15 15 10 20 C5 15 5 5 10 0" fill="#FFB7C5" opacity="0.9" />
+            <path d="M10 0 C15 5 15 15 10 20 C5 15 5 5 10 0" fill="#FFB7C5" opacity="1" />
           </svg>
           <svg className="petal absolute w-4 h-4" style={{ left: '34%', top: '8%' }} viewBox="0 0 20 20">
-            <path d="M10 0 C15 5 15 15 10 20 C5 15 5 5 10 0" fill="#FFB7C5" opacity="0.9" />
+            <path d="M10 0 C15 5 15 15 10 20 C5 15 5 5 10 0" fill="#FFB7C5" opacity="1" />
           </svg>
           <svg className="petal absolute w-4 h-4" style={{ left: '46%', top: '12%' }} viewBox="0 0 20 20">
-            <path d="M10 0 C15 5 15 15 10 20 C5 15 5 5 10 0" fill="#FFB7C5" opacity="0.9" />
+            <path d="M10 0 C15 5 15 15 10 20 C5 15 5 5 10 0" fill="#FFB7C5" opacity="1" />
           </svg>
           <svg className="petal absolute w-4 h-4" style={{ left: '58%', top: '20%' }} viewBox="0 0 20 20">
-            <path d="M10 0 C15 5 15 15 10 20 C5 15 5 5 10 0" fill="#FFB7C5" opacity="0.9" />
+            <path d="M10 0 C15 5 15 15 10 20 C5 15 5 5 10 0" fill="#FFB7C5" opacity="1" />
           </svg>
           <svg className="petal absolute w-4 h-4" style={{ left: '70%', top: '10%' }} viewBox="0 0 20 20">
-            <path d="M10 0 C15 5 15 15 10 20 C5 15 5 5 10 0" fill="#FFB7C5" opacity="0.9" />
+            <path d="M10 0 C15 5 15 15 10 20 C5 15 5 5 10 0" fill="#FFB7C5" opacity="1" />
           </svg>
           <svg className="petal absolute w-4 h-4" style={{ left: '82%', top: '18%' }} viewBox="0 0 20 20">
-            <path d="M10 0 C15 5 15 15 10 20 C5 15 5 5 10 0" fill="#FFB7C5" opacity="0.9" />
+            <path d="M10 0 C15 5 15 15 10 20 C5 15 5 5 10 0" fill="#FFB7C5" opacity="1" />
           </svg>
           <svg className="petal absolute w-4 h-4" style={{ left: '94%', top: '7%' }} viewBox="0 0 20 20">
-            <path d="M10 0 C15 5 15 15 10 20 C5 15 5 5 10 0" fill="#FFB7C5" opacity="0.9" />
+            <path d="M10 0 C15 5 15 15 10 20 C5 15 5 5 10 0" fill="#FFB7C5" opacity="1" />
           </svg>
         </div>
 
@@ -120,14 +121,17 @@ export default function Home() {
         </div>
 
         <div className="relative z-10 container mx-auto px-6 h-full flex items-center">
-          <div className="w-1/2">
-          <ShinobiLogo/>
+          <div className="w-1/2 absolute top-10 left-[-50px]">
+            <ShinobiLogo />
           </div>
           <div className="w-1/2 h-[150vh] absolute right-50 top-25">
             <Naruto1 />
           </div>
         </div>
       </section>
+
+      {/* Card Stack Section */}
+      <CardStack />
     </main>
   );
 }
