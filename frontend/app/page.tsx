@@ -37,6 +37,22 @@ export default function Home() {
         ease: 'none',
       });
     });
+
+    // Logo animation from hero to fixed corner position
+    gsap.to('#hero-logo', {
+      scrollTrigger: {
+        trigger: 'section',
+        start: 'top top',
+        end: '+=100%',
+        scrub: 1.5,
+      },
+      position: 'fixed',
+      top: '60px',
+      left: '20px',
+      width: '300px',
+      scale: 1.5,
+      ease: 'power2.inOut',
+    });
   }, []);
 
   return (
@@ -121,7 +137,7 @@ export default function Home() {
         </div>
 
         <div className="relative z-10 container mx-auto px-6 h-full flex items-center">
-          <div className="w-1/2 absolute top-10 left-[-50px]">
+          <div id="hero-logo" className="w-1/2 absolute top-10 left-[-50px]">
             <ShinobiLogo />
           </div>
           <div className="w-1/2 h-[150vh] absolute right-50 top-25">
@@ -134,4 +150,4 @@ export default function Home() {
       <CardStack />
     </main>
   );
-}
+} 
