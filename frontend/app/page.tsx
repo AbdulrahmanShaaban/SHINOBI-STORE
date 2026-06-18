@@ -8,6 +8,7 @@ import SlidingImage from '@/components/shared/SlidingImage';
 import Naruto1 from '@/components/characters/Naruto1';
 import CardStack from '@/components/shared/CardStack';
 import ShinobiLogo from '@/components/shared/ShinobiLogo';
+import ChooseShinobi from '@/components/shared/ChooseShinobi';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -148,6 +149,10 @@ export default function Home() {
 
       {/* Card Stack Section */}
       <CardStack />
+
+      {/* Choose Your Shinobi Section */}
+      <ChooseShinobi />
+      
     </main>
   );
 } 
