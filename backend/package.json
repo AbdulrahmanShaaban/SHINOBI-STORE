@@ -1,5 +1,5 @@
 {
-  "name": "shinobi-store-backend",
+  "name": "backend",
   "version": "1.0.0",
   "description": "Backend API for Shinobi Store - Premium anime-inspired e-commerce",
   "main": "dist/server.js",

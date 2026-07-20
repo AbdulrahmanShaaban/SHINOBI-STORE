@@ -1,0 +1,11 @@
+{
+  "name": "shinobi-store",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Shinobi Store - Premium anime-inspired e-commerce monorepo",
+  "scripts": {
+    "dev": "pnpm --recursive run dev",
+    "build": "pnpm --recursive run build",
+    "start": "pnpm --recursive run start"
+  }
+}
