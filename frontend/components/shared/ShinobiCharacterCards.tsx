@@ -77,43 +77,52 @@ export default function ShinobiCharacterCards() {
         {/* NARUTO */}
         <div
           ref={narutoRef}
-          className="flex-1 flex flex-col items-center"
+          className="flex-1 flex flex-col items-center p-6"
           onMouseEnter={() => handleMouseEnter(narutoDefaultRef, narutoJutsuRef)}
           onMouseLeave={() => handleMouseLeave(narutoDefaultRef, narutoJutsuRef)}
         >
-          <div className="relative w-full min-h-[450px] md:min-h-[650px] overflow-hidden rounded-lg flex items-center justify-center" style={{ backgroundColor: "var(--bg-card)", border: "2px solid var(--primary)" }}>
+          <div className="font-anton uppercase text-[28px] leading-none" style={{ color: "#F5E6C8" }}>NARUTO</div>
+          <div className="font-inter text-sm mt-1" style={{ color: "rgba(245,230,200,0.85)" }}>
+            Never gives up. Never backs down.
+          </div>
+          <div className="relative w-full flex-1 min-h-[450px] md:min-h-[650px] overflow-hidden rounded-lg flex items-center justify-center mt-4" style={{ backgroundColor: "var(--naruto-card-bg)", border: "2px solid var(--primary)" }}>
             <img ref={narutoDefaultRef} src="/naruto-default.png" alt="Naruto" className="absolute inset-0 w-full h-full object-cover" />
             <img ref={narutoJutsuRef} src="/naruto-rasengan.png" alt="Naruto Rasengan" className="absolute inset-0 w-full h-full object-cover" style={{ opacity: 0 }} />
           </div>
-          <span className="font-anton uppercase text-lg mt-3" style={{ letterSpacing: "0.12em", color: "var(--primary)" }}>NARUTO</span>
         </div>
 
         {/* ITACHI */}
         <div
           ref={itachiRef}
-          className="flex-1 flex flex-col items-center"
+          className="flex-1 flex flex-col items-center p-6"
           onMouseEnter={() => handleMouseEnter(itachiDefaultRef, itachiJutsuRef)}
           onMouseLeave={() => handleMouseLeave(itachiDefaultRef, itachiJutsuRef)}
         >
-          <div className="relative w-full min-h-[450px] md:min-h-[650px] overflow-hidden rounded-lg flex items-center justify-center" style={{ backgroundColor: "var(--bg-card)", border: "2px solid var(--red)" }}>
+          <div className="font-anton uppercase text-[28px] leading-none" style={{ color: "#F5E6C8" }}>ITACHI</div>
+          <div className="font-inter text-sm mt-1" style={{ color: "rgba(245,230,200,0.85)" }}>
+            Sacrifice everything for peace.
+          </div>
+          <div className="relative w-full flex-1 min-h-[450px] md:min-h-[650px] overflow-hidden rounded-lg flex items-center justify-center mt-4" style={{ backgroundColor: "var(--itachi-card-bg)", border: "2px solid var(--itachi-card-accent)" }}>
             <img ref={itachiDefaultRef} src="/itachi-default.png" alt="Itachi" className="absolute inset-0 w-full h-full object-cover" />
             <img ref={itachiJutsuRef} src="/itachi-mangekyou.png" alt="Itachi Mangekyo" className="absolute inset-0 w-full h-full object-cover" style={{ opacity: 0 }} />
           </div>
-          <span className="font-anton uppercase text-lg mt-3" style={{ letterSpacing: "0.12em", color: "var(--red)" }}>ITACHI</span>
         </div>
 
         {/* SASUKE */}
         <div
           ref={sasukeRef}
-          className="flex-1 flex flex-col items-center"
+          className="flex-1 flex flex-col items-center p-6"
           onMouseEnter={() => handleMouseEnter(sasukeDefaultRef, sasukeJutsuRef)}
           onMouseLeave={() => handleMouseLeave(sasukeDefaultRef, sasukeJutsuRef)}
         >
-          <div className="relative w-full min-h-[450px] md:min-h-[650px] overflow-hidden rounded-lg flex items-center justify-center" style={{ backgroundColor: "var(--bg-card)", border: "2px solid var(--sasuke-accent)" }}>
+          <div className="font-anton uppercase text-[28px] leading-none" style={{ color: "#F5E6C8" }}>SASUKE</div>
+          <div className="font-inter text-sm mt-1" style={{ color: "rgba(245,230,200,0.85)" }}>
+            Power at any cost.
+          </div>
+          <div className="relative w-full flex-1 min-h-[450px] md:min-h-[650px] overflow-hidden rounded-lg flex items-center justify-center mt-4" style={{ backgroundColor: "var(--sasuke-card-bg)", border: "2px solid var(--sasuke-accent)" }}>
             <img ref={sasukeDefaultRef} src="/sasuke-default.png" alt="Sasuke" className="absolute inset-0 w-full h-full object-cover" />
             <img ref={sasukeJutsuRef} src="/sasuke-chidori.png" alt="Sasuke Chidori" className="absolute inset-0 w-full h-full object-cover" style={{ opacity: 0 }} />
           </div>
-          <span className="font-anton uppercase text-lg mt-3" style={{ letterSpacing: "0.12em", color: "var(--sasuke-accent)" }}>SASUKE</span>
         </div>
       </div>
     </section>
