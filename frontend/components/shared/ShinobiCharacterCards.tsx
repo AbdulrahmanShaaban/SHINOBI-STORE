@@ -82,12 +82,13 @@ export default function ShinobiCharacterCards() {
   };
 
   return (
-    <section ref={sectionRef} className="w-full py-8 px-4 md:py-12 md:px-6 lg:px-8 min-h-[85vh] md:min-h-[90vh] mb-12 md:mb-16">
-      <div className="w-full max-w-[1800px] mx-auto flex flex-col md:flex-row justify-center items-stretch gap-4 md:gap-5 lg:gap-6 px-2 md:px-4 lg:px-6">
+    <section ref={sectionRef} className="w-full py-8 md:py-12 min-h-[85vh] md:min-h-[90vh] mb-12 md:mb-16 flex justify-center">
+      <div className="w-full max-w-[1900px] px-4 md:px-6 lg:px-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-5 lg:gap-6">
         {/* NARUTO */}
         <div
           ref={narutoRef}
-          className="flex-1 flex flex-col rounded-xl overflow-hidden"
+          className="flex flex-col rounded-xl overflow-hidden"
           style={{ backgroundColor: "var(--naruto-card-bg)", border: "2px solid var(--primary)" }}
           onMouseEnter={() => handleMouseEnter(narutoDefaultRef, narutoJutsuRef)}
           onMouseLeave={() => handleMouseLeave(narutoDefaultRef, narutoJutsuRef)}
@@ -102,7 +103,7 @@ export default function ShinobiCharacterCards() {
               <img ref={narutoJutsuRef} src="/naruto-rasengan.png" alt="Naruto Rasengan" className="absolute inset-0 w-full h-full object-contain" style={{ opacity: 0 }} />
             </div>
           </div>
-          <div className="w-full p-5 md:p-6 lg:p-8 pt-4 md:pt-5 pb-6 lg:pb-8 mt-auto border-t border-white/10">
+          <div className="w-full p-5 md:p-6 lg:p-8 pt-4 md:pt-5 pb-6 lg:pb-8 mt-auto">
             <div className="flex gap-3 md:gap-4">
               <button
                 onClick={() => addItem({ id: "naruto", name: "NARUTO", price: 29.99, quantity: 1, image: "/naruto-default.png" })}
@@ -129,7 +130,7 @@ export default function ShinobiCharacterCards() {
         {/* ITACHI */}
         <div
           ref={itachiRef}
-          className="flex-1 flex flex-col rounded-xl overflow-hidden"
+          className="flex flex-col rounded-xl overflow-hidden"
           style={{ backgroundColor: "var(--itachi-card-bg)", border: "2px solid var(--itachi-card-accent)" }}
           onMouseEnter={() => handleMouseEnter(itachiDefaultRef, itachiJutsuRef)}
           onMouseLeave={() => handleMouseLeave(itachiDefaultRef, itachiJutsuRef)}
@@ -144,7 +145,7 @@ export default function ShinobiCharacterCards() {
               <img ref={itachiJutsuRef} src="/itachi-mangekyou.png" alt="Itachi Mangekyo" className="absolute inset-0 w-full h-full object-contain" style={{ opacity: 0 }} />
             </div>
           </div>
-          <div className="w-full p-5 md:p-6 lg:p-8 pt-4 md:pt-5 pb-6 lg:pb-8 mt-auto border-t border-white/10">
+          <div className="w-full p-5 md:p-6 lg:p-8 pt-4 md:pt-5 pb-6 lg:pb-8 mt-auto">
             <div className="flex gap-3 md:gap-4">
               <button
                 onClick={() => addItem({ id: "itachi", name: "ITACHI", price: 34.99, quantity: 1, image: "/itachi-default.png" })}
@@ -171,7 +172,7 @@ export default function ShinobiCharacterCards() {
         {/* SASUKE */}
         <div
           ref={sasukeRef}
-          className="flex-1 flex flex-col rounded-xl overflow-hidden"
+          className="flex flex-col rounded-xl overflow-hidden"
           style={{ backgroundColor: "var(--sasuke-card-bg)", border: "2px solid var(--sasuke-accent)" }}
           onMouseEnter={() => handleMouseEnter(sasukeDefaultRef, sasukeJutsuRef)}
           onMouseLeave={() => handleMouseLeave(sasukeDefaultRef, sasukeJutsuRef)}
@@ -186,7 +187,7 @@ export default function ShinobiCharacterCards() {
               <img ref={sasukeJutsuRef} src="/sasuke-chidori.png" alt="Sasuke Chidori" className="absolute inset-0 w-full h-full object-contain" style={{ opacity: 0 }} />
             </div>
           </div>
-          <div className="w-full p-5 md:p-6 lg:p-8 pt-4 md:pt-5 pb-6 lg:pb-8 mt-auto border-t border-white/10">
+          <div className="w-full p-5 md:p-6 lg:p-8 pt-4 md:pt-5 pb-6 lg:pb-8 mt-auto">
             <div className="flex gap-3 md:gap-4">
               <button
                 onClick={() => addItem({ id: "sasuke", name: "SASUKE", price: 31.99, quantity: 1, image: "/sasuke-default.png" })}
@@ -209,6 +210,7 @@ export default function ShinobiCharacterCards() {
             </div>
           </div>
         </div>
+      </div>
       </div>
     </section>
   );
