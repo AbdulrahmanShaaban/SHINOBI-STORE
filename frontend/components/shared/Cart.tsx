@@ -22,7 +22,7 @@ interface CartStore {
   updateQuantity: (id: string, quantity: number) => void;
 }
 
-const useCartStore = create<CartStore>((set) => ({
+export const useCartStore = create<CartStore>((set) => ({
   items: [],
   isOpen: false,
   openCart: () => set({ isOpen: true }),
