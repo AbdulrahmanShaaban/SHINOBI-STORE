@@ -98,13 +98,13 @@ export default function ShinobiCharacterCards() {
             <div className="font-inter text-sm mt-1 text-center" style={{ color: "rgba(245,230,200,0.85)" }}>
               Never gives up. Never backs down.
             </div>
-            <div className="relative w-full flex-1 min-h-[500px] md:min-h-[650px] lg:min-h-[750px] overflow-hidden rounded-lg flex items-center justify-center mt-4">
+            <div className="relative w-full flex-1 min-h-[450px] md:min-h-[550px] lg:min-h-[650px] overflow-hidden rounded-lg flex items-center justify-center mt-4">
               <img ref={narutoDefaultRef} src="/naruto-default.png" alt="Naruto" className="absolute inset-0 w-full h-full object-contain" />
               <img ref={narutoJutsuRef} src="/naruto-rasengan.png" alt="Naruto Rasengan" className="absolute inset-0 w-full h-full object-contain" style={{ opacity: 0 }} />
             </div>
           </div>
-          <div className="w-full p-5 md:p-6 lg:p-8 pt-4 md:pt-5 pb-10 lg:pb-12 mt-auto">
-            <div className="flex gap-3 md:gap-4">
+          <div className="w-full p-5 md:p-6 lg:p-8 pt-4 md:pt-5 pb-12 lg:pb-14 mt-auto">
+            <div className="flex gap-3 md:gap-4 mx-4 md:mx-6 lg:mx-8">
               <button
                 onClick={() => addItem({ id: "naruto", name: "NARUTO", price: 29.99, quantity: 1, image: "/naruto-default.png" })}
                 className="flex-1 h-[64px] md:h-[68px] lg:h-[72px] px-8 md:px-10 lg:px-12 rounded-lg font-cinzel font-bold text-[15px] md:text-[16px] flex items-center justify-between transition-all hover:brightness-110 active:scale-[0.97]"
@@ -140,13 +140,13 @@ export default function ShinobiCharacterCards() {
             <div className="font-inter text-sm mt-1 text-center" style={{ color: "rgba(245,230,200,0.85)" }}>
               Sacrifice everything for peace.
             </div>
-            <div className="relative w-full flex-1 min-h-[500px] md:min-h-[650px] lg:min-h-[750px] overflow-hidden rounded-lg flex items-center justify-center mt-4">
+            <div className="relative w-full flex-1 min-h-[450px] md:min-h-[550px] lg:min-h-[650px] overflow-hidden rounded-lg flex items-center justify-center mt-4">
               <img ref={itachiDefaultRef} src="/itachi-default.png" alt="Itachi" className="absolute inset-0 w-full h-full object-contain" />
               <img ref={itachiJutsuRef} src="/itachi-mangekyou.png" alt="Itachi Mangekyo" className="absolute inset-0 w-full h-full object-contain" style={{ opacity: 0 }} />
             </div>
           </div>
-          <div className="w-full p-5 md:p-6 lg:p-8 pt-4 md:pt-5 pb-10 lg:pb-12 mt-auto">
-            <div className="flex gap-3 md:gap-4">
+          <div className="w-full p-5 md:p-6 lg:p-8 pt-4 md:pt-5 pb-12 lg:pb-14 mt-auto">
+            <div className="flex gap-3 md:gap-4 mx-4 md:mx-6 lg:mx-8">
               <button
                 onClick={() => addItem({ id: "itachi", name: "ITACHI", price: 34.99, quantity: 1, image: "/itachi-default.png" })}
                 className="flex-1 h-[64px] md:h-[68px] lg:h-[72px] px-8 md:px-10 lg:px-12 rounded-lg font-cinzel font-bold text-[15px] md:text-[16px] flex items-center justify-between transition-all hover:brightness-110 active:scale-[0.97]"
@@ -182,13 +182,13 @@ export default function ShinobiCharacterCards() {
             <div className="font-inter text-sm mt-1 text-center" style={{ color: "rgba(245,230,200,0.85)" }}>
               Power at any cost.
             </div>
-            <div className="relative w-full flex-1 min-h-[500px] md:min-h-[650px] lg:min-h-[750px] overflow-hidden rounded-lg flex items-center justify-center mt-4">
+            <div className="relative w-full flex-1 min-h-[450px] md:min-h-[550px] lg:min-h-[650px] overflow-hidden rounded-lg flex items-center justify-center mt-4">
               <img ref={sasukeDefaultRef} src="/sasuke-default.png" alt="Sasuke" className="absolute inset-0 w-full h-full object-contain" />
               <img ref={sasukeJutsuRef} src="/sasuke-chidori.png" alt="Sasuke Chidori" className="absolute inset-0 w-full h-full object-contain" style={{ opacity: 0 }} />
             </div>
           </div>
-          <div className="w-full p-5 md:p-6 lg:p-8 pt-4 md:pt-5 pb-10 lg:pb-12 mt-auto">
-            <div className="flex gap-3 md:gap-4">
+          <div className="w-full p-5 md:p-6 lg:p-8 pt-4 md:pt-5 pb-12 lg:pb-14 mt-auto">
+            <div className="flex gap-3 md:gap-4 mx-4 md:mx-6 lg:mx-8">
               <button
                 onClick={() => addItem({ id: "sasuke", name: "SASUKE", price: 31.99, quantity: 1, image: "/sasuke-default.png" })}
                 className="flex-1 h-[64px] md:h-[68px] lg:h-[72px] px-8 md:px-10 lg:px-12 rounded-lg font-cinzel font-bold text-[15px] md:text-[16px] flex items-center justify-between transition-all hover:brightness-110 active:scale-[0.97]"
