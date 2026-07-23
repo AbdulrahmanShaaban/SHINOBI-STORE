@@ -102,23 +102,23 @@ export default function ShinobiCharacterCards() {
               <img ref={narutoJutsuRef} src="/naruto-rasengan.png" alt="Naruto Rasengan" className="absolute inset-0 w-full h-full object-contain" style={{ opacity: 0 }} />
             </div>
           </div>
-          <div className="w-full p-6 pt-4 mt-auto border-t border-white/10">
+          <div className="w-full p-6 pt-5 pb-7 mt-auto border-t border-white/10">
             <div className="flex gap-3">
               <button
                 onClick={() => addItem({ id: "naruto", name: "NARUTO", price: 29.99, quantity: 1, image: "/naruto-default.png" })}
-                className="flex-1 py-3 px-4 rounded-lg font-cinzel font-bold text-sm flex items-center justify-between transition-all hover:brightness-110 active:scale-[0.97]"
+                className="flex-1 h-[52px] px-5 rounded-lg font-cinzel font-bold text-[13px] flex items-center justify-between transition-all hover:brightness-110 active:scale-[0.97]"
                 style={{ backgroundColor: "#F4E9D3", color: "#1A1A1A" }}
               >
                 <span>ADD TO CART</span>
-                <span className="font-inter text-xs font-semibold">$29.99</span>
+                <span className="font-inter text-[12px] font-semibold">$29.99</span>
               </button>
               <Link
                 href={`/product/naruto`}
-                className="flex-1 py-3 px-4 rounded-lg font-cinzel font-bold text-sm flex items-center justify-between transition-all hover:brightness-110 active:scale-[0.97]"
-                style={{ backgroundColor: "transparent", color: "var(--primary)", border: "1px solid var(--primary)" }}
+                className="flex-1 h-[52px] px-5 rounded-lg font-cinzel font-bold text-[13px] flex items-center justify-between transition-all hover:brightness-110 active:scale-[0.97]"
+                style={{ backgroundColor: "transparent", color: "var(--primary)", border: "1.5px solid var(--primary)" }}
               >
                 <span>VIEW PRODUCT</span>
-                <svg className="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <svg className="w-[18px] h-[18px] flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M5 12h14M12 5l7 7-7 7" />
                 </svg>
               </Link>
@@ -144,23 +144,23 @@ export default function ShinobiCharacterCards() {
               <img ref={itachiJutsuRef} src="/itachi-mangekyou.png" alt="Itachi Mangekyo" className="absolute inset-0 w-full h-full object-contain" style={{ opacity: 0 }} />
             </div>
           </div>
-          <div className="w-full p-6 pt-4 mt-auto border-t border-white/10">
+          <div className="w-full p-6 pt-5 pb-7 mt-auto border-t border-white/10">
             <div className="flex gap-3">
               <button
                 onClick={() => addItem({ id: "itachi", name: "ITACHI", price: 34.99, quantity: 1, image: "/itachi-default.png" })}
-                className="flex-1 py-3 px-4 rounded-lg font-cinzel font-bold text-sm flex items-center justify-between transition-all hover:brightness-110 active:scale-[0.97]"
+                className="flex-1 h-[52px] px-5 rounded-lg font-cinzel font-bold text-[13px] flex items-center justify-between transition-all hover:brightness-110 active:scale-[0.97]"
                 style={{ backgroundColor: "#F4E9D3", color: "#1A1A1A" }}
               >
                 <span>ADD TO CART</span>
-                <span className="font-inter text-xs font-semibold">$34.99</span>
+                <span className="font-inter text-[12px] font-semibold">$34.99</span>
               </button>
               <Link
                 href={`/product/itachi`}
-                className="flex-1 py-3 px-4 rounded-lg font-cinzel font-bold text-sm flex items-center justify-between transition-all hover:brightness-110 active:scale-[0.97]"
-                style={{ backgroundColor: "transparent", color: "var(--itachi-card-accent)", border: "1px solid var(--itachi-card-accent)" }}
+                className="flex-1 h-[52px] px-5 rounded-lg font-cinzel font-bold text-[13px] flex items-center justify-between transition-all hover:brightness-110 active:scale-[0.97]"
+                style={{ backgroundColor: "transparent", color: "var(--itachi-card-accent)", border: "1.5px solid var(--itachi-card-accent)" }}
               >
                 <span>VIEW PRODUCT</span>
-                <svg className="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <svg className="w-[18px] h-[18px] flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M5 12h14M12 5l7 7-7 7" />
                 </svg>
               </Link>
@@ -186,23 +186,23 @@ export default function ShinobiCharacterCards() {
               <img ref={sasukeJutsuRef} src="/sasuke-chidori.png" alt="Sasuke Chidori" className="absolute inset-0 w-full h-full object-contain" style={{ opacity: 0 }} />
             </div>
           </div>
-          <div className="w-full p-6 pt-4 mt-auto border-t border-white/10">
+          <div className="w-full p-6 pt-5 pb-7 mt-auto border-t border-white/10">
             <div className="flex gap-3">
               <button
                 onClick={() => addItem({ id: "sasuke", name: "SASUKE", price: 31.99, quantity: 1, image: "/sasuke-default.png" })}
-                className="flex-1 py-3 px-4 rounded-lg font-cinzel font-bold text-sm flex items-center justify-between transition-all hover:brightness-110 active:scale-[0.97]"
+                className="flex-1 h-[52px] px-5 rounded-lg font-cinzel font-bold text-[13px] flex items-center justify-between transition-all hover:brightness-110 active:scale-[0.97]"
                 style={{ backgroundColor: "#F4E9D3", color: "#1A1A1A" }}
               >
                 <span>ADD TO CART</span>
-                <span className="font-inter text-xs font-semibold">$31.99</span>
+                <span className="font-inter text-[12px] font-semibold">$31.99</span>
               </button>
               <Link
                 href={`/product/sasuke`}
-                className="flex-1 py-3 px-4 rounded-lg font-cinzel font-bold text-sm flex items-center justify-between transition-all hover:brightness-110 active:scale-[0.97]"
-                style={{ backgroundColor: "transparent", color: "var(--sasuke-accent)", border: "1px solid var(--sasuke-accent)" }}
+                className="flex-1 h-[52px] px-5 rounded-lg font-cinzel font-bold text-[13px] flex items-center justify-between transition-all hover:brightness-110 active:scale-[0.97]"
+                style={{ backgroundColor: "transparent", color: "var(--sasuke-accent)", border: "1.5px solid var(--sasuke-accent)" }}
               >
                 <span>VIEW PRODUCT</span>
-                <svg className="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <svg className="w-[18px] h-[18px] flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M5 12h14M12 5l7 7-7 7" />
                 </svg>
               </Link>
