@@ -82,8 +82,8 @@ export default function ShinobiCharacterCards() {
   };
 
   return (
-    <section ref={sectionRef} className="w-full py-16 px-4 flex justify-center">
-      <div className="w-full max-w-[1600px] mx-auto flex flex-col md:flex-row justify-center items-end gap-10 px-6">
+    <section ref={sectionRef} className="w-full py-8 px-4 md:py-12 md:px-6 lg:px-8 min-h-[85vh] md:min-h-[90vh] mb-12 md:mb-16">
+      <div className="w-full max-w-[1800px] mx-auto flex flex-col md:flex-row justify-center items-stretch gap-4 md:gap-5 lg:gap-6 px-2 md:px-4 lg:px-6">
         {/* NARUTO */}
         <div
           ref={narutoRef}
@@ -92,33 +92,33 @@ export default function ShinobiCharacterCards() {
           onMouseEnter={() => handleMouseEnter(narutoDefaultRef, narutoJutsuRef)}
           onMouseLeave={() => handleMouseLeave(narutoDefaultRef, narutoJutsuRef)}
         >
-          <div className="flex flex-col items-center w-full flex-1 p-6 pb-0">
-            <div className="font-anton uppercase text-[28px] leading-none" style={{ color: "#F5E6C8" }}>NARUTO</div>
+          <div className="flex flex-col items-center w-full flex-1 p-5 md:p-6 lg:p-8 pb-0">
+            <div className="font-anton uppercase text-[24px] md:text-[28px] lg:text-[32px] leading-none" style={{ color: "#F5E6C8" }}>NARUTO</div>
             <div className="font-inter text-sm mt-1 text-center" style={{ color: "rgba(245,230,200,0.85)" }}>
               Never gives up. Never backs down.
             </div>
-            <div className="relative w-full flex-1 min-h-[450px] md:min-h-[650px] overflow-hidden rounded-lg flex items-center justify-center mt-4">
+            <div className="relative w-full flex-1 min-h-[350px] md:min-h-[450px] lg:min-h-[550px] overflow-hidden rounded-lg flex items-center justify-center mt-4">
               <img ref={narutoDefaultRef} src="/naruto-default.png" alt="Naruto" className="absolute inset-0 w-full h-full object-contain" />
               <img ref={narutoJutsuRef} src="/naruto-rasengan.png" alt="Naruto Rasengan" className="absolute inset-0 w-full h-full object-contain" style={{ opacity: 0 }} />
             </div>
           </div>
-          <div className="w-full p-6 pt-5 pb-7 mt-auto border-t border-white/10">
-            <div className="flex gap-3">
+          <div className="w-full p-5 md:p-6 lg:p-8 pt-4 md:pt-5 pb-6 lg:pb-8 mt-auto border-t border-white/10">
+            <div className="flex gap-3 md:gap-4">
               <button
                 onClick={() => addItem({ id: "naruto", name: "NARUTO", price: 29.99, quantity: 1, image: "/naruto-default.png" })}
-                className="flex-1 h-[52px] px-5 rounded-lg font-cinzel font-bold text-[13px] flex items-center justify-between transition-all hover:brightness-110 active:scale-[0.97]"
+                className="flex-1 h-[52px] md:h-[56px] lg:h-[60px] px-5 md:px-6 rounded-lg font-cinzel font-bold text-[13px] md:text-[14px] flex items-center justify-between transition-all hover:brightness-110 active:scale-[0.97]"
                 style={{ backgroundColor: "#F4E9D3", color: "#1A1A1A" }}
               >
                 <span>ADD TO CART</span>
-                <span className="font-inter text-[12px] font-semibold">$29.99</span>
+                <span className="font-inter text-[11px] md:text-[12px] font-semibold">$29.99</span>
               </button>
               <Link
                 href={`/product/naruto`}
-                className="flex-1 h-[52px] px-5 rounded-lg font-cinzel font-bold text-[13px] flex items-center justify-between transition-all hover:brightness-110 active:scale-[0.97]"
-                style={{ backgroundColor: "transparent", color: "var(--primary)", border: "1.5px solid var(--primary)" }}
+                className="flex-1 h-[52px] md:h-[56px] lg:h-[60px] px-5 md:px-6 rounded-lg font-cinzel font-bold text-[13px] md:text-[14px] flex items-center justify-between transition-all hover:brightness-110 active:scale-[0.97]"
+                style={{ backgroundColor: "transparent", color: "white", border: "1.5px solid var(--primary)" }}
               >
                 <span>VIEW PRODUCT</span>
-                <svg className="w-[18px] h-[18px] flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <svg className="w-5 h-5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M5 12h14M12 5l7 7-7 7" />
                 </svg>
               </Link>
@@ -134,33 +134,33 @@ export default function ShinobiCharacterCards() {
           onMouseEnter={() => handleMouseEnter(itachiDefaultRef, itachiJutsuRef)}
           onMouseLeave={() => handleMouseLeave(itachiDefaultRef, itachiJutsuRef)}
         >
-          <div className="flex flex-col items-center w-full flex-1 p-6 pb-0">
-            <div className="font-anton uppercase text-[28px] leading-none" style={{ color: "#F5E6C8" }}>ITACHI</div>
+          <div className="flex flex-col items-center w-full flex-1 p-5 md:p-6 lg:p-8 pb-0">
+            <div className="font-anton uppercase text-[24px] md:text-[28px] lg:text-[32px] leading-none" style={{ color: "#F5E6C8" }}>ITACHI</div>
             <div className="font-inter text-sm mt-1 text-center" style={{ color: "rgba(245,230,200,0.85)" }}>
               Sacrifice everything for peace.
             </div>
-            <div className="relative w-full flex-1 min-h-[450px] md:min-h-[650px] overflow-hidden rounded-lg flex items-center justify-center mt-4">
+            <div className="relative w-full flex-1 min-h-[350px] md:min-h-[450px] lg:min-h-[550px] overflow-hidden rounded-lg flex items-center justify-center mt-4">
               <img ref={itachiDefaultRef} src="/itachi-default.png" alt="Itachi" className="absolute inset-0 w-full h-full object-contain" />
               <img ref={itachiJutsuRef} src="/itachi-mangekyou.png" alt="Itachi Mangekyo" className="absolute inset-0 w-full h-full object-contain" style={{ opacity: 0 }} />
             </div>
           </div>
-          <div className="w-full p-6 pt-5 pb-7 mt-auto border-t border-white/10">
-            <div className="flex gap-3">
+          <div className="w-full p-5 md:p-6 lg:p-8 pt-4 md:pt-5 pb-6 lg:pb-8 mt-auto border-t border-white/10">
+            <div className="flex gap-3 md:gap-4">
               <button
                 onClick={() => addItem({ id: "itachi", name: "ITACHI", price: 34.99, quantity: 1, image: "/itachi-default.png" })}
-                className="flex-1 h-[52px] px-5 rounded-lg font-cinzel font-bold text-[13px] flex items-center justify-between transition-all hover:brightness-110 active:scale-[0.97]"
+                className="flex-1 h-[52px] md:h-[56px] lg:h-[60px] px-5 md:px-6 rounded-lg font-cinzel font-bold text-[13px] md:text-[14px] flex items-center justify-between transition-all hover:brightness-110 active:scale-[0.97]"
                 style={{ backgroundColor: "#F4E9D3", color: "#1A1A1A" }}
               >
                 <span>ADD TO CART</span>
-                <span className="font-inter text-[12px] font-semibold">$34.99</span>
+                <span className="font-inter text-[11px] md:text-[12px] font-semibold">$34.99</span>
               </button>
               <Link
                 href={`/product/itachi`}
-                className="flex-1 h-[52px] px-5 rounded-lg font-cinzel font-bold text-[13px] flex items-center justify-between transition-all hover:brightness-110 active:scale-[0.97]"
-                style={{ backgroundColor: "transparent", color: "var(--itachi-card-accent)", border: "1.5px solid var(--itachi-card-accent)" }}
+                className="flex-1 h-[52px] md:h-[56px] lg:h-[60px] px-5 md:px-6 rounded-lg font-cinzel font-bold text-[13px] md:text-[14px] flex items-center justify-between transition-all hover:brightness-110 active:scale-[0.97]"
+                style={{ backgroundColor: "transparent", color: "white", border: "1.5px solid var(--itachi-card-accent)" }}
               >
                 <span>VIEW PRODUCT</span>
-                <svg className="w-[18px] h-[18px] flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <svg className="w-5 h-5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="var(--itachi-card-accent)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M5 12h14M12 5l7 7-7 7" />
                 </svg>
               </Link>
@@ -176,33 +176,33 @@ export default function ShinobiCharacterCards() {
           onMouseEnter={() => handleMouseEnter(sasukeDefaultRef, sasukeJutsuRef)}
           onMouseLeave={() => handleMouseLeave(sasukeDefaultRef, sasukeJutsuRef)}
         >
-          <div className="flex flex-col items-center w-full flex-1 p-6 pb-0">
-            <div className="font-anton uppercase text-[28px] leading-none" style={{ color: "#F5E6C8" }}>SASUKE</div>
+          <div className="flex flex-col items-center w-full flex-1 p-5 md:p-6 lg:p-8 pb-0">
+            <div className="font-anton uppercase text-[24px] md:text-[28px] lg:text-[32px] leading-none" style={{ color: "#F5E6C8" }}>SASUKE</div>
             <div className="font-inter text-sm mt-1 text-center" style={{ color: "rgba(245,230,200,0.85)" }}>
               Power at any cost.
             </div>
-            <div className="relative w-full flex-1 min-h-[450px] md:min-h-[650px] overflow-hidden rounded-lg flex items-center justify-center mt-4">
+            <div className="relative w-full flex-1 min-h-[350px] md:min-h-[450px] lg:min-h-[550px] overflow-hidden rounded-lg flex items-center justify-center mt-4">
               <img ref={sasukeDefaultRef} src="/sasuke-default.png" alt="Sasuke" className="absolute inset-0 w-full h-full object-contain" />
               <img ref={sasukeJutsuRef} src="/sasuke-chidori.png" alt="Sasuke Chidori" className="absolute inset-0 w-full h-full object-contain" style={{ opacity: 0 }} />
             </div>
           </div>
-          <div className="w-full p-6 pt-5 pb-7 mt-auto border-t border-white/10">
-            <div className="flex gap-3">
+          <div className="w-full p-5 md:p-6 lg:p-8 pt-4 md:pt-5 pb-6 lg:pb-8 mt-auto border-t border-white/10">
+            <div className="flex gap-3 md:gap-4">
               <button
                 onClick={() => addItem({ id: "sasuke", name: "SASUKE", price: 31.99, quantity: 1, image: "/sasuke-default.png" })}
-                className="flex-1 h-[52px] px-5 rounded-lg font-cinzel font-bold text-[13px] flex items-center justify-between transition-all hover:brightness-110 active:scale-[0.97]"
+                className="flex-1 h-[52px] md:h-[56px] lg:h-[60px] px-5 md:px-6 rounded-lg font-cinzel font-bold text-[13px] md:text-[14px] flex items-center justify-between transition-all hover:brightness-110 active:scale-[0.97]"
                 style={{ backgroundColor: "#F4E9D3", color: "#1A1A1A" }}
               >
                 <span>ADD TO CART</span>
-                <span className="font-inter text-[12px] font-semibold">$31.99</span>
+                <span className="font-inter text-[11px] md:text-[12px] font-semibold">$31.99</span>
               </button>
               <Link
                 href={`/product/sasuke`}
-                className="flex-1 h-[52px] px-5 rounded-lg font-cinzel font-bold text-[13px] flex items-center justify-between transition-all hover:brightness-110 active:scale-[0.97]"
-                style={{ backgroundColor: "transparent", color: "var(--sasuke-accent)", border: "1.5px solid var(--sasuke-accent)" }}
+                className="flex-1 h-[52px] md:h-[56px] lg:h-[60px] px-5 md:px-6 rounded-lg font-cinzel font-bold text-[13px] md:text-[14px] flex items-center justify-between transition-all hover:brightness-110 active:scale-[0.97]"
+                style={{ backgroundColor: "transparent", color: "white", border: "1.5px solid var(--sasuke-accent)" }}
               >
                 <span>VIEW PRODUCT</span>
-                <svg className="w-[18px] h-[18px] flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <svg className="w-5 h-5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="var(--sasuke-accent)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M5 12h14M12 5l7 7-7 7" />
                 </svg>
               </Link>
