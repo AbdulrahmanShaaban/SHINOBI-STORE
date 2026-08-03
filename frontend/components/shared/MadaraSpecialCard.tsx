@@ -23,6 +23,29 @@ const SAND_COLORS: [number, number, number][] = [
 const SAMPLE_W = 140;
 const SAMPLE_H = 196;
 
+const SAND_ORBIT_COUNT = 24;
+
+function mulberry32(seed: number) {
+  return function () {
+    seed |= 0;
+    seed = (seed + 0x6d2b79f5) | 0;
+    let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+const rand = mulberry32(20240804);
+
+const ORBIT_CONFIGS = Array.from({ length: SAND_ORBIT_COUNT }, () => ({
+  size: 22 + rand() * 50,
+  opacity: 0.35 + rand() * 0.55,
+  radiusFactor: 0.7 + rand() * 0.6,
+  speed: 10 + rand() * 16,
+  phase: rand() * Math.PI * 2,
+  spinFactor: 0.4 + rand() * 1.2,
+}));
+
 interface Particle {
   homeX: number;
   homeY: number;
@@ -39,11 +62,13 @@ interface Particle {
 interface MadaraSpecialCardProps {
   defaultImg?: string;
   jutsuImg?: string;
+  sandImg?: string;
 }
 
 export default function MadaraSpecialCard({
   defaultImg = "/madara-default.png",
   jutsuImg = "/madara-susanoo.png",
+  sandImg = "/sand.png",
 }: MadaraSpecialCardProps) {
   const sectionRef = useRef<HTMLElement>(null);
   const titleRef = useRef<HTMLDivElement>(null);
@@ -51,6 +76,7 @@ export default function MadaraSpecialCard({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const defaultImgRef = useRef<HTMLImageElement>(null);
   const jutsuImgRef = useRef<HTMLImageElement>(null);
+  const sandOrbitRef = useRef<HTMLDivElement>(null);
   const addItem = useCartStore((s) => s.addItem);
 
   const particlesRef = useRef<Particle[]>([]);
@@ -202,6 +228,43 @@ export default function MadaraSpecialCard({
           },
         });
       }
+
+      if (sandOrbitRef.current && cardRef.current) {
+        const rect = cardRef.current.getBoundingClientRect();
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
+        const maxRadius = Math.min(centerX, centerY) + 60;
+
+        const sandImgs = Array.from(
+          sandOrbitRef.current.querySelectorAll<HTMLImageElement>("img")
+        );
+
+        sandImgs.forEach((img, i) => {
+          const config = ORBIT_CONFIGS[i % ORBIT_CONFIGS.length];
+          const radius = 40 + config.radiusFactor * maxRadius;
+          const state = { angle: config.phase };
+
+          gsap.set(img, {
+            x: centerX + radius * Math.cos(config.phase),
+            y: centerY + radius * Math.sin(config.phase),
+            rotation: config.phase * (180 / Math.PI),
+          });
+
+          gsap.to(state, {
+            angle: config.phase + Math.PI * 2,
+            duration: config.speed,
+            repeat: -1,
+            ease: "none",
+            onUpdate: () => {
+              gsap.set(img, {
+                x: centerX + radius * Math.cos(state.angle),
+                y: centerY + radius * Math.sin(state.angle),
+                rotation: state.angle * config.spinFactor * (180 / Math.PI),
+              });
+            },
+          });
+        });
+      }
     },
     { scope: sectionRef }
   );
@@ -251,7 +314,7 @@ export default function MadaraSpecialCard({
         </div>
 
         {/* Madara card — identical structure to existing 3 cards, larger */}
-        <div ref={cardRef} className="flex justify-center">
+        <div ref={cardRef} className="relative flex justify-center">
           <div
             className="flex flex-col rounded-xl overflow-hidden w-full max-w-[700px]"
             style={{ backgroundColor: "#1a0808", border: "2px solid #8b1a1a" }}
@@ -338,6 +401,28 @@ export default function MadaraSpecialCard({
                 </Link>
               </div>
             </div>
+          </div>
+
+          {/* Orbiting sand ring around the card */}
+          <div
+            ref={sandOrbitRef}
+            className="pointer-events-none absolute inset-0 overflow-visible"
+            aria-hidden="true"
+          >
+            {ORBIT_CONFIGS.map((config, i) => (
+              <img
+                key={i}
+                src={sandImg}
+                alt=""
+                className="absolute left-0 top-0 object-contain"
+                style={{
+                  width: `${config.size}px`,
+                  height: `${config.size}px`,
+                  opacity: config.opacity,
+                  willChange: "transform",
+                }}
+              />
+            ))}
           </div>
         </div>
       </div>
