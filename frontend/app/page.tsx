@@ -158,6 +158,9 @@ export default function Home() {
       {/* Shinobi Character Cards */}
       <ShinobiCharacterCards />
 
+      {/* Spacer between character cards and Madara special card */}
+      <div className="h-24 md:h-36 lg:h-44" />
+
       {/* Legendary Madara Special Card */}
       <MadaraSpecialCard />
       </main>
