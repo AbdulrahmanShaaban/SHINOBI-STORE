@@ -10,6 +10,7 @@ import CardStack from '@/components/shared/CardStack';
 import ShinobiLogo from '@/components/shared/ShinobiLogo';
 import ChooseShinobi from '@/components/shared/ChooseShinobi';
 import ShinobiCharacterCards from '@/components/shared/ShinobiCharacterCards';
+import MadaraSpecialCard from '@/components/shared/MadaraSpecialCard';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -156,6 +157,9 @@ export default function Home() {
 
       {/* Shinobi Character Cards */}
       <ShinobiCharacterCards />
+
+      {/* Legendary Madara Special Card */}
+      <MadaraSpecialCard />
       </main>
   );
 } 
