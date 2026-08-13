@@ -174,8 +174,8 @@ export default function MadaraSpecialCard({
           .to(crater, { opacity: 0.25, scale: 1.8, duration: 0.34, ease: "power3.out" }, "impact+=0.05")
           .addLabel("open")
           .to(coffinDoor, {
-            rotationX: -105,
-            y: 18,
+            rotationX: -112,
+            y: 70,
             duration: 0.42,
             ease: "power3.inOut",
           }, "open")
@@ -202,65 +202,83 @@ export default function MadaraSpecialCard({
       }
 
       if (sandOrbitRef.current) {
-        const sandImgs = Array.from(
-          sandOrbitRef.current.querySelectorAll<HTMLImageElement>("img")
-        );
-        const orbitStates: { angle: number }[] = [];
+        const orbit = sandOrbitRef.current;
+        const sandImgs = Array.from(orbit.querySelectorAll<HTMLImageElement>("img"));
 
-        const updateOrbit = () => {
-          const rect = card.getBoundingClientRect();
-          const orbitRect = sandOrbitRef.current!.getBoundingClientRect();
-          const centerX = rect.left - orbitRect.left + rect.width / 2;
-          const centerY = rect.top - orbitRect.top + rect.height / 2;
-          const maxRadius = Math.min(rect.width, rect.height) * 0.5;
+        // Keep the orbit on a single GSAP ticker instead of running one tween
+        // and multiple layout reads per particle. Geometry is cached and only
+        // recalculated when the card changes size.
+        const setX = sandImgs.map((img) => gsap.quickSetter(img, "x", "px"));
+        const setY = sandImgs.map((img) => gsap.quickSetter(img, "y", "px"));
+        const setRotation = sandImgs.map((img) => gsap.quickSetter(img, "rotation", "deg"));
 
-          sandImgs.forEach((img, i) => {
-            const config = ORBIT_CONFIGS[i % ORBIT_CONFIGS.length];
-            const radiusX = maxRadius * (0.7 + config.radiusFactor * 0.55);
-            const radiusY = maxRadius * config.yScale * (0.72 + config.radiusFactor * 0.28);
-            const state = { angle: config.phase };
-            orbitStates.push(state);
-
-            gsap.set(img, {
-              x: centerX + Math.cos(state.angle) * radiusX,
-              y: centerY + Math.sin(state.angle) * radiusY,
-              rotation: state.angle * config.spinFactor * (180 / Math.PI),
-            });
-
-            if (!reducedMotion) {
-              gsap.to(state, {
-                angle: config.phase + Math.PI * 2,
-                duration: config.speed,
-                repeat: -1,
-                ease: "none",
-                onUpdate: () => {
-                  const latestRect = card.getBoundingClientRect();
-                  const latestOrbitRect = sandOrbitRef.current!.getBoundingClientRect();
-                  const cx = latestRect.left - latestOrbitRect.left + latestRect.width / 2;
-                  const cy = latestRect.top - latestOrbitRect.top + latestRect.height / 2;
-                  const rx = Math.min(latestRect.width, latestRect.height) * 0.5 * (0.7 + config.radiusFactor * 0.55);
-                  const ry = Math.min(latestRect.width, latestRect.height) * 0.5 * config.yScale * (0.72 + config.radiusFactor * 0.28);
-
-                  gsap.set(img, {
-                    x: cx + Math.cos(state.angle) * rx,
-                    y: cy + Math.sin(state.angle) * ry,
-                    rotation: state.angle * config.spinFactor * (180 / Math.PI),
-                  });
-                },
-              });
-            }
-          });
+        const geometry = {
+          centerX: 0,
+          centerY: 0,
+          baseRadius: 0,
         };
 
-        updateOrbit();
-        const resizeObserver = new ResizeObserver(updateOrbit);
+        const updateOrbitGeometry = () => {
+          const cardRect = card.getBoundingClientRect();
+          const orbitRect = orbit.getBoundingClientRect();
+          const base = Math.min(cardRect.width, cardRect.height) * 0.5;
+
+          geometry.centerX = cardRect.left - orbitRect.left + cardRect.width * 0.5;
+          geometry.centerY = cardRect.top - orbitRect.top + cardRect.height * 0.5;
+          geometry.baseRadius = base;
+        };
+
+        updateOrbitGeometry();
+
+        if (reducedMotion) {
+          sandImgs.forEach((img, i) => {
+            const config = ORBIT_CONFIGS[i];
+            const angle = config.phase;
+            const rx = geometry.baseRadius * (0.7 + config.radiusFactor * 0.55);
+            const ry = geometry.baseRadius * config.yScale * (0.72 + config.radiusFactor * 0.28);
+
+            setX[i](geometry.centerX + Math.cos(angle) * rx);
+            setY[i](geometry.centerY + Math.sin(angle) * ry);
+            setRotation[i](angle * config.spinFactor * (180 / Math.PI));
+          });
+        } else {
+          const orbitProgress = { value: 0 };
+
+          const orbitTween = gsap.to(orbitProgress, {
+            value: Math.PI * 2,
+            duration: 12,
+            repeat: -1,
+            ease: "none",
+            onUpdate: () => {
+              const rotation = orbitProgress.value;
+
+              sandImgs.forEach((_, i) => {
+                const config = ORBIT_CONFIGS[i];
+                const angle = config.phase + rotation * config.speed / 12;
+                const rx = geometry.baseRadius * (0.7 + config.radiusFactor * 0.55);
+                const ry = geometry.baseRadius * config.yScale * (0.72 + config.radiusFactor * 0.28);
+
+                setX[i](geometry.centerX + Math.cos(angle) * rx);
+                setY[i](geometry.centerY + Math.sin(angle) * ry);
+                setRotation[i](angle * config.spinFactor * (180 / Math.PI));
+              });
+            },
+          });
+
+          const resizeObserver = new ResizeObserver(updateOrbitGeometry);
+          resizeObserver.observe(card);
+
+          return () => {
+            resizeObserver.disconnect();
+            orbitTween.kill();
+          };
+        }
+
+        const resizeObserver = new ResizeObserver(updateOrbitGeometry);
         resizeObserver.observe(card);
-        window.addEventListener("resize", updateOrbit);
 
         return () => {
           resizeObserver.disconnect();
-          window.removeEventListener("resize", updateOrbit);
-          gsap.killTweensOf(orbitStates);
         };
       }
     },
@@ -488,10 +506,14 @@ export default function MadaraSpecialCard({
             </div>
           </div>
 
-          {/* Edo Tensei coffin. It starts below the ground and rises over the card. */}
+          {/*
+           * Edo Tensei coffin shell.
+           * The shell stays BEHIND the card so the card content remains visible in the final state.
+           * Only the front door temporarily sits above the card while it is closed.
+           */}
           <div
             ref={coffinRef}
-            className="pointer-events-none absolute left-1/2 top-0 z-[65] h-full w-[calc(100%+28px)] max-w-[728px] -translate-x-1/2"
+            className="pointer-events-none absolute left-1/2 top-[-90px] z-[25] h-[calc(100%+180px)] w-[calc(100%+140px)] max-w-[840px] -translate-x-1/2"
             style={{ transformOrigin: "50% 100%" }}
             aria-hidden="true"
           >
@@ -506,7 +528,7 @@ export default function MadaraSpecialCard({
                 }}
               />
               <div
-                className="absolute inset-x-0 top-0 h-[12%] rounded-t-[12px]"
+                className="absolute inset-x-0 top-0 h-[12%] rounded-t-[12px] z-[1]"
                 style={{
                   background:
                     "linear-gradient(90deg, #3b2519, #8d6035 12%, #a77743 30%, #5f3b20 48%, #9b6d3c 70%, #49301b 88%, #2d1b11), repeating-linear-gradient(90deg, rgba(35,20,12,.25) 0 3px, transparent 3px 30px)",
@@ -514,19 +536,19 @@ export default function MadaraSpecialCard({
                 }}
               />
               <div
-                className="absolute inset-y-0 left-0 w-[8%] rounded-l-[12px]"
+                className="absolute inset-y-0 left-0 w-[8%] rounded-l-[12px] z-[1]"
                 style={{
                   background: "linear-gradient(90deg, #2d1b11, #714a2a 45%, #9b6d3c 72%, #3b2519)",
                 }}
               />
               <div
-                className="absolute inset-y-0 right-0 w-[8%] rounded-r-[12px]"
+                className="absolute inset-y-0 right-0 w-[8%] rounded-r-[12px] z-[1]"
                 style={{
                   background: "linear-gradient(90deg, #3b2519, #9b6d3c 28%, #714a2a 55%, #2d1b11)",
                 }}
               />
               <div
-                className="absolute inset-x-0 bottom-0 h-[9%] rounded-b-[12px]"
+                className="absolute inset-x-0 bottom-0 h-[9%] rounded-b-[12px] z-[1]"
                 style={{
                   background: "linear-gradient(90deg, #2d1b11, #714a2a 20%, #9b6d3c 48%, #5a381e 72%, #2d1b11)",
                   boxShadow: "inset 0 8px 18px rgba(0,0,0,.32)",
@@ -553,7 +575,7 @@ export default function MadaraSpecialCard({
               {/* Door: physically opens downward. */}
               <div
                 ref={coffinDoorRef}
-                className="absolute inset-[8%] z-[6] rounded-[8px]"
+                className="absolute inset-[7%] z-[50] rounded-[8px]"
                 style={{
                   transformOrigin: "50% 100%",
                   transformStyle: "preserve-3d",
@@ -584,7 +606,7 @@ export default function MadaraSpecialCard({
 
               {/* Heavy lower hinge / threshold */}
               <div
-                className="absolute bottom-0 left-[2%] right-[2%] z-[7] h-[22px] rounded-b-[10px]"
+                className="absolute bottom-[1%] left-[2%] right-[2%] z-[2] h-[24px] rounded-b-[10px]"
                 style={{
                   background: "linear-gradient(#6d4828, #2d1b11)",
                   borderTop: "2px solid rgba(224,181,111,.25)",
