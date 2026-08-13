@@ -9,7 +9,7 @@ import { useCartStore } from "./Cart";
 
 gsap.registerPlugin(ScrollTrigger);
 
-const SAND_ORBIT_COUNT = 24;
+const SAND_ORBIT_COUNT = 42;
 
 function mulberry32(seed: number) {
   return function () {
@@ -24,13 +24,20 @@ function mulberry32(seed: number) {
 const rand = mulberry32(20240804);
 
 const ORBIT_CONFIGS = Array.from({ length: SAND_ORBIT_COUNT }, () => ({
-  size: 22 + rand() * 50,
-  opacity: 0.3 + rand() * 0.5,
-  radiusFactor: 0.78 + rand() * 0.58,
-  speed: 9 + rand() * 15,
+  // Larger, softer fragments read more like drifting sand/dust than tiny sprites.
+  size: 18 + rand() * 58,
+  opacity: 0.08 + rand() * 0.38,
+  radiusFactor: 0.95 + rand() * 0.72,
+  speed: 5.5 + rand() * 8.5,
   phase: rand() * Math.PI * 2,
-  spinFactor: 0.45 + rand() * 1.1,
-  yScale: 0.62 + rand() * 0.32,
+  spinFactor: 0.25 + rand() * 0.85,
+  yScale: 0.54 + rand() * 0.5,
+  drift: 0.8 + rand() * 1.65,
+  depth: 0.35 + rand() * 1.15,
+  stretchX: 0.72 + rand() * 1.45,
+  stretchY: 0.38 + rand() * 0.82,
+  blur: 0.15 + rand() * 2.1,
+  gust: 0.8 + rand() * 1.5,
 }));
 
 const DUST_PARTICLES = Array.from({ length: 56 }, (_, i) => {
@@ -49,12 +56,14 @@ const DUST_PARTICLES = Array.from({ length: 56 }, (_, i) => {
 interface MadaraSpecialCardProps {
   defaultImg?: string;
   jutsuImg?: string;
+  sixPathsImg?: string;
   sandImg?: string;
 }
 
 export default function MadaraSpecialCard({
   defaultImg = "/madara-default.png",
   jutsuImg = "/madara-susanoo.png",
+  sixPathsImg = "/madara-six-paths.png",
   sandImg = "/sand.png",
 }: MadaraSpecialCardProps) {
   const sectionRef = useRef<HTMLElement>(null);
@@ -70,6 +79,14 @@ export default function MadaraSpecialCard({
   const craterRef = useRef<HTMLDivElement>(null);
   const defaultImgRef = useRef<HTMLImageElement>(null);
   const jutsuImgRef = useRef<HTMLImageElement>(null);
+  const sixPathsImgRef = useRef<HTMLImageElement>(null);
+  const chakraAuraRef = useRef<HTMLDivElement>(null);
+  const chakraCoreRef = useRef<HTMLDivElement>(null);
+  const chakraRingRefs = [
+    useRef<HTMLDivElement>(null),
+    useRef<HTMLDivElement>(null),
+    useRef<HTMLDivElement>(null),
+  ];
   const sandOrbitRef = useRef<HTMLDivElement>(null);
   const addItem = useCartStore((s) => s.addItem);
 
@@ -85,8 +102,11 @@ export default function MadaraSpecialCard({
       const dust = dustRef.current;
       const dustFront = dustFrontRef.current;
       const crater = craterRef.current;
+      const chakraAura = chakraAuraRef.current;
+      const chakraCore = chakraCoreRef.current;
+      const chakraRings = chakraRingRefs.map((ref) => ref.current);
 
-      if (!section || !stage || !card || !coffin || !coffinBody || !coffinDoor) {
+      if (!section || !stage || !card || !coffin || !coffinBody || !coffinDoor || !chakraAura || !chakraCore || chakraRings.some((el) => !el)) {
         return;
       }
 
@@ -121,7 +141,131 @@ export default function MadaraSpecialCard({
         gsap.set(crater, { opacity: 0, scale: 0.2 });
         gsap.set(ground, { scaleY: 1, opacity: 1 });
         gsap.set(sandOrbitRef.current, { opacity: 0 });
+        gsap.set(chakraAura, { opacity: 0, scale: 0.88 });
+        gsap.set(chakraCore, { opacity: 0, scale: 0.76 });
+        gsap.set(chakraRings, { opacity: 0 });
+        gsap.set(chakraRings[0], { rotation: 0, scale: 0.96 });
+        gsap.set(chakraRings[1], { rotation: 120, scale: 1.02 });
+        gsap.set(chakraRings[2], { rotation: 240, scale: 1.08 });
 
+        // Seamless Six Paths chakra motion.
+        // Each flame layer returns to its exact starting transform before its loop
+        // repeats, so there is no visible snap/cut when the animation cycles.
+        const flameConfigs = [
+          {
+            duration: 5.2,
+            delay: 0,
+            driftX: 3.5,
+            driftY: -3,
+            rotationA: 7,
+            rotationB: -5,
+            scaleXA: 1.08,
+            scaleYA: 0.94,
+            scaleXB: 0.95,
+            scaleYB: 1.06,
+          },
+          {
+            duration: 6.4,
+            delay: 0.75,
+            driftX: -3.8,
+            driftY: 2.8,
+            rotationA: -8,
+            rotationB: 5,
+            scaleXA: 0.94,
+            scaleYA: 1.07,
+            scaleXB: 1.06,
+            scaleYB: 0.94,
+          },
+          {
+            duration: 7.2,
+            delay: 1.35,
+            driftX: 3,
+            driftY: 2.2,
+            rotationA: 6,
+            rotationB: -7,
+            scaleXA: 1.06,
+            scaleYA: 0.95,
+            scaleXB: 0.94,
+            scaleYB: 1.07,
+          },
+        ];
+
+        chakraRings.forEach((ring, index) => {
+          const baseRotation = [0, 120, 240][index];
+          const config = flameConfigs[index];
+          const cycle = gsap.timeline({
+            repeat: -1,
+            delay: config.delay,
+            defaults: { ease: "sine.inOut" },
+          });
+
+          cycle
+            .to(ring, {
+              xPercent: config.driftX,
+              yPercent: config.driftY,
+              rotation: baseRotation + config.rotationA,
+              scaleX: config.scaleXA,
+              scaleY: config.scaleYA,
+              duration: config.duration * 0.28,
+            })
+            .to(ring, {
+              xPercent: config.driftX * -0.7,
+              yPercent: config.driftY * -0.5,
+              rotation: baseRotation + config.rotationB,
+              scaleX: config.scaleXB,
+              scaleY: config.scaleYB,
+              duration: config.duration * 0.32,
+            })
+            .to(ring, {
+              xPercent: config.driftX * 0.35,
+              yPercent: config.driftY * 0.8,
+              rotation: baseRotation + config.rotationA * 0.35,
+              scaleX: 1.025,
+              scaleY: 0.985,
+              duration: config.duration * 0.16,
+            })
+            .to(ring, {
+              xPercent: 0,
+              yPercent: 0,
+              rotation: baseRotation,
+              scaleX: 1,
+              scaleY: 1,
+              duration: config.duration * 0.24,
+            });
+        });
+
+        // The broad aura breathes on a long, non-synchronized cycle so it feels
+        // like continuous energy rather than a repeating CSS animation.
+        const auraDrift = gsap.timeline({ repeat: -1, defaults: { ease: "sine.inOut" } });
+        auraDrift
+          .to(chakraAura, { yPercent: -1.6, xPercent: 0.8, scale: 1.018, duration: 2.8 })
+          .to(chakraAura, { yPercent: 0.9, xPercent: -0.7, scale: 0.992, duration: 3.2 })
+          .to(chakraAura, { yPercent: 0, xPercent: 0, scale: 1, duration: 2.2 });
+
+        const chakraPulse = gsap.to(chakraAura, {
+          opacity: 0.88,
+          scale: 1.025,
+          duration: 2.2,
+          repeat: -1,
+          yoyo: true,
+          ease: "sine.inOut",
+          paused: true,
+        });
+
+        const chakraCorePulse = gsap.to(chakraCore, {
+          opacity: 0.82,
+          scale: 1.09,
+          duration: 1.55,
+          repeat: -1,
+          yoyo: true,
+          ease: "sine.inOut",
+          paused: true,
+        });
+
+        // Keep everything alive continuously; visibility is still controlled by
+        // the reveal timeline, so hidden states do not require restarting loops.
+        chakraPulse.pause();
+        chakraCorePulse.pause();
         const reveal = gsap.timeline({
           defaults: { overwrite: "auto" },
           scrollTrigger: {
@@ -198,7 +342,15 @@ export default function MadaraSpecialCard({
           // Keep the coffin frame around the revealed card. Only the front door moves away,
           // so the final composition still reads as Madara standing inside the coffin.
           .set(card, { pointerEvents: "auto" }, "reveal+=0.30")
-          .to(sandOrbitRef.current, { opacity: 1, duration: 0.18, ease: "power2.out" }, "reveal+=0.18");
+          .to(sandOrbitRef.current, { opacity: 1, duration: 0.22, ease: "power2.out" }, "reveal+=0.18")
+          .to(chakraAura, { opacity: 1, scale: 1, duration: 0.38, ease: "power3.out" }, "reveal+=0.20")
+          .to(chakraCore, { opacity: 0.85, scale: 1, duration: 0.34, ease: "power3.out" }, "reveal+=0.24")
+          .to(chakraRings, { opacity: 1, scale: 1, duration: 0.42, stagger: 0.055, ease: "power3.out" }, "reveal+=0.24")
+          .to(chakraCore, { opacity: 0.58, scale: 1.06, duration: 0.22, repeat: 3, yoyo: true, ease: "sine.inOut" }, "reveal+=0.55")
+          .call(() => {
+            chakraPulse.play();
+            chakraCorePulse.play();
+          }, [], "reveal+=0.60");
       }
 
       if (sandOrbitRef.current) {
@@ -211,6 +363,9 @@ export default function MadaraSpecialCard({
         const setX = sandImgs.map((img) => gsap.quickSetter(img, "x", "px"));
         const setY = sandImgs.map((img) => gsap.quickSetter(img, "y", "px"));
         const setRotation = sandImgs.map((img) => gsap.quickSetter(img, "rotation", "deg"));
+        const setScaleX = sandImgs.map((img) => gsap.quickSetter(img, "scaleX"));
+        const setScaleY = sandImgs.map((img) => gsap.quickSetter(img, "scaleY"));
+        const setOpacity = sandImgs.map((img) => gsap.quickSetter(img, "opacity"));
 
         const geometry = {
           centerX: 0,
@@ -234,12 +389,16 @@ export default function MadaraSpecialCard({
           sandImgs.forEach((img, i) => {
             const config = ORBIT_CONFIGS[i];
             const angle = config.phase;
-            const rx = geometry.baseRadius * (0.7 + config.radiusFactor * 0.55);
-            const ry = geometry.baseRadius * config.yScale * (0.72 + config.radiusFactor * 0.28);
+            const rx = geometry.baseRadius * (0.82 + config.radiusFactor * 0.58);
+            const ry = geometry.baseRadius * config.yScale * (0.82 + config.radiusFactor * 0.26);
+            const tangentRotation = Math.atan2(Math.cos(angle) * ry, -Math.sin(angle) * rx) * (180 / Math.PI);
 
             setX[i](geometry.centerX + Math.cos(angle) * rx);
             setY[i](geometry.centerY + Math.sin(angle) * ry);
-            setRotation[i](angle * config.spinFactor * (180 / Math.PI));
+            setRotation[i](tangentRotation * config.spinFactor);
+            setScaleX[i](config.stretchX * 0.9);
+            setScaleY[i](config.stretchY * 0.9);
+            setOpacity[i](Math.max(0.06, config.opacity * (0.72 + config.depth * 0.2)));
           });
         } else {
           const orbitProgress = { value: 0 };
@@ -254,13 +413,76 @@ export default function MadaraSpecialCard({
 
               sandImgs.forEach((_, i) => {
                 const config = ORBIT_CONFIGS[i];
-                const angle = config.phase + rotation * config.speed / 12;
-                const rx = geometry.baseRadius * (0.7 + config.radiusFactor * 0.55);
-                const ry = geometry.baseRadius * config.yScale * (0.72 + config.radiusFactor * 0.28);
 
-                setX[i](geometry.centerX + Math.cos(angle) * rx);
-                setY[i](geometry.centerY + Math.sin(angle) * ry);
-                setRotation[i](angle * config.spinFactor * (180 / Math.PI));
+                // Slightly chaotic, wind-driven orbit: the path remains centered on
+                // the coffin, but the radius and vertical flow breathe continuously.
+                const angle = config.phase + rotation * config.speed / 12;
+                const turbulence =
+                  Math.sin(angle * 1.35 + config.phase * 0.8) * 0.055 +
+                  Math.sin(angle * 2.7 + config.phase * 1.7) * 0.025;
+                const radialBreath = 1 + turbulence;
+                const rx = geometry.baseRadius * (0.98 + config.radiusFactor * 0.58) * radialBreath;
+                const ry =
+                  geometry.baseRadius *
+                  config.yScale *
+                  (0.96 + config.radiusFactor * 0.32) *
+                  (1 + Math.cos(angle * 1.1 + config.phase) * 0.045);
+
+                const gustX =
+                  Math.sin(angle * 1.9 + config.phase) *
+                  geometry.baseRadius *
+                  0.055 *
+                  config.drift;
+                const gustY =
+                  Math.cos(angle * 1.45 + config.phase * 0.7) *
+                  geometry.baseRadius *
+                  0.035 *
+                  config.gust;
+
+                const windBias =
+                  Math.sin(rotation * 0.55 + config.phase * 2) *
+                  geometry.baseRadius *
+                  0.018;
+
+                // Near particles are larger/sharper; far particles become softer
+                // and lighter, creating fake depth without extra 3D rendering.
+                const depthWave = 0.68 + 0.32 * (0.5 + 0.5 * Math.sin(angle + config.phase));
+                const depthScale = 0.82 + depthWave * 0.36;
+                const tangentRotation =
+                  Math.atan2(Math.cos(angle) * ry, -Math.sin(angle) * rx) *
+                  (180 / Math.PI);
+
+                setX[i](
+                  geometry.centerX +
+                  Math.cos(angle) * rx +
+                  gustX +
+                  windBias
+                );
+                setY[i](
+                  geometry.centerY +
+                  Math.sin(angle) * ry +
+                  gustY
+                );
+                setRotation[i](
+                  tangentRotation * (0.42 + config.spinFactor * 0.5) +
+                  Math.sin(angle * 1.6 + config.phase) * 7
+                );
+                setScaleX[i](
+                  config.stretchX *
+                  depthScale *
+                  (1 + Math.sin(angle * 1.8 + config.phase) * 0.08)
+                );
+                setScaleY[i](
+                  config.stretchY *
+                  depthScale *
+                  (1 + Math.cos(angle * 1.35 + config.phase) * 0.08)
+                );
+                setOpacity[i](
+                  Math.max(
+                    0.045,
+                    config.opacity * (0.52 + depthWave * 0.62)
+                  )
+                );
               });
             },
           });
@@ -274,15 +496,9 @@ export default function MadaraSpecialCard({
           };
         }
 
-        const resizeObserver = new ResizeObserver(updateOrbitGeometry);
-        resizeObserver.observe(card);
-
-        return () => {
-          resizeObserver.disconnect();
-        };
       }
     },
-    { scope: sectionRef, dependencies: [defaultImg, jutsuImg, sandImg] }
+    { scope: sectionRef, dependencies: [defaultImg, jutsuImg, sixPathsImg, sandImg] }
   );
 
   const handleMouseEnter = () => {
@@ -293,10 +509,38 @@ export default function MadaraSpecialCard({
       overwrite: "auto",
     });
     gsap.to(jutsuImgRef.current, {
-      opacity: 1,
-      scale: 1.04,
-      duration: 0.4,
+      opacity: 0,
+      scale: 1,
+      duration: 0.22,
       ease: "power2.out",
+      overwrite: "auto",
+    });
+    gsap.to(sixPathsImgRef.current, {
+      opacity: 1,
+      scale: 1.045,
+      duration: 0.45,
+      ease: "power3.out",
+      overwrite: "auto",
+    });
+    gsap.to(chakraAuraRef.current, {
+      opacity: 1,
+      scale: 1.06,
+      duration: 0.38,
+      ease: "power2.out",
+      overwrite: "auto",
+    });
+    gsap.to(chakraCoreRef.current, {
+      opacity: 1,
+      scale: 1.1,
+      duration: 0.28,
+      ease: "power2.out",
+      overwrite: "auto",
+    });
+    gsap.to(chakraRingRefs.map((ref) => ref.current), {
+      opacity: 1,
+      scale: 1.035,
+      duration: 0.28,
+      stagger: 0.04,
       overwrite: "auto",
     });
   };
@@ -311,8 +555,34 @@ export default function MadaraSpecialCard({
     gsap.to(jutsuImgRef.current, {
       opacity: 0,
       scale: 1,
-      duration: 0.4,
+      duration: 0.22,
       ease: "power2.out",
+      overwrite: "auto",
+    });
+    gsap.to(sixPathsImgRef.current, {
+      opacity: 0,
+      scale: 1,
+      duration: 0.28,
+      ease: "power2.out",
+      overwrite: "auto",
+    });
+    gsap.to(chakraAuraRef.current, {
+      opacity: 0,
+      scale: 0.98,
+      duration: 0.32,
+      ease: "power2.out",
+      overwrite: "auto",
+    });
+    gsap.to(chakraCoreRef.current, {
+      opacity: 0,
+      scale: 0.96,
+      duration: 0.26,
+      ease: "power2.out",
+      overwrite: "auto",
+    });
+    gsap.to(chakraRingRefs.map((ref) => ref.current), {
+      opacity: 0,
+      duration: 0.24,
       overwrite: "auto",
     });
   };
@@ -444,17 +714,145 @@ export default function MadaraSpecialCard({
                   onMouseEnter={handleMouseEnter}
                   onMouseLeave={handleMouseLeave}
                 >
+                  {/* Six Paths chakra aura — INSIDE the Madara card image area. */}
+          <div
+            ref={chakraAuraRef}
+            className="pointer-events-none absolute inset-[-9%] z-[10] overflow-hidden rounded-lg"
+            style={{ opacity: 0, transformOrigin: "50% 72%", mixBlendMode: "screen" }}
+            aria-hidden="true"
+          >
+            {/* Soft atmosphere / hot inner core. */}
+            <div
+              ref={chakraCoreRef}
+              className="absolute inset-[8%] rounded-[48%]"
+              style={{
+                opacity: 0,
+                transform: "scale(.78)",
+                background:
+                  "radial-gradient(ellipse at 50% 62%, rgba(255,255,255,.92) 0%, rgba(243,234,255,.72) 14%, rgba(211,187,255,.48) 30%, rgba(164,111,255,.26) 52%, rgba(105,49,225,.10) 70%, transparent 86%)",
+                filter:
+                  "blur(24px) drop-shadow(0 0 18px rgba(235,220,255,.95)) drop-shadow(0 0 55px rgba(151,93,255,.65))",
+              }}
+            />
+
+            {/* Large irregular flame sheets. Their jagged silhouettes are closer to anime chakra than perfect rings. */}
+            {chakraRingRefs.map((ref, index) => {
+              const flameShapes = [
+                {
+                  clipPath: "polygon(49% 100%, 34% 92%, 27% 81%, 14% 75%, 20% 63%, 6% 56%, 17% 47%, 9% 34%, 24% 37%, 20% 22%, 35% 29%, 42% 8%, 49% 22%, 56% 4%, 61% 26%, 76% 14%, 72% 35%, 91% 30%, 82% 46%, 97% 52%, 84% 60%, 94% 75%, 78% 73%, 74% 88%, 61% 91%)",
+                  background: "linear-gradient(180deg, rgba(142,84,255,.72) 0%, rgba(102,49,222,.56) 38%, rgba(213,187,255,.62) 68%, rgba(255,255,255,.42) 100%)",
+                  blur: "blur(9px)",
+                  opacity: 0.76,
+                },
+                {
+                  clipPath: "polygon(50% 100%, 38% 86%, 22% 88%, 28% 72%, 7% 76%, 20% 59%, 2% 55%, 22% 46%, 10% 31%, 29% 37%, 27% 17%, 42% 29%, 50% 0%, 58% 28%, 70% 10%, 71% 34%, 91% 24%, 81% 45%, 100% 48%, 82% 61%, 94% 78%, 75% 72%, 76% 91%, 60% 85%)",
+                  background: "linear-gradient(180deg, rgba(83,36,190,.58) 0%, rgba(132,76,255,.48) 36%, rgba(217,193,255,.50) 66%, rgba(255,255,255,.22) 100%)",
+                  blur: "blur(15px)",
+                  opacity: 0.58,
+                },
+                {
+                  clipPath: "polygon(50% 100%, 30% 90%, 20% 74%, 4% 70%, 17% 53%, 3% 42%, 19% 37%, 15% 19%, 32% 29%, 43% 5%, 51% 25%, 61% 3%, 66% 27%, 84% 18%, 78% 36%, 97% 42%, 83% 53%, 96% 67%, 77% 71%, 70% 88%, 58% 89%)",
+                  background: "radial-gradient(ellipse at 50% 58%, rgba(255,255,255,.54) 0%, rgba(203,173,255,.46) 26%, rgba(132,74,248,.42) 52%, rgba(74,30,176,.18) 74%, transparent 88%)",
+                  blur: "blur(20px)",
+                  opacity: 0.48,
+                },
+              ][index];
+
+              return (
+                <div
+                  key={index}
+                  ref={ref}
+                  className="absolute inset-[5%]"
+                  style={{
+                    clipPath: flameShapes.clipPath,
+                    background: flameShapes.background,
+                    filter: `${flameShapes.blur} drop-shadow(0 0 14px rgba(143,92,255,.58))`,
+                    opacity: 0,
+                    transform: `scale(${1 + index * 0.05}) rotate(${index === 0 ? -2 : index === 1 ? 3 : -4}deg)`,
+                    transformOrigin: "50% 72%",
+                    mixBlendMode: "screen",
+                  }}
+                />
+              );
+            })}
+
+            {/* Bright inner flame tongues: white-violet center, deep violet outer edges. */}
+            {[
+              { className: "left-[8%] top-[4%] h-[45%] w-[18%] rotate-[-13deg]", clip: "polygon(50% 100%, 15% 74%, 42% 57%, 14% 38%, 48% 42%, 56% 0%, 68% 43%, 93% 24%, 76% 61%, 92% 79%)" },
+              { className: "left-[23%] top-[-4%] h-[34%] w-[13%] rotate-[-5deg]", clip: "polygon(48% 100%, 19% 73%, 40% 48%, 22% 25%, 52% 43%, 60% 0%, 72% 47%, 96% 21%, 81% 70%)" },
+              { className: "right-[8%] top-[1%] h-[47%] w-[19%] rotate-[14deg]", clip: "polygon(52% 100%, 12% 77%, 35% 58%, 7% 34%, 43% 44%, 54% 0%, 67% 46%, 91% 18%, 79% 61%, 96% 79%)" },
+              { className: "right-[24%] top-[-5%] h-[36%] w-[13%] rotate-[6deg]", clip: "polygon(50% 100%, 17% 70%, 42% 48%, 20% 26%, 52% 41%, 62% 0%, 70% 46%, 97% 23%, 79% 71%)" },
+              { className: "left-1/2 top-[-9%] h-[41%] w-[17%] -translate-x-1/2", clip: "polygon(50% 100%, 22% 72%, 40% 50%, 30% 27%, 51% 39%, 58% 0%, 69% 41%, 89% 21%, 76% 68%)" },
+            ].map((tongue, i) => (
+              <div
+                key={i}
+                className={`absolute ${tongue.className}`}
+                style={{
+                  clipPath: tongue.clip,
+                  background: i % 2 === 0
+                    ? "linear-gradient(180deg, rgba(248,242,255,.82), rgba(204,173,255,.64) 42%, rgba(120,67,238,.34) 80%, transparent)"
+                    : "linear-gradient(180deg, rgba(211,190,255,.74), rgba(151,98,255,.48) 50%, rgba(82,34,190,.22) 82%, transparent)",
+                  filter: "blur(10px) drop-shadow(0 0 14px rgba(224,207,255,.65))",
+                  opacity: i === 4 ? 0.82 : 0.58,
+                  mixBlendMode: "screen",
+                }}
+              />
+            ))}
+
+            {/* Wispy side plumes for the broad, turbulent silhouette. */}
+            <div
+              className="absolute left-[-5%] top-[27%] h-[45%] w-[32%] rotate-[-18deg]"
+              style={{
+                borderRadius: "50% 50% 42% 58%",
+                background: "radial-gradient(ellipse at 80% 50%, rgba(229,213,255,.38), rgba(142,89,255,.26) 44%, transparent 78%)",
+                filter: "blur(24px)",
+                opacity: 0.62,
+                mixBlendMode: "screen",
+              }}
+            />
+            <div
+              className="absolute right-[-5%] top-[24%] h-[48%] w-[32%] rotate-[17deg]"
+              style={{
+                borderRadius: "50% 50% 58% 42%",
+                background: "radial-gradient(ellipse at 20% 50%, rgba(229,213,255,.38), rgba(135,83,252,.24) 45%, transparent 78%)",
+                filter: "blur(26px)",
+                opacity: 0.58,
+                mixBlendMode: "screen",
+              }}
+            />
+
+            {/* Hot edge glow: this is what makes the aura read as illuminated chakra. */}
+            <div
+              className="absolute inset-[10%] rounded-[46%]"
+              style={{
+                border: "1px solid rgba(244,236,255,.28)",
+                boxShadow:
+                  "0 0 24px rgba(245,237,255,.34), 0 0 54px rgba(143,89,255,.34), inset 0 0 42px rgba(147,94,255,.16)",
+                filter: "blur(2px)",
+                opacity: 0.72,
+                mixBlendMode: "screen",
+              }}
+            />
+          </div>
+
                   <img
                     ref={defaultImgRef}
                     src={defaultImg}
                     alt="Madara Uchiha"
-                    className="absolute inset-0 w-full h-full object-contain"
+                    className="absolute inset-0 z-[20] w-full h-full object-contain"
                   />
                   <img
                     ref={jutsuImgRef}
                     src={jutsuImg}
                     alt="Madara Susanoo"
-                    className="absolute inset-0 w-full h-full object-contain"
+                    className="absolute inset-0 z-[20] w-full h-full object-contain"
+                    style={{ opacity: 0 }}
+                  />
+                  <img
+                    ref={sixPathsImgRef}
+                    src={sixPathsImg}
+                    alt="Madara Six Paths"
+                    className="absolute inset-0 z-[20] w-full h-full object-contain"
                     style={{ opacity: 0 }}
                   />
                 </div>
@@ -618,9 +1016,18 @@ export default function MadaraSpecialCard({
           {/* Persistent sand.png orbit. This is intentionally outside the card content. */}
           <div
             ref={sandOrbitRef}
-            className="pointer-events-none absolute -inset-[12%] z-[95] overflow-visible"
+            className="pointer-events-none absolute -inset-[16%] z-[95] overflow-visible"
             aria-hidden="true"
           >
+            <div
+              className="pointer-events-none absolute inset-[14%] rounded-[45%] opacity-55"
+              style={{
+                background:
+                  "radial-gradient(ellipse at center, rgba(205,170,102,.16) 0%, rgba(180,141,79,.10) 34%, rgba(132,95,47,.05) 56%, transparent 76%)",
+                filter: "blur(22px)",
+                mixBlendMode: "screen",
+              }}
+            />
             {ORBIT_CONFIGS.map((config, i) => (
               <img
                 key={i}
@@ -629,9 +1036,11 @@ export default function MadaraSpecialCard({
                 className="absolute left-0 top-0 object-contain"
                 style={{
                   width: `${config.size}px`,
-                  height: `${config.size}px`,
+                  height: `${config.size * (0.48 + config.stretchY * 0.42)}px`,
                   opacity: config.opacity,
-                  willChange: "transform",
+                  willChange: "transform, opacity",
+                  filter: `blur(${config.blur}px) saturate(.82) sepia(.14)`,
+                  mixBlendMode: "screen",
                 }}
               />
             ))}
