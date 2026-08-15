@@ -130,3 +130,22 @@ body {
   letter-spacing: -0.01em;
   will-change: transform, opacity;
 }
+
+/* ─── Post-Madara horizontal showcase ─── */
+/* Reduced motion: stack panels vertically so every panel stays reachable. */
+@media (prefers-reduced-motion: reduce) {
+  .shinobi-horizontal-stage {
+    min-height: auto !important;
+  }
+
+  .shinobi-horizontal-track {
+    flex-direction: column !important;
+    width: 100% !important;
+  }
+
+  .shinobi-horizontal-panel {
+    width: 100% !important;
+    height: auto !important;
+    min-height: auto !important;
+  }
+}
