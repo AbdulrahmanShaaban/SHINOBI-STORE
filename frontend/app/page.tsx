@@ -12,7 +12,6 @@ import ChooseShinobi from '@/components/shared/ChooseShinobi';
 import ShinobiCharacterCards from '@/components/shared/ShinobiCharacterCards';
 import MadaraSpecialCard from '@/components/shared/MadaraSpecialCard';
 import ShinobiAfterMadaraSection from '@/components/shared/ShinobiAfterMadaraSection';
-import ProductGrid from '@/components/shared/ProductGrid';
 import StoreFooter from '@/components/shared/StoreFooter';
 
 gsap.registerPlugin(ScrollTrigger);
@@ -171,8 +170,7 @@ export default function Home() {
       <ShinobiAfterMadaraSection />
 
       {/* Normal product content */}
-      <ProductGrid />
-
+      
       {/* Large closing footer */}
       <StoreFooter />
       </main>
