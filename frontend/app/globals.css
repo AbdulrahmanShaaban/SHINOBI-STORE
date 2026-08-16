@@ -131,6 +131,14 @@ body {
   will-change: transform, opacity;
 }
 
+/* ─── Custom cursor ─── */
+/* Native cursor is hidden only while the custom cursor is active
+   (fine-pointer devices), never as a permanent global rule. */
+body.custom-cursor-enabled,
+body.custom-cursor-enabled * {
+  cursor: none !important;
+}
+
 /* ─── Post-Madara horizontal showcase ─── */
 /* Reduced motion: stack panels vertically so every panel stays reachable. */
 @media (prefers-reduced-motion: reduce) {

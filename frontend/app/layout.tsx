@@ -3,6 +3,7 @@ import "./globals.css";
 import Navbar from "@/components/shared/Navbar";
 import LoadingScreen from "@/components/LoadingScreen";
 import SmoothScroll from "@/components/shared/SmoothScroll";
+import CustomCursor from "@/components/shared/CustomCursor";
 
 
 export const metadata: Metadata = {
@@ -22,6 +23,7 @@ export default function RootLayout({
     <html lang="en" className="h-full antialiased">
       <body className="min-h-full flex flex-col">
         <SmoothScroll />
+        <CustomCursor />
         <LoadingScreen />
         <Navbar />
         {children}
