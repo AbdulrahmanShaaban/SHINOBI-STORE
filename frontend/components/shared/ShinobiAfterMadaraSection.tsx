@@ -23,9 +23,7 @@ const MARQUEE_ROWS = [
 ];
 
 const MARQUEE_COPIES = 4;
-
 const QUOTE = "THOSE WHO CANNOT ACKNOWLEDGE THEMSELVES WILL EVENTUALLY FAIL.";
-
 const QUOTE_CHARS = Array.from(QUOTE);
 
 const SHOWCASE_ITEMS = [
@@ -50,7 +48,7 @@ const SHOWCASE_ITEMS = [
     thumbs: [
       "/madara-default.png",
       "/itachi-default.png",
-      "/sasuke-default.png",
+      "/sasuke-chidori.png",
     ],
   },
 ];
@@ -94,12 +92,18 @@ function MarqueeRow({
         const resizeObserver = new ResizeObserver(() => {
           tween.duration(duration());
         });
+
         resizeObserver.observe(track);
 
         return () => {
           resizeObserver.disconnect();
+          tween.kill();
         };
       });
+
+      return () => {
+        mm.revert();
+      };
     },
     { scope: rowRef, dependencies: [row] }
   );
@@ -137,7 +141,6 @@ function ShowcaseVisual({
 }: {
   item: (typeof SHOWCASE_ITEMS)[number];
 }) {
-  // Panel 02: desktop = collector card composition, mobile = phone mockup.
   if (item.number === "02") {
     return (
       <>
@@ -163,6 +166,7 @@ function ShowcaseVisual({
                 ADD TO CART — $49.99
               </div>
             </div>
+
             <div
               className="showcase-floating absolute -bottom-10 -left-10 w-[14vw] max-w-[210px] aspect-[3/4] rounded-lg overflow-hidden border"
               style={{
@@ -180,7 +184,6 @@ function ShowcaseVisual({
           </div>
         </div>
 
-        {/* Mobile: single centered phone */}
         <div className="showcase-phone relative md:hidden flex items-center justify-center">
           <div
             className="phone-frame relative w-[40vw] max-w-[185px] aspect-[9/18.5] rounded-[1.9rem]"
@@ -204,6 +207,7 @@ function ShowcaseVisual({
                 $49.99
               </div>
             </div>
+
             <div className="absolute top-2 left-1/2 -translate-x-1/2 w-10 h-1.5 rounded-full bg-[#2E2E38]" />
           </div>
         </div>
@@ -211,7 +215,6 @@ function ShowcaseVisual({
     );
   }
 
-  // Panel 01: character silhouette.
   if (item.number === "01") {
     return (
       <div className="showcase-visual relative flex items-center justify-center">
@@ -234,7 +237,6 @@ function ShowcaseVisual({
     );
   }
 
-  // Panel 03: store / browser mockup, layered media.
   return (
     <div className="showcase-visual relative flex items-center justify-center">
       <div className="relative" style={{ perspective: "1200px" }}>
@@ -263,6 +265,7 @@ function ShowcaseVisual({
               shinobistore.com
             </span>
           </div>
+
           <div className="relative h-[38vw] md:h-[14vw] max-h-[180px] overflow-hidden">
             <img
               src="/sky.webp"
@@ -274,6 +277,7 @@ function ShowcaseVisual({
               SHINOBI STORE
             </div>
           </div>
+
           <div className="showcase-thumbs grid grid-cols-3 gap-2 p-3">
             {item.thumbs?.map((thumb) => (
               <div
@@ -289,6 +293,7 @@ function ShowcaseVisual({
             ))}
           </div>
         </div>
+
         <div
           className="showcase-floating absolute -bottom-8 -right-6 w-[24vw] md:w-[11vw] max-w-[160px] aspect-[3/4] rounded-lg overflow-hidden border"
           style={{
@@ -310,8 +315,12 @@ function ShowcaseVisual({
 
 export default function ShinobiAfterMadaraSection() {
   const sectionRef = useRef<HTMLElement>(null);
+
   const quoteSectionRef = useRef<HTMLDivElement>(null);
+  const quotePinRef = useRef<HTMLDivElement>(null);
+  const quoteTextRef = useRef<HTMLHeadingElement>(null);
   const attributionRef = useRef<HTMLDivElement>(null);
+
   const horizontalRef = useRef<HTMLDivElement>(null);
   const pinRef = useRef<HTMLDivElement>(null);
 
@@ -319,11 +328,8 @@ export default function ShinobiAfterMadaraSection() {
     () => {
       const section = sectionRef.current;
       const quoteSection = quoteSectionRef.current;
-      const chars = quoteSection
-        ? Array.from(
-            quoteSection.querySelectorAll<HTMLSpanElement>(".quote-char")
-          )
-        : [];
+      const quotePin = quotePinRef.current;
+      const quoteText = quoteTextRef.current;
       const attribution = attributionRef.current;
       const pin = pinRef.current;
       const track = horizontalRef.current;
@@ -332,10 +338,22 @@ export default function ShinobiAfterMadaraSection() {
 
       const mm = gsap.matchMedia();
 
-      // ─── Quote: scroll-driven staggered letter reveal ───
-      if (quoteSection && chars.length && attribution) {
+      // ------------------------------------------------------------
+      // QUOTE
+      // quoteSection controls when the scene enters.
+      // quotePin is the ONLY pinned element.
+      // ------------------------------------------------------------
+      if (quoteSection && quotePin && quoteText) {
+        const chars = Array.from(
+          quoteText.querySelectorAll<HTMLSpanElement>(".quote-char")
+        );
+
         mm.add("(prefers-reduced-motion: reduce)", () => {
           gsap.set(chars, { clearProps: "all" });
+
+          if (attribution) {
+            gsap.set(attribution, { clearProps: "all" });
+          }
         });
 
         mm.add("(prefers-reduced-motion: no-preference)", () => {
@@ -347,27 +365,57 @@ export default function ShinobiAfterMadaraSection() {
             filter: "blur(8px)",
             color: "#3A3A40",
           });
-            gsap.set(attribution, { opacity: 0, y: 20 });
 
-            const tl = gsap.timeline({
-              defaults: { ease: "power3.out" },
-              scrollTrigger: {
-                trigger: quoteSection,
-                start: "top 75%",
-                end: "bottom 30%",
-                scrub: 0.8,
-              },
+          if (attribution) {
+            gsap.set(attribution, {
+              opacity: 0,
+              y: 20,
             });
+          }
 
-            tl.to(chars, {
-              opacity: 1,
-              yPercent: 0,
-              rotationX: 0,
-              filter: "blur(0px)",
-              color: "#F5E6C8",
-              stagger: 0.035,
-              duration: 0.5,
-            }).to(
+          const isMobile = window.matchMedia(
+            "(max-width: 767px)"
+          ).matches;
+
+          const scrollDistance = isMobile ? 1200 : 1800;
+          const CHARACTER_OFFSET = 0.065;
+
+          const tl = gsap.timeline({
+            defaults: {
+              ease: "power3.out",
+            },
+            scrollTrigger: {
+              trigger: quoteSection,
+              pin: quotePin,
+              start: "top top",
+              end: () => `+=${scrollDistance}`,
+              scrub: 1,
+              pinSpacing: true,
+              anticipatePin: 1,
+              pinReparent: true,
+              invalidateOnRefresh: true,
+              refreshPriority: -2,
+            },
+          });
+
+          chars.forEach((char, index) => {
+            tl.to(
+              char,
+              {
+                opacity: 1,
+                yPercent: 0,
+                rotationX: 0,
+                filter: "blur(0px)",
+                color: "#F5E6C8",
+                duration: 0.7,
+                ease: "power3.out",
+              },
+              index * CHARACTER_OFFSET
+            );
+          });
+
+          if (attribution) {
+            tl.to(
               attribution,
               {
                 opacity: 1,
@@ -375,12 +423,15 @@ export default function ShinobiAfterMadaraSection() {
                 duration: 0.5,
                 ease: "power2.out",
               },
-              "+=0.55"
+              "+=0.15"
             );
+          }
         });
       }
 
-      // ─── Horizontal showcase (pinned on all sizes) ───
+      // ------------------------------------------------------------
+      // HORIZONTAL SHOWCASE
+      // ------------------------------------------------------------
       if (pin && track) {
         mm.add(
           {
@@ -395,16 +446,14 @@ export default function ShinobiAfterMadaraSection() {
               reduce: boolean;
             };
 
-            if (reduce) {
-              // Reduced motion: CSS stacks panels vertically, everything static.
-              return;
-            }
+            if (reduce) return;
 
             const panels = Array.from(
               pin.querySelectorAll<HTMLElement>(".showcase-panel")
             );
 
-            const getDistance = () => track.scrollWidth - window.innerWidth;
+            const getDistance = () =>
+              Math.max(0, track.scrollWidth - window.innerWidth);
 
             const tween = gsap.to(track, {
               x: () => -getDistance(),
@@ -453,11 +502,11 @@ export default function ShinobiAfterMadaraSection() {
                 },
               };
 
-              // Editorial micro-reveal: number → title → description → CTA.
               const tl = gsap.timeline({
                 ...reveal,
                 defaults: { ease: "power3.out" },
               });
+
               if (number) {
                 tl.fromTo(
                   number,
@@ -466,6 +515,7 @@ export default function ShinobiAfterMadaraSection() {
                   0
                 );
               }
+
               if (title) {
                 tl.fromTo(
                   title,
@@ -474,6 +524,7 @@ export default function ShinobiAfterMadaraSection() {
                   0.1
                 );
               }
+
               if (desc) {
                 tl.fromTo(
                   desc,
@@ -482,6 +533,7 @@ export default function ShinobiAfterMadaraSection() {
                   0.2
                 );
               }
+
               if (cta) {
                 tl.fromTo(
                   cta,
@@ -498,16 +550,19 @@ export default function ShinobiAfterMadaraSection() {
                   const from = isMockup
                     ? { scale: 0.96, rotateY: 5, y: 30, opacity: 0.7 }
                     : { opacity: 0.6, scale: 0.94, x: 50, rotation: 2 };
+
                   const to = isMockup
                     ? { scale: 1, rotateY: 0, y: 0, opacity: 1 }
                     : { opacity: 1, scale: 1, x: 0, rotation: 0 };
+
                   gsap.fromTo(visual, from, {
                     ...to,
                     ease: "power2.out",
                     ...reveal,
                   });
                 }
-                if (floating) {
+
+                if (floating && thumbs) {
                   gsap.fromTo(
                     thumbs,
                     { x: 14 },
@@ -537,6 +592,7 @@ export default function ShinobiAfterMadaraSection() {
                       ...reveal,
                     }
                   );
+
                   gsap.fromTo(
                     phone,
                     { x: 14, rotation: 2 },
@@ -557,33 +613,53 @@ export default function ShinobiAfterMadaraSection() {
                   gsap.fromTo(
                     visual,
                     { opacity: 0.7, scale: 0.95, x: 30 },
-                    { opacity: 1, scale: 1, x: 0, ease: "power2.out", ...reveal }
+                    {
+                      opacity: 1,
+                      scale: 1,
+                      x: 0,
+                      ease: "power2.out",
+                      ...reveal,
+                    }
                   );
                 }
               }
 
-              // Final panel eases out as the horizontal motion ends.
               if (index === panels.length - 1) {
-                gsap.fromTo(
-                  panel.querySelector<HTMLElement>(".showcase-content"),
-                  { opacity: 1 },
-                  {
-                    opacity: 0.9,
-                    ease: "none",
-                    scrollTrigger: {
-                      containerAnimation: tween,
-                      trigger: panel,
-                      start: "left 45%",
-                      end: "left 0%",
-                      scrub: 0.8,
-                    },
-                  }
+                const content = panel.querySelector<HTMLElement>(
+                  ".showcase-content"
                 );
+
+                if (content) {
+                  gsap.fromTo(
+                    content,
+                    { opacity: 1 },
+                    {
+                      opacity: 0.9,
+                      ease: "none",
+                      scrollTrigger: {
+                        containerAnimation: tween,
+                        trigger: panel,
+                        start: "left 45%",
+                        end: "left 0%",
+                        scrub: 0.8,
+                      },
+                    }
+                  );
+                }
               }
             });
+
+            return () => {
+              tween.scrollTrigger?.kill();
+              tween.kill();
+            };
           }
         );
       }
+
+      return () => {
+        mm.revert();
+      };
     },
     { scope: sectionRef }
   );
@@ -591,60 +667,75 @@ export default function ShinobiAfterMadaraSection() {
   return (
     <section
       ref={sectionRef}
-      className="relative w-full bg-[#101014] overflow-hidden"
+      className="relative w-full overflow-hidden bg-[#101014]"
     >
-      {/* ─── PHASE 1 + 2 — Marquee stack (breathing gap after Madara) ─── */}
+      {/* Marquees */}
       <div className="pt-[clamp(96px,12vh,180px)]">
         {MARQUEE_ROWS.map((row) => (
           <MarqueeRow key={row.text} row={row} />
         ))}
       </div>
 
-      {/* ─── PHASE 3 — Itachi quote ─── */}
+      {/* Quote */}
       <div
         ref={quoteSectionRef}
-        className="mx-auto max-w-[1300px] px-6 flex flex-col items-center justify-center text-center min-h-[70svh] md:min-h-[80svh] mt-[clamp(140px,18vh,280px)]"
+        className="relative mt-[clamp(140px,18vh,280px)] min-h-[100svh] w-full"
       >
-        <h2
-          className="font-anton uppercase leading-[0.88] tracking-[0.02em] text-[clamp(34px,10vw,68px)] md:text-[clamp(52px,6.5vw,120px)]"
-          style={{ color: "#F5E6C8" }}
-        >
-          {QUOTE_CHARS.map((char, index) => (
-            <span key={index} className="inline-block overflow-hidden">
-              <span
-                className="quote-char inline-block will-change-transform"
-                style={{ color: "#F5E6C8" }}
-              >
-                {char === " " ? "\u00A0" : char}
-              </span>
-            </span>
-          ))}
-        </h2>
-
         <div
-          ref={attributionRef}
-          className="flex flex-col items-center mt-9 md:mt-12"
+          ref={quotePinRef}
+          className="relative flex min-h-[100svh] w-full items-center justify-center overflow-hidden px-6 text-center"
         >
-          <span
-            className="font-inter text-sm md:text-base tracking-[0.18em] uppercase"
-            style={{ color: "rgba(245,230,200,0.58)" }}
-          >
-            <span style={{ color: "#FF5A2A" }}>—</span> ITACHI UCHIHA
-          </span>
-          <span
-            className="mt-3 h-[2px] w-16 md:w-24"
-            style={{
-              background:
-                "linear-gradient(90deg, transparent, #FF5A2A, transparent)",
-            }}
-          />
+          <div className="w-full max-w-[1300px]">
+            <h2
+              ref={quoteTextRef}
+              className="font-anton text-[clamp(34px,10vw,68px)] uppercase leading-[0.88] tracking-[0.02em] md:text-[clamp(52px,6.5vw,120px)]"
+              style={{ color: "#F5E6C8" }}
+            >
+              {QUOTE_CHARS.map((char, index) => (
+                <span key={index} className="inline-block overflow-hidden">
+                  <span
+                    className="quote-char inline-block will-change-transform"
+                    style={{ color: "#F5E6C8" }}
+                  >
+                    {char === " " ? "\u00A0" : char}
+                  </span>
+                </span>
+              ))}
+            </h2>
+
+            <div
+              ref={attributionRef}
+              className="mt-9 flex flex-col items-center md:mt-12"
+            >
+              <span
+                className="font-inter text-sm uppercase tracking-[0.18em] md:text-base"
+                style={{ color: "rgba(245,230,200,0.58)" }}
+              >
+                <span style={{ color: "#FF5A2A" }}>—</span> ITACHI UCHIHA
+              </span>
+
+              <span
+                className="mt-3 h-[2px] w-16 md:w-24"
+                style={{
+                  background:
+                    "linear-gradient(90deg, transparent, #FF5A2A, transparent)",
+                }}
+              />
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* ─── PHASE 4 — Editorial horizontal showcase ─── */}
+      {/* Large cinematic breathing space before the next animated section */}
+      <div
+        aria-hidden="true"
+        className="h-[800px] sm:h-[950px] lg:h-[1200px] xl:h-[1400px] 2xl:h-[1500px] shrink-0"
+      />
+
+      {/* Horizontal showcase */}
       <div
         ref={pinRef}
-        className="shinobi-horizontal-stage relative flex items-center overflow-hidden min-h-[100svh] border-y border-[#F5E6C8]/10"
+        className="shinobi-horizontal-stage relative flex min-h-[100svh] items-center overflow-hidden border-y border-[#F5E6C8]/10"
         style={{
           backgroundImage:
             "repeating-linear-gradient(135deg, rgba(245,230,200,0.035) 0 1px, transparent 1px 42px)",
@@ -652,64 +743,67 @@ export default function ShinobiAfterMadaraSection() {
       >
         <div
           ref={horizontalRef}
-          className="shinobi-horizontal-track flex flex-row w-max items-center will-change-transform"
+          className="shinobi-horizontal-track flex w-max flex-row items-center will-change-transform"
         >
           {SHOWCASE_ITEMS.map((item, index) => (
             <article
               key={item.number}
-              className={`showcase-panel shinobi-horizontal-panel relative flex flex-col md:flex-row w-screen h-[80svh] md:h-[76svh] xl:h-[72svh] overflow-hidden ${
+              className={`showcase-panel shinobi-horizontal-panel relative flex h-[80svh] w-screen flex-col overflow-hidden md:h-[76svh] md:flex-row xl:h-[72svh] ${
                 index < SHOWCASE_ITEMS.length - 1
-                  ? "border-b md:border-b-0 md:border-r border-[#F5E6C8]/10"
+                  ? "border-b border-[#F5E6C8]/10 md:border-b-0 md:border-r"
                   : ""
               }`}
               style={{ perspective: "1200px" }}
             >
-              <div className="mx-auto w-full max-w-[1920px] px-4 md:px-10 lg:px-12 xl:px-[72px] flex flex-col md:flex-row md:items-center justify-between gap-10 md:gap-0 py-10 md:py-0 h-full">
-                {/* Text column — title dominates the left */}
-                <div className="showcase-content relative md:w-[55%] flex flex-col justify-center z-[1]">
+              <div className="mx-auto flex h-full w-full max-w-[1920px] flex-col justify-between gap-10 px-4 py-10 md:flex-row md:items-center md:gap-0 md:px-10 md:py-0 lg:px-12 xl:px-[72px]">
+                <div className="showcase-content relative z-[1] flex flex-col justify-center md:w-[55%]">
                   <div
-                    className="showcase-number pointer-events-none select-none absolute bottom-0 right-0 md:bottom-[-3%] font-anton leading-none text-[26vw] md:text-[16vw]"
+                    className="showcase-number pointer-events-none absolute bottom-0 right-0 select-none font-anton text-[26vw] leading-none md:bottom-[-3%] md:text-[16vw]"
                     style={{ color: "#8B1A1A", opacity: 0 }}
                     aria-hidden="true"
                   >
                     {item.number}
                   </div>
+
                   <h3
-                    className="showcase-title relative font-anton uppercase leading-[0.95] tracking-[0.02em] text-[clamp(46px,11.5vw,84px)] md:text-[5vw]"
+                    className="showcase-title relative font-anton text-[clamp(46px,11.5vw,84px)] uppercase leading-[0.95] tracking-[0.02em] md:text-[5vw]"
                     style={{ color: "#F5E6C8" }}
                   >
                     {item.title}
                   </h3>
+
                   <p
-                    className="showcase-desc relative font-inter text-sm md:text-lg mt-4 md:mt-6 max-w-md"
+                    className="showcase-desc relative mt-4 max-w-md font-inter text-sm md:mt-6 md:text-lg"
                     style={{ color: "rgba(245,230,200,0.60)" }}
                   >
                     {item.description}
                   </p>
+
                   <div
-                    className="showcase-cta relative mt-7 md:mt-10 flex items-center gap-3"
+                    className="showcase-cta relative mt-7 flex items-center gap-3 md:mt-10"
                     style={{ color: "#FF5A2A" }}
                   >
                     <span className="font-anton text-sm tracking-[0.25em]">
                       EXPLORE
                     </span>
+
                     <svg
-                      className="w-6 h-6"
+                      className="h-6 w-6"
                       viewBox="0 0 24 24"
                       fill="none"
                       stroke="currentColor"
                       strokeWidth="2"
                       strokeLinecap="round"
                       strokeLinejoin="round"
+                      aria-hidden="true"
                     >
                       <path d="M5 12h14M12 5l7 7-7 7" />
                     </svg>
                   </div>
                 </div>
 
-                {/* Visual column — artwork on the right */}
                 <div
-                  className={`relative flex items-center justify-center md:justify-end md:w-[45%] ${
+                  className={`relative flex items-center justify-center md:w-[45%] md:justify-end ${
                     item.number !== "02" ? "md:-mr-14" : ""
                   }`}
                 >
@@ -721,7 +815,6 @@ export default function ShinobiAfterMadaraSection() {
         </div>
       </div>
 
-      {/* ─── Closing transition — release into normal content ─── */}
       <div className="h-24 md:h-36" />
     </section>
   );
