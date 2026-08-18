@@ -585,7 +585,7 @@ export default function ShinobiAfterMadaraSection() {
               <div ref={attributionRef} className="mt-9 flex flex-col items-center md:mt-12">
                 <span className="font-inter text-sm uppercase tracking-[0.18em] md:text-base"
                   style={{ color: "rgba(245,230,200,0.58)" }}>
-                  <span style={{ color: "#FF5A2A" }}>\u2014</span> ITACHI UCHIHA
+                  ITACHI UCHIHA
                 </span>
                 <span className="mt-3 h-[2px] w-16 md:w-24"
                   style={{ background: "linear-gradient(90deg, transparent, #FF5A2A, transparent)" }} />
