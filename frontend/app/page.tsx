@@ -18,46 +18,89 @@ gsap.registerPlugin(ScrollTrigger);
 
 export default function Home() {
   useGSAP(() => {
-    const tl = gsap.timeline({ delay: 0.2 });
-    tl.from('.naruto1-character', { x: 200, opacity: 0, duration: 1.2, ease: 'power3.out' }, '-=1');
+    const mm = gsap.matchMedia();
 
-    // Naruto1 float
-    gsap.to('.naruto1-character', {
-      y: -10,
-      duration: 2,
-      repeat: -1,
-      yoyo: true,
-      ease: 'sine.inOut',
-    });
+    mm.add('(min-width: 768px)', () => {
+      const tl = gsap.timeline({ delay: 0.2 });
+      tl.from('.naruto1-character', { x: 200, opacity: 0, duration: 1.2, ease: 'power3.out' }, '-=1');
 
-    // Sakura petals fall
-    gsap.utils.toArray('.petal').forEach((petal: any) => {
-      gsap.to(petal, {
-        y: '100vh',
-        x: gsap.utils.random(-100, 100),
-        rotation: gsap.utils.random(0, 360),
-        duration: gsap.utils.random(4, 8),
+      gsap.to('.naruto1-character', {
+        y: -10,
+        duration: 2,
         repeat: -1,
-        delay: gsap.utils.random(0, 5),
-        ease: 'none',
+        yoyo: true,
+        ease: 'sine.inOut',
+      });
+
+      gsap.utils.toArray('.petal').forEach((petal: any) => {
+        gsap.to(petal, {
+          y: '100vh',
+          x: gsap.utils.random(-100, 100),
+          rotation: gsap.utils.random(0, 360),
+          duration: gsap.utils.random(4, 8),
+          repeat: -1,
+          delay: gsap.utils.random(0, 5),
+          ease: 'none',
+        });
+      });
+
+      gsap.to('#hero-logo', {
+        scrollTrigger: {
+          trigger: 'section',
+          start: 'top top',
+          end: '+=100%',
+          scrub: 1.5,
+        },
+        position: 'fixed',
+        top: '60px',
+        left: '20px',
+        width: '300px',
+        scale: 1.5,
+        ease: 'power2.inOut',
       });
     });
 
-    // Logo animation from hero to fixed corner position
-    gsap.to('#hero-logo', {
-      scrollTrigger: {
-        trigger: 'section',
-        start: 'top top',
-        end: '+=100%',
-        scrub: 1.5,
-      },
-      position: 'fixed',
-      top: '60px',
-      left: '20px',
-      width: '300px',
-      scale: 1.5,
-      ease: 'power2.inOut',
+    mm.add('(max-width: 767px)', () => {
+      const tl = gsap.timeline({ delay: 0.2 });
+      tl.from('.naruto1-character', { x: 100, opacity: 0, duration: 1, ease: 'power3.out' }, '-=1');
+
+      gsap.to('.naruto1-character', {
+        y: -6,
+        duration: 2.5,
+        repeat: -1,
+        yoyo: true,
+        ease: 'sine.inOut',
+      });
+
+      gsap.utils.toArray('.petal').forEach((petal: any) => {
+        gsap.to(petal, {
+          y: '100vh',
+          x: gsap.utils.random(-40, 40),
+          rotation: gsap.utils.random(0, 360),
+          duration: gsap.utils.random(5, 9),
+          repeat: -1,
+          delay: gsap.utils.random(0, 5),
+          ease: 'none',
+        });
+      });
+
+      gsap.to('#hero-logo', {
+        scrollTrigger: {
+          trigger: 'section',
+          start: 'top top',
+          end: '+=100%',
+          scrub: 1.5,
+        },
+        position: 'fixed',
+        top: '20px',
+        left: '10px',
+        width: '160px',
+        scale: 1,
+        ease: 'power2.inOut',
+      });
     });
+
+    return () => mm.revert();
   }, []);
 
   return (
@@ -142,10 +185,10 @@ export default function Home() {
         </div>
 
         <div className="relative z-10 container mx-auto px-6 h-full flex items-center">
-          <div id="hero-logo" className="w-1/2 absolute top-10 left-[-50px]">
+          <div id="hero-logo" className="w-[60%] md:w-1/2 absolute top-4 left-[-20px] md:top-10 md:left-[-50px]">
             <ShinobiLogo />
           </div>
-          <div className="w-1/2 h-[150vh] absolute right-50 top-25">
+          <div className="w-[70%] md:w-1/2 h-[120vh] md:h-[150vh] absolute right-4 top-10 md:right-50 md:top-25">
             <Naruto1 />
           </div>
         </div>

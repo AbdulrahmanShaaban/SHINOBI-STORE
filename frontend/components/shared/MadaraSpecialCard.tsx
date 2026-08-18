@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useState, useEffect } from "react";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -8,6 +8,21 @@ import Link from "next/link";
 import { useCartStore } from "./Cart";
 
 gsap.registerPlugin(ScrollTrigger);
+
+const MOBILE_SAND_COUNT = 16;
+const MOBILE_DUST_COUNT = 20;
+
+function useIsMobile() {
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const mql = window.matchMedia("(max-width: 767px)");
+    setIsMobile(mql.matches);
+    const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches);
+    mql.addEventListener("change", handler);
+    return () => mql.removeEventListener("change", handler);
+  }, []);
+  return isMobile;
+}
 
 const SAND_ORBIT_COUNT = 42;
 
@@ -66,6 +81,7 @@ export default function MadaraSpecialCard({
   sixPathsImg = "/madara-six-paths.png",
   sandImg = "/sand.png",
 }: MadaraSpecialCardProps) {
+  const isMobile = useIsMobile();
   const sectionRef = useRef<HTMLElement>(null);
   const titleRef = useRef<HTMLDivElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
@@ -649,7 +665,7 @@ export default function MadaraSpecialCard({
 
           <div
             ref={dustRef}
-            className="pointer-events-none absolute bottom-[-2%] left-1/2 z-[55] h-[210px] w-[min(900px,115%)] -translate-x-1/2 overflow-visible"
+            className="pointer-events-none absolute bottom-[-2%] left-1/2 z-[55] h-[min(210px,30vh)] w-[min(900px,115%)] -translate-x-1/2 overflow-visible"
             style={{ opacity: 0, transformOrigin: "50% 88%" }}
             aria-hidden="true"
           >
@@ -671,6 +687,7 @@ export default function MadaraSpecialCard({
                           : "#d2ae6b",
                     filter: i % 4 === 0 ? "blur(2px)" : "blur(.4px)",
                     transform: `rotate(${particle.rotate}deg)`,
+                    display: isMobile && i >= MOBILE_DUST_COUNT ? "none" : undefined,
                   }}
               />
             ))}
@@ -678,7 +695,7 @@ export default function MadaraSpecialCard({
 
           <div
             ref={dustFrontRef}
-            className="pointer-events-none absolute bottom-[-1%] left-1/2 z-[80] h-[190px] w-[min(900px,115%)] -translate-x-1/2"
+            className="pointer-events-none absolute bottom-[-1%] left-1/2 z-[80] h-[min(190px,28vh)] w-[min(900px,115%)] -translate-x-1/2"
             style={{ opacity: 0, transformOrigin: "50% 50%" }}
             aria-hidden="true"
           >
@@ -747,7 +764,6 @@ export default function MadaraSpecialCard({
               className="absolute inset-[8%] rounded-[48%]"
               style={{
                 opacity: 0,
-                transform: "scale(.78)",
                 background:
                   "radial-gradient(ellipse at 50% 62%, rgba(255,255,255,.92) 0%, rgba(243,234,255,.72) 14%, rgba(211,187,255,.48) 30%, rgba(164,111,255,.26) 52%, rgba(105,49,225,.10) 70%, transparent 86%)",
                 filter:
@@ -788,7 +804,6 @@ export default function MadaraSpecialCard({
                     background: flameShapes.background,
                     filter: `${flameShapes.blur} drop-shadow(0 0 14px rgba(143,92,255,.58))`,
                     opacity: 0,
-                    transform: `scale(${1 + index * 0.05}) rotate(${index === 0 ? -2 : index === 1 ? 3 : -4}deg)`,
                     transformOrigin: "50% 72%",
                     mixBlendMode: "screen",
                   }}
@@ -931,7 +946,7 @@ export default function MadaraSpecialCard({
            */}
           <div
             ref={coffinRef}
-            className="pointer-events-none absolute left-1/2 top-[-90px] z-[60] h-[calc(100%+180px)] w-[calc(100%+140px)] max-w-[840px] -translate-x-1/2"
+            className="pointer-events-none absolute left-1/2 top-[-40px] md:top-[-90px] z-[60] h-[calc(100%+80px)] md:h-[calc(100%+180px)] w-[calc(100%+80px)] md:w-[calc(100%+140px)] max-w-[840px] -translate-x-1/2"
             style={{ transformOrigin: "50% 100%" }}
             aria-hidden="true"
           >
@@ -1061,6 +1076,7 @@ export default function MadaraSpecialCard({
                   willChange: "transform, opacity",
                   filter: `blur(${config.blur}px) saturate(.82) sepia(.14)`,
                   mixBlendMode: "screen",
+                  display: isMobile && i >= MOBILE_SAND_COUNT ? "none" : undefined,
                 }}
               />
             ))}

@@ -156,3 +156,19 @@ body.custom-cursor-enabled * {
     min-height: auto !important;
   }
 }
+
+/* ─── Mobile showcase: native scroll-snap ─── */
+@media (max-width: 767px) {
+  .snap-x.snap-mandatory > div > .showcase-panel {
+    scroll-snap-align: start;
+  }
+
+  /* Hide scrollbar on mobile showcase */
+  .snap-x.snap-mandatory::-webkit-scrollbar {
+    display: none;
+  }
+  .snap-x.snap-mandatory {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}

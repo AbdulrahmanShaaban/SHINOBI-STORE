@@ -91,6 +91,9 @@ export default function Navbar() {
               <Link href="/contact" className="text-[#F0F0F0] font-cinzel hover:text-[#FF6B00] transition-colors">
                 Contact
               </Link>
+              <Link href="/cart" className="text-[#F0F0F0] font-cinzel hover:text-[#FF6B00] transition-colors">
+                Cart
+              </Link>
             </div>
           </div>
         )}

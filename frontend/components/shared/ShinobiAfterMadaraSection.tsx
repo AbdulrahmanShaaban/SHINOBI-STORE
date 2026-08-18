@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useRef } from "react";
+import { useRef, useState, useEffect } from "react";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -363,9 +363,22 @@ function CharacterPanel({ character }: { character: Character }) {
 const QUOTE = "THOSE WHO CANNOT ACKNOWLEDGE THEMSELVES WILL EVENTUALLY FAIL.";
 const QUOTE_CHARS = Array.from(QUOTE);
 
+function useIsMobile() {
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const mql = window.matchMedia("(max-width: 767px)");
+    setIsMobile(mql.matches);
+    const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches);
+    mql.addEventListener("change", handler);
+    return () => mql.removeEventListener("change", handler);
+  }, []);
+  return isMobile;
+}
+
 /* ---- Main ---- */
 
 export default function ShinobiAfterMadaraSection() {
+  const isMobile = useIsMobile();
   const sectionRef = useRef<HTMLElement>(null);
   const pinRef = useRef<HTMLDivElement>(null);
   const quoteTextRef = useRef<HTMLHeadingElement>(null);
@@ -375,6 +388,12 @@ export default function ShinobiAfterMadaraSection() {
   const stageRef = useRef<HTMLDivElement>(null);
   const trackWrapRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
+
+  // Mobile-only refs
+  const mobileQuotePinRef = useRef<HTMLDivElement>(null);
+  const mobileQuoteTextRef = useRef<HTMLHeadingElement>(null);
+  const mobileAttributionRef = useRef<HTMLDivElement>(null);
+  const mobileShowcaseTrackRef = useRef<HTMLDivElement>(null);
 
   useGSAP(
     () => {
@@ -393,11 +412,11 @@ export default function ShinobiAfterMadaraSection() {
 
       mm.add("(prefers-reduced-motion: reduce)", () => {
         const chars = quoteText.querySelectorAll<HTMLElement>(".quote-char");
-        gsap.set(chars, { clearProps: "all" });
-        if (attribution) gsap.set(attribution, { clearProps: "all" });
-        if (quoteWrap) gsap.set(quoteWrap, { clearProps: "all" });
-        if (showcaseHeading) gsap.set(showcaseHeading, { clearProps: "all" });
-        if (trackWrap) gsap.set(trackWrap, { clearProps: "all" });
+        gsap.set(chars, { opacity: 1, yPercent: 0, rotationX: 0, filter: "none", color: "#F5E6C8", clearProps: "transform,perspective" });
+        if (attribution) gsap.set(attribution, { opacity: 1, y: 0, clearProps: "transform" });
+        if (quoteWrap) gsap.set(quoteWrap, { opacity: 1, clearProps: "transform" });
+        if (showcaseHeading) gsap.set(showcaseHeading, { opacity: 0, clearProps: "transform" });
+        if (trackWrap) gsap.set(trackWrap, { opacity: 0, clearProps: "transform" });
       });
 
       mm.add("(prefers-reduced-motion: no-preference)", () => {
@@ -550,6 +569,138 @@ export default function ShinobiAfterMadaraSection() {
     { scope: sectionRef }
   );
 
+  // Mobile-only animations: quote pins independently, showcase uses native scroll-snap
+  useGSAP(
+    () => {
+      const quotePin = mobileQuotePinRef.current;
+      const quoteText = mobileQuoteTextRef.current;
+      const attribution = mobileAttributionRef.current;
+      const track = mobileShowcaseTrackRef.current;
+
+      if (!quotePin || !quoteText) return;
+
+      const mm = gsap.matchMedia();
+
+      mm.add("(max-width: 767px)", () => {
+        // Quote character reveal — pinned independently
+        const chars = Array.from(
+          quoteText.querySelectorAll<HTMLElement>(".quote-char")
+        );
+
+        gsap.set(chars, {
+          opacity: 0,
+          yPercent: 120,
+          rotationX: 70,
+          transformPerspective: 800,
+          filter: "blur(8px)",
+          color: "#3A3A40",
+        });
+        if (attribution) gsap.set(attribution, { opacity: 0, y: 20 });
+
+        const CHARACTER_OFFSET = 0.065;
+
+        const tl = gsap.timeline({
+          defaults: { ease: "power3.out" },
+          scrollTrigger: {
+            trigger: quotePin,
+            pin: quotePin,
+            start: "top top",
+            end: () => `+=${window.innerWidth < 768 ? 1200 : 1800}`,
+            scrub: 1,
+            pinSpacing: true,
+            anticipatePin: 1,
+            invalidateOnRefresh: true,
+          },
+        });
+
+        chars.forEach((char, index) => {
+          tl.to(
+            char,
+            {
+              opacity: 1,
+              yPercent: 0,
+              rotationX: 0,
+              filter: "blur(0px)",
+              color: "#F5E6C8",
+              duration: 0.7,
+              ease: "power3.out",
+            },
+            index * CHARACTER_OFFSET
+          );
+        });
+
+        if (attribution) {
+          tl.to(
+            attribution,
+            { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" },
+            "+=0.15"
+          );
+        }
+
+        // Showcase: native scroll-snap with IntersectionObserver for panel reveals
+        if (track) {
+          const panels = Array.from(
+            track.querySelectorAll<HTMLElement>(".showcase-panel")
+          );
+
+          const observer = new IntersectionObserver(
+            (entries) => {
+              entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                  const panel = entry.target as HTMLElement;
+                  const isIntro = panel.classList.contains("showcase-intro");
+                  const sel = (cls: string) => panel.querySelector<HTMLElement>(cls);
+                  const elements = isIntro
+                    ? {
+                        eyebrow: sel(".showcase-intro-eyebrow"),
+                        title: sel(".showcase-intro-title"),
+                        copy: sel(".showcase-intro-copy"),
+                        cta: sel(".showcase-intro-cta"),
+                        visual: sel(".showcase-intro-visual"),
+                      }
+                    : {
+                        eyebrow: sel(".showcase-eyebrow"),
+                        title: sel(".showcase-title"),
+                        copy: sel(".showcase-desc"),
+                        cta: sel(".showcase-cta"),
+                        visual: sel(".showcase-visual"),
+                      };
+
+                  const revealTl = gsap.timeline({ defaults: { ease: "power3.out" } });
+                  if (elements.eyebrow) {
+                    revealTl.fromTo(elements.eyebrow, { y: 18, opacity: 0 }, { y: 0, opacity: 1, duration: 0.45 }, 0);
+                  }
+                  if (elements.title) {
+                    revealTl.fromTo(elements.title, { y: 36, opacity: 0 }, { y: 0, opacity: 1, duration: 0.7 }, 0.05);
+                  }
+                  if (elements.copy) {
+                    revealTl.fromTo(elements.copy, { y: 22, opacity: 0 }, { y: 0, opacity: 0.82, duration: 0.55 }, 0.16);
+                  }
+                  if (elements.cta) {
+                    revealTl.fromTo(elements.cta, { y: 16, opacity: 0 }, { y: 0, opacity: 1, duration: 0.5 }, 0.28);
+                  }
+                  if (elements.visual) {
+                    revealTl.fromTo(elements.visual, { x: 42, opacity: 0.65, scale: 0.97 }, { x: 0, opacity: 1, scale: 1, duration: 0.8, ease: "power2.out" }, 0);
+                  }
+
+                  observer.unobserve(panel);
+                }
+              });
+            },
+            { threshold: 0.4 }
+          );
+
+          panels.forEach((panel) => observer.observe(panel));
+
+          return () => observer.disconnect();
+        }
+      });
+
+      return () => mm.revert();
+    },
+    { scope: sectionRef }
+  );
+
   return (
     <section ref={sectionRef} className="relative w-full overflow-hidden bg-[#101014]">
       {/* Marquees */}
@@ -559,59 +710,136 @@ export default function ShinobiAfterMadaraSection() {
         ))}
       </div>
 
-      {/* Single pinned container: quote + showcase */}
-      <div ref={stageRef} className="relative">
-        <div
-          ref={pinRef}
-          className="relative flex min-h-[100svh] w-full flex-col items-center justify-center overflow-hidden"
-        >
-          {/* Quote */}
-          <div ref={quoteWrapRef} className="absolute inset-0 z-20 flex items-center justify-center px-6 text-center">
-            <div className="w-full max-w-[1300px]">
-              <h2
-                ref={quoteTextRef}
-                className="font-anton text-[clamp(34px,10vw,68px)] uppercase leading-[0.88] tracking-[0.02em] md:text-[clamp(52px,6.5vw,120px)]"
-                style={{ color: "#F5E6C8" }}
-              >
-                {QUOTE_CHARS.map((char, index) => (
-                  <span key={index} className="inline-block overflow-hidden">
-                    <span className="quote-char inline-block will-change-transform" style={{ color: "#F5E6C8" }}>
-                      {char === " " ? "\u00A0" : char}
+      {/* Desktop: single pinned container (quote + showcase crossfade) */}
+      <div className="hidden md:block">
+        <div ref={stageRef} className="relative">
+          <div
+            ref={pinRef}
+            className="relative flex min-h-[100svh] w-full flex-col items-center justify-center overflow-hidden"
+          >
+            {/* Quote */}
+            <div ref={quoteWrapRef} className="absolute inset-0 z-20 flex items-center justify-center px-6 text-center">
+              <div className="w-full max-w-[1300px]">
+                <h2
+                  ref={quoteTextRef}
+                  className="font-anton text-[clamp(34px,10vw,68px)] uppercase leading-[0.88] tracking-[0.02em] md:text-[clamp(52px,6.5vw,120px)]"
+                  style={{ color: "#F5E6C8" }}
+                >
+                  {QUOTE_CHARS.map((char, index) => (
+                    <span key={index} className="inline-block overflow-hidden">
+                      <span className="quote-char inline-block will-change-transform" style={{ color: "#F5E6C8" }}>
+                        {char === " " ? "\u00A0" : char}
+                      </span>
                     </span>
-                  </span>
-                ))}
-              </h2>
+                  ))}
+                </h2>
 
-              <div ref={attributionRef} className="mt-9 flex flex-col items-center md:mt-12">
-                <span className="font-inter text-sm uppercase tracking-[0.18em] md:text-base"
-                  style={{ color: "rgba(245,230,200,0.58)" }}>
-                  ITACHI UCHIHA
-                </span>
-                <span className="mt-3 h-[2px] w-16 md:w-24"
-                  style={{ background: "linear-gradient(90deg, transparent, #FF5A2A, transparent)" }} />
+                <div ref={attributionRef} className="mt-9 flex flex-col items-center md:mt-12">
+                  <span className="font-inter text-sm uppercase tracking-[0.18em] md:text-base"
+                    style={{ color: "rgba(245,230,200,0.58)" }}>
+                    ITACHI UCHIHA
+                  </span>
+                  <span className="mt-3 h-[2px] w-16 md:w-24"
+                    style={{ background: "linear-gradient(90deg, transparent, #FF5A2A, transparent)" }} />
+                </div>
+              </div>
+            </div>
+
+            {/* Showcase heading (appears during crossfade) */}
+            <div ref={showcaseHeadingRef} className="absolute inset-0 z-10 flex items-center justify-center px-6 text-center" style={{ opacity: 0 }}>
+              <h2 className="font-anton text-[clamp(48px,7vw,112px)] uppercase leading-[0.86] tracking-[0.02em]"
+                style={{ color: "#F5E6C8" }}>
+                THE ICONS
+              </h2>
+            </div>
+
+            {/* Horizontal showcase track — hidden until crossfade */}
+            <div ref={trackWrapRef} className="absolute inset-0 z-0 flex items-center overflow-hidden"
+              style={{
+                opacity: 0,
+                backgroundImage: "repeating-linear-gradient(135deg, rgba(245,230,200,0.035) 0 1px, transparent 1px 42px)",
+              }}>
+              <div ref={trackRef} className="flex w-max items-center gap-5 px-4 will-change-transform md:gap-8 md:px-10 xl:gap-10 xl:px-14">
+                <IntroPanel />
+                <CharacterPanel character={CHARACTERS[1]} />
+                <CharacterPanel character={CHARACTERS[2]} />
+                <div aria-hidden="true" className="h-1 w-[8vw] shrink-0" />
               </div>
             </div>
           </div>
+        </div>
+      </div>
 
-          {/* Showcase heading (appears during crossfade) */}
-          <div ref={showcaseHeadingRef} className="absolute inset-0 z-10 flex items-center justify-center px-6 text-center" style={{ opacity: 0 }}>
+      {/* Mobile: quote pins independently, showcase uses native scroll-snap */}
+      <div className="block md:hidden">
+        {/* Mobile quote — pinned independently */}
+        <div
+          ref={mobileQuotePinRef}
+          className="relative flex min-h-[100svh] w-full flex-col items-center justify-center overflow-hidden px-6 text-center"
+          style={{ background: "radial-gradient(ellipse at center, #101014 0%, #0A0A0F 100%)" }}
+        >
+          <div className="w-full max-w-[1300px]">
+            <h2
+              ref={mobileQuoteTextRef}
+              className="font-anton text-[clamp(34px,10vw,68px)] uppercase leading-[0.88] tracking-[0.02em]"
+              style={{ color: "#F5E6C8" }}
+            >
+              {QUOTE_CHARS.map((char, index) => (
+                <span key={index} className="inline-block overflow-hidden">
+                  <span className="quote-char inline-block will-change-transform" style={{ color: "#F5E6C8" }}>
+                    {char === " " ? "\u00A0" : char}
+                  </span>
+                </span>
+              ))}
+            </h2>
+
+            <div ref={mobileAttributionRef} className="mt-9 flex flex-col items-center">
+              <span className="font-inter text-sm uppercase tracking-[0.18em]"
+                style={{ color: "rgba(245,230,200,0.58)" }}>
+                ITACHI UCHIHA
+              </span>
+              <span className="mt-3 h-[2px] w-16"
+                style={{ background: "linear-gradient(90deg, transparent, #FF5A2A, transparent)" }} />
+            </div>
+          </div>
+        </div>
+
+        {/* Mobile showcase — native horizontal scroll-snap */}
+        <div className="relative w-full overflow-hidden bg-[#101014]">
+          <div className="px-6 pb-8 text-center">
             <h2 className="font-anton text-[clamp(48px,7vw,112px)] uppercase leading-[0.86] tracking-[0.02em]"
               style={{ color: "#F5E6C8" }}>
               THE ICONS
             </h2>
           </div>
 
-          {/* Horizontal showcase track — hidden until crossfade */}
-          <div ref={trackWrapRef} className="absolute inset-0 z-0 flex items-center overflow-hidden"
+          <div
+            className="flex snap-x snap-mandatory overflow-x-auto"
             style={{
-              opacity: 0,
+              scrollBehavior: "smooth",
+              WebkitOverflowScrolling: "touch",
               backgroundImage: "repeating-linear-gradient(135deg, rgba(245,230,200,0.035) 0 1px, transparent 1px 42px)",
-            }}>
-            <div ref={trackRef} className="flex w-max items-center gap-5 px-4 will-change-transform md:gap-8 md:px-10 xl:gap-10 xl:px-14">
+            }}
+          >
+            <div
+              ref={mobileShowcaseTrackRef}
+              className="flex w-max items-center gap-5 px-4 md:gap-8 md:px-10 xl:gap-10 xl:px-14"
+            >
               <IntroPanel />
               <CharacterPanel character={CHARACTERS[1]} />
               <CharacterPanel character={CHARACTERS[2]} />
               <div aria-hidden="true" className="h-1 w-[8vw] shrink-0" />
+            </div>
+          </div>
+
+          {/* Scroll hint */}
+          <div className="flex justify-center py-6">
+            <div className="flex items-center gap-2 font-anton text-[10px] uppercase tracking-[0.22em]"
+              style={{ color: "rgba(245,230,200,0.30)" }}>
+              <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M5 12h14M12 5l7 7-7 7" />
+              </svg>
+              SWIPE TO EXPLORE
             </div>
           </div>
         </div>
