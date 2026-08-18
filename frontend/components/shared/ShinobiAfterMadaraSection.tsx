@@ -428,13 +428,15 @@ export default function ShinobiAfterMadaraSection() {
           return Math.max(0, trackWidth - window.innerWidth);
         };
 
+        const SCROLL_SPEED_FACTOR = 2;
+
         const tl = gsap.timeline({
           defaults: { ease: "power3.out" },
           scrollTrigger: {
             trigger: stage,
             pin: pin,
             start: "top top",
-            end: () => `+=${getQuoteDistance() + getShowcaseDistance()}`,
+            end: () => `+=${getQuoteDistance() + getShowcaseDistance() * SCROLL_SPEED_FACTOR}`,
             scrub: 1,
             pinSpacing: true,
             anticipatePin: 1,
