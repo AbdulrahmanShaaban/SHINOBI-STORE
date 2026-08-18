@@ -5,7 +5,7 @@ import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Link from "next/link";
-import { useCartStore } from "./Cart";
+import { useCartStore } from "@/components/shared/Cart";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -77,7 +77,7 @@ interface MadaraSpecialCardProps {
 
 export default function MadaraSpecialCard({
   defaultImg = "/madara-default.png",
-  jutsuImg = "/madara-susanoo.png",
+  jutsuImg = "/madara-six-paths.png",
   sixPathsImg = "/madara-six-paths.png",
   sandImg = "/sand.png",
 }: MadaraSpecialCardProps) {
@@ -626,7 +626,7 @@ export default function MadaraSpecialCard({
   return (
     <section
       ref={sectionRef}
-      className="w-full py-12 md:py-16 min-h-[80vh] md:min-h-[90vh] mb-16 md:mb-20 flex flex-col items-center"
+      className="w-full py-12 md:py-16 min-h-[80vh] md:min-h-[90vh] flex flex-col items-center"
     >
       <div className="w-full max-w-[1900px] px-4 md:px-6 lg:px-8">
         <div ref={titleRef} className="flex justify-center mb-10 md:mb-14">
@@ -892,8 +892,8 @@ export default function MadaraSpecialCard({
                   />
                 </div>
               </div>
-              <div className="w-full p-6 md:p-8 lg:p-10 pt-4 md:pt-5 pb-12 lg:pb-14 mt-auto">
-                <div className="flex gap-3 md:gap-4 mx-4 md:mx-6 lg:mx-8">
+              <div className="w-full p-4 sm:p-6 md:p-8 lg:p-10 pt-4 md:pt-5 pb-8 sm:pb-12 lg:pb-14 mt-auto">
+                <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 md:gap-4 mx-0 sm:mx-4 md:mx-6 lg:mx-8">
                   <button
                     onClick={() =>
                       addItem({
@@ -904,17 +904,17 @@ export default function MadaraSpecialCard({
                         image: defaultImg,
                       })
                     }
-                    className="flex-1 h-[64px] md:h-[68px] lg:h-[72px] px-8 md:px-10 lg:px-12 rounded-lg font-cinzel font-bold text-[15px] md:text-[16px] flex items-center justify-between transition-all hover:brightness-110 active:scale-[0.97]"
+                    className="flex-1 h-[52px] sm:h-[64px] md:h-[68px] lg:h-[72px] px-4 sm:px-8 md:px-10 lg:px-12 rounded-lg font-cinzel font-bold text-[13px] sm:text-[15px] md:text-[16px] flex items-center justify-between transition-all hover:brightness-110 active:scale-[0.97]"
                     style={{ backgroundColor: "#F4E9D3", color: "#1A1A1A" }}
                   >
                     <span>ADD TO CART</span>
-                    <span className="font-inter text-[13px] md:text-[14px] font-semibold">
+                    <span className="font-inter text-[12px] sm:text-[13px] md:text-[14px] font-semibold">
                       $49.99
                     </span>
                   </button>
                   <Link
                     href="/product/madara"
-                    className="flex-1 h-[64px] md:h-[68px] lg:h-[72px] px-8 md:px-10 lg:px-12 rounded-lg font-cinzel font-bold text-[15px] md:text-[16px] flex items-center justify-between transition-all hover:brightness-110 active:scale-[0.97]"
+                    className="flex-1 h-[52px] sm:h-[64px] md:h-[68px] lg:h-[72px] px-4 sm:px-8 md:px-10 lg:px-12 rounded-lg font-cinzel font-bold text-[13px] sm:text-[15px] md:text-[16px] flex items-center justify-between transition-all hover:brightness-110 active:scale-[0.97]"
                     style={{
                       backgroundColor: "transparent",
                       color: "white",
@@ -923,7 +923,7 @@ export default function MadaraSpecialCard({
                   >
                     <span>VIEW PRODUCT</span>
                     <svg
-                      className="w-6 h-6 flex-shrink-0"
+                      className="w-5 h-5 sm:w-6 sm:h-6 flex-shrink-0"
                       viewBox="0 0 24 24"
                       fill="none"
                       stroke="white"

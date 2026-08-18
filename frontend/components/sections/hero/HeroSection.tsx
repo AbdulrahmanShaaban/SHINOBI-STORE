@@ -1,0 +1,180 @@
+'use client';
+
+import { useGSAP } from '@gsap/react';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import ShinobiLogo from '@/components/shared/ShinobiLogo';
+import Naruto1 from '@/components/sections/hero/NarutoHeroImage';
+import SlidingImage from '@/components/sections/hero/SlidingImage';
+
+gsap.registerPlugin(ScrollTrigger);
+
+export default function HeroSection() {
+  useGSAP(() => {
+    const mm = gsap.matchMedia();
+
+    mm.add('(min-width: 768px)', () => {
+      const tl = gsap.timeline({ delay: 0.2 });
+      tl.from('.naruto1-character', { x: 200, opacity: 0, duration: 1.2, ease: 'power3.out' }, '-=1');
+
+      gsap.to('.naruto1-character', {
+        y: -10,
+        duration: 2,
+        repeat: -1,
+        yoyo: true,
+        ease: 'sine.inOut',
+      });
+
+      gsap.utils.toArray('.petal').forEach((petal: any) => {
+        gsap.to(petal, {
+          y: '100vh',
+          x: gsap.utils.random(-100, 100),
+          rotation: gsap.utils.random(0, 360),
+          duration: gsap.utils.random(4, 8),
+          repeat: -1,
+          delay: gsap.utils.random(0, 5),
+          ease: 'none',
+        });
+      });
+
+      gsap.to('#hero-logo', {
+        scrollTrigger: {
+          trigger: 'section',
+          start: 'top top',
+          end: '+=100%',
+          scrub: 1.5,
+        },
+        position: 'fixed',
+        top: '60px',
+        left: '20px',
+        width: '300px',
+        scale: 1.5,
+        ease: 'power2.inOut',
+      });
+    });
+
+    mm.add('(max-width: 767px)', () => {
+      const tl = gsap.timeline({ delay: 0.2 });
+      tl.from('.naruto1-character', { x: 100, opacity: 0, duration: 1, ease: 'power3.out' }, '-=1');
+
+      gsap.to('.naruto1-character', {
+        y: -6,
+        duration: 2.5,
+        repeat: -1,
+        yoyo: true,
+        ease: 'sine.inOut',
+      });
+
+      gsap.utils.toArray('.petal').forEach((petal: any) => {
+        gsap.to(petal, {
+          y: '100vh',
+          x: gsap.utils.random(-40, 40),
+          rotation: gsap.utils.random(0, 360),
+          duration: gsap.utils.random(5, 9),
+          repeat: -1,
+          delay: gsap.utils.random(0, 5),
+          ease: 'none',
+        });
+      });
+
+      gsap.to('#hero-logo', {
+        scrollTrigger: {
+          trigger: 'section',
+          start: 'top top',
+          end: '+=100%',
+          scrub: 1.5,
+        },
+        position: 'fixed',
+        top: '20px',
+        left: '10px',
+        width: '160px',
+        scale: 1,
+        ease: 'power2.inOut',
+      });
+    });
+
+    return () => mm.revert();
+  }, []);
+
+  return (
+    <section className="relative min-h-[100svh] h-screen overflow-hidden">
+      {/* Background sky */}
+      <img
+        src="/sky.webp"
+        alt="Sky"
+        className="absolute z-0 inset-0 w-full h-full object-cover"
+      />
+
+      {/* Mountain */}
+      <img
+        src="/mountain.webp"
+        alt="Mountain"
+        className="absolute z-5 inset-0 w-full h-full object-cover"
+      />
+
+      {/* Sakura petals */}
+      <div className="absolute z-5 inset-0 pointer-events-none">
+        <svg className="petal absolute w-3 h-3 md:w-4 md:h-4" style={{ left: '10%', top: '5%' }} viewBox="0 0 20 20">
+          <path d="M10 0 C15 5 15 15 10 20 C5 15 5 5 10 0" fill="#FFB7C5" opacity="1" />
+        </svg>
+        <svg className="petal absolute w-3 h-3 md:w-4 md:h-4" style={{ left: '22%', top: '15%' }} viewBox="0 0 20 20">
+          <path d="M10 0 C15 5 15 15 10 20 C5 15 5 5 10 0" fill="#FFB7C5" opacity="1" />
+        </svg>
+        <svg className="petal absolute w-3 h-3 md:w-4 md:h-4" style={{ left: '34%', top: '8%' }} viewBox="0 0 20 20">
+          <path d="M10 0 C15 5 15 15 10 20 C5 15 5 5 10 0" fill="#FFB7C5" opacity="1" />
+        </svg>
+        <svg className="petal absolute w-3 h-3 md:w-4 md:h-4" style={{ left: '46%', top: '12%' }} viewBox="0 0 20 20">
+          <path d="M10 0 C15 5 15 15 10 20 C5 15 5 5 10 0" fill="#FFB7C5" opacity="1" />
+        </svg>
+        <svg className="petal absolute w-3 h-3 md:w-4 md:h-4" style={{ left: '58%', top: '20%' }} viewBox="0 0 20 20">
+          <path d="M10 0 C15 5 15 15 10 20 C5 15 5 5 10 0" fill="#FFB7C5" opacity="1" />
+        </svg>
+        <svg className="petal absolute w-3 h-3 md:w-4 md:h-4" style={{ left: '70%', top: '10%' }} viewBox="0 0 20 20">
+          <path d="M10 0 C15 5 15 15 10 20 C5 15 5 5 10 0" fill="#FFB7C5" opacity="1" />
+        </svg>
+        <svg className="petal absolute w-3 h-3 md:w-4 md:h-4" style={{ left: '82%', top: '18%' }} viewBox="0 0 20 20">
+          <path d="M10 0 C15 5 15 15 10 20 C5 15 5 5 10 0" fill="#FFB7C5" opacity="1" />
+        </svg>
+        <svg className="petal absolute w-3 h-3 md:w-4 md:h-4" style={{ left: '94%', top: '7%' }} viewBox="0 0 20 20">
+          <path d="M10 0 C15 5 15 15 10 20 C5 15 5 5 10 0" fill="#FFB7C5" opacity="1" />
+        </svg>
+      </div>
+
+      {/* Clouds */}
+      <SlidingImage />
+
+      {/* Glowing particles */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute w-1 h-1 bg-[#FF6B00] rounded-full" style={{ left: '10%', top: '10%', opacity: 0.3 }} />
+        <div className="absolute w-1 h-1 bg-[#FF6B00] rounded-full" style={{ left: '20%', top: '30%', opacity: 0.4 }} />
+        <div className="absolute w-1 h-1 bg-[#FF6B00] rounded-full" style={{ left: '30%', top: '50%', opacity: 0.2 }} />
+        <div className="absolute w-1 h-1 bg-[#FF6B00] rounded-full" style={{ left: '40%', top: '20%', opacity: 0.5 }} />
+        <div className="absolute w-1 h-1 bg-[#FF6B00] rounded-full" style={{ left: '50%', top: '40%', opacity: 0.3 }} />
+        <div className="absolute w-1 h-1 bg-[#FF6B00] rounded-full" style={{ left: '60%', top: '60%', opacity: 0.4 }} />
+        <div className="absolute w-1 h-1 bg-[#FF6B00] rounded-full" style={{ left: '70%', top: '25%', opacity: 0.2 }} />
+        <div className="absolute w-1 h-1 bg-[#FF6B00] rounded-full" style={{ left: '80%', top: '45%', opacity: 0.5 }} />
+        <div className="absolute w-1 h-1 bg-[#FF6B00] rounded-full" style={{ left: '90%', top: '35%', opacity: 0.3 }} />
+        <div className="absolute w-1 h-1 bg-[#FF6B00] rounded-full" style={{ left: '15%', top: '70%', opacity: 0.4 }} />
+        <div className="absolute w-1 h-1 bg-[#FF6B00] rounded-full" style={{ left: '25%', top: '80%', opacity: 0.2 }} />
+        <div className="absolute w-1 h-1 bg-[#FF6B00] rounded-full" style={{ left: '35%', top: '15%', opacity: 0.5 }} />
+        <div className="absolute w-1 h-1 bg-[#FF6B00] rounded-full" style={{ left: '45%', top: '75%', opacity: 0.3 }} />
+        <div className="absolute w-1 h-1 bg-[#FF6B00] rounded-full" style={{ left: '55%', top: '85%', opacity: 0.4 }} />
+        <div className="absolute w-1 h-1 bg-[#FF6B00] rounded-full" style={{ left: '65%', top: '55%', opacity: 0.2 }} />
+        <div className="absolute w-1 h-1 bg-[#FF6B00] rounded-full" style={{ left: '75%', top: '90%', opacity: 0.5 }} />
+        <div className="absolute w-1 h-1 bg-[#FF6B00] rounded-full" style={{ left: '85%', top: '65%', opacity: 0.3 }} />
+        <div className="absolute w-1 h-1 bg-[#FF6B00] rounded-full" style={{ left: '95%', top: '95%', opacity: 0.4 }} />
+        <div className="absolute w-1 h-1 bg-[#FF6B00] rounded-full" style={{ left: '5%', top: '45%', opacity: 0.2 }} />
+        <div className="absolute w-1 h-1 bg-[#FF6B00] rounded-full" style={{ left: '95%', top: '5%', opacity: 0.5 }} />
+      </div>
+
+      <div className="relative z-10 container mx-auto px-4 md:px-6 h-full flex items-center">
+        <div id="hero-logo" className="w-[45%] sm:w-[55%] md:w-1/2 absolute top-4 left-0 md:top-10 md:left-[-50px]">
+          <ShinobiLogo />
+        </div>
+        <div className="w-[50%] sm:w-[65%] md:w-1/2 h-[75vh] sm:h-[90vh] md:h-[120vh] lg:h-[150vh] absolute right-0 sm:right-2 top-14 sm:top-10 md:right-[50px] md:top-[25px]">
+          <Naruto1 />
+        </div>
+      </div>
+    </section>
+  );
+}

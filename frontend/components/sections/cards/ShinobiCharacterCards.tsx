@@ -5,7 +5,7 @@ import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Link from "next/link";
-import { useCartStore } from "./Cart";
+import { useCartStore } from "@/components/shared/Cart";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -103,23 +103,23 @@ export default function ShinobiCharacterCards() {
               <img ref={narutoJutsuRef} src="/naruto-rasengan.png" alt="Naruto Rasengan" className="absolute inset-0 w-full h-full object-contain" style={{ opacity: 0 }} />
             </div>
           </div>
-          <div className="w-full p-5 md:p-6 lg:p-8 pt-4 md:pt-5 pb-12 lg:pb-14 mt-auto">
-            <div className="flex gap-3 md:gap-4 mx-4 md:mx-6 lg:mx-8">
+          <div className="w-full p-4 sm:p-5 md:p-6 lg:p-8 pt-4 md:pt-5 pb-8 sm:pb-12 lg:pb-14 mt-auto">
+            <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 md:gap-4 mx-0 sm:mx-4 md:mx-6 lg:mx-8">
               <button
                 onClick={() => addItem({ id: "naruto", name: "NARUTO", price: 29.99, quantity: 1, image: "/naruto-default.png" })}
-                className="flex-1 h-[64px] md:h-[68px] lg:h-[72px] px-8 md:px-10 lg:px-12 rounded-lg font-cinzel font-bold text-[15px] md:text-[16px] flex items-center justify-between transition-all hover:brightness-110 active:scale-[0.97]"
+                className="flex-1 h-[52px] sm:h-[64px] md:h-[68px] lg:h-[72px] px-4 sm:px-8 md:px-10 lg:px-12 rounded-lg font-cinzel font-bold text-[13px] sm:text-[15px] md:text-[16px] flex items-center justify-between transition-all hover:brightness-110 active:scale-[0.97]"
                 style={{ backgroundColor: "#F4E9D3", color: "#1A1A1A" }}
               >
                 <span>ADD TO CART</span>
-                <span className="font-inter text-[13px] md:text-[14px] font-semibold">$29.99</span>
+                <span className="font-inter text-[12px] sm:text-[13px] md:text-[14px] font-semibold">$29.99</span>
               </button>
               <Link
                 href={`/product/naruto`}
-                className="flex-1 h-[64px] md:h-[68px] lg:h-[72px] px-8 md:px-10 lg:px-12 rounded-lg font-cinzel font-bold text-[15px] md:text-[16px] flex items-center justify-between transition-all hover:brightness-110 active:scale-[0.97]"
+                className="flex-1 h-[52px] sm:h-[64px] md:h-[68px] lg:h-[72px] px-4 sm:px-8 md:px-10 lg:px-12 rounded-lg font-cinzel font-bold text-[13px] sm:text-[15px] md:text-[16px] flex items-center justify-between transition-all hover:brightness-110 active:scale-[0.97]"
                 style={{ backgroundColor: "transparent", color: "white", border: "1.5px solid white" }}
               >
                 <span>VIEW PRODUCT</span>
-                <svg className="w-6 h-6 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <svg className="w-5 h-5 sm:w-6 sm:h-6 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M5 12h14M12 5l7 7-7 7" />
                 </svg>
               </Link>
@@ -145,23 +145,23 @@ export default function ShinobiCharacterCards() {
               <img ref={itachiJutsuRef} src="/itachi-mangekyou.png" alt="Itachi Mangekyo" className="absolute inset-0 w-full h-full object-contain" style={{ opacity: 0 }} />
             </div>
           </div>
-          <div className="w-full p-5 md:p-6 lg:p-8 pt-4 md:pt-5 pb-12 lg:pb-14 mt-auto">
-            <div className="flex gap-3 md:gap-4 mx-4 md:mx-6 lg:mx-8">
+          <div className="w-full p-4 sm:p-5 md:p-6 lg:p-8 pt-4 md:pt-5 pb-8 sm:pb-12 lg:pb-14 mt-auto">
+            <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 md:gap-4 mx-0 sm:mx-4 md:mx-6 lg:mx-8">
               <button
                 onClick={() => addItem({ id: "itachi", name: "ITACHI", price: 34.99, quantity: 1, image: "/itachi-default.png" })}
-                className="flex-1 h-[64px] md:h-[68px] lg:h-[72px] px-8 md:px-10 lg:px-12 rounded-lg font-cinzel font-bold text-[15px] md:text-[16px] flex items-center justify-between transition-all hover:brightness-110 active:scale-[0.97]"
+                className="flex-1 h-[52px] sm:h-[64px] md:h-[68px] lg:h-[72px] px-4 sm:px-8 md:px-10 lg:px-12 rounded-lg font-cinzel font-bold text-[13px] sm:text-[15px] md:text-[16px] flex items-center justify-between transition-all hover:brightness-110 active:scale-[0.97]"
                 style={{ backgroundColor: "#F4E9D3", color: "#1A1A1A" }}
               >
                 <span>ADD TO CART</span>
-                <span className="font-inter text-[13px] md:text-[14px] font-semibold">$34.99</span>
+                <span className="font-inter text-[12px] sm:text-[13px] md:text-[14px] font-semibold">$34.99</span>
               </button>
               <Link
                 href={`/product/itachi`}
-                className="flex-1 h-[64px] md:h-[68px] lg:h-[72px] px-8 md:px-10 lg:px-12 rounded-lg font-cinzel font-bold text-[15px] md:text-[16px] flex items-center justify-between transition-all hover:brightness-110 active:scale-[0.97]"
+                className="flex-1 h-[52px] sm:h-[64px] md:h-[68px] lg:h-[72px] px-4 sm:px-8 md:px-10 lg:px-12 rounded-lg font-cinzel font-bold text-[13px] sm:text-[15px] md:text-[16px] flex items-center justify-between transition-all hover:brightness-110 active:scale-[0.97]"
                 style={{ backgroundColor: "transparent", color: "white", border: "1.5px solid white" }}
               >
                 <span>VIEW PRODUCT</span>
-                <svg className="w-6 h-6 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <svg className="w-5 h-5 sm:w-6 sm:h-6 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M5 12h14M12 5l7 7-7 7" />
                 </svg>
               </Link>
@@ -187,23 +187,23 @@ export default function ShinobiCharacterCards() {
               <img ref={sasukeJutsuRef} src="/sasuke-chidori.png" alt="Sasuke Chidori" className="absolute inset-0 w-full h-full object-contain" style={{ opacity: 0 }} />
             </div>
           </div>
-          <div className="w-full p-5 md:p-6 lg:p-8 pt-4 md:pt-5 pb-12 lg:pb-14 mt-auto">
-            <div className="flex gap-3 md:gap-4 mx-4 md:mx-6 lg:mx-8">
+          <div className="w-full p-4 sm:p-5 md:p-6 lg:p-8 pt-4 md:pt-5 pb-8 sm:pb-12 lg:pb-14 mt-auto">
+            <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 md:gap-4 mx-0 sm:mx-4 md:mx-6 lg:mx-8">
               <button
                 onClick={() => addItem({ id: "sasuke", name: "SASUKE", price: 31.99, quantity: 1, image: "/sasuke-default.png" })}
-                className="flex-1 h-[64px] md:h-[68px] lg:h-[72px] px-8 md:px-10 lg:px-12 rounded-lg font-cinzel font-bold text-[15px] md:text-[16px] flex items-center justify-between transition-all hover:brightness-110 active:scale-[0.97]"
+                className="flex-1 h-[52px] sm:h-[64px] md:h-[68px] lg:h-[72px] px-4 sm:px-8 md:px-10 lg:px-12 rounded-lg font-cinzel font-bold text-[13px] sm:text-[15px] md:text-[16px] flex items-center justify-between transition-all hover:brightness-110 active:scale-[0.97]"
                 style={{ backgroundColor: "#F4E9D3", color: "#1A1A1A" }}
               >
                 <span>ADD TO CART</span>
-                <span className="font-inter text-[13px] md:text-[14px] font-semibold">$31.99</span>
+                <span className="font-inter text-[12px] sm:text-[13px] md:text-[14px] font-semibold">$31.99</span>
               </button>
               <Link
                 href={`/product/sasuke`}
-                className="flex-1 h-[64px] md:h-[68px] lg:h-[72px] px-8 md:px-10 lg:px-12 rounded-lg font-cinzel font-bold text-[15px] md:text-[16px] flex items-center justify-between transition-all hover:brightness-110 active:scale-[0.97]"
+                className="flex-1 h-[52px] sm:h-[64px] md:h-[68px] lg:h-[72px] px-4 sm:px-8 md:px-10 lg:px-12 rounded-lg font-cinzel font-bold text-[13px] sm:text-[15px] md:text-[16px] flex items-center justify-between transition-all hover:brightness-110 active:scale-[0.97]"
                 style={{ backgroundColor: "transparent", color: "white", border: "1.5px solid white" }}
               >
                 <span>VIEW PRODUCT</span>
-                <svg className="w-6 h-6 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <svg className="w-5 h-5 sm:w-6 sm:h-6 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M5 12h14M12 5l7 7-7 7" />
                 </svg>
               </Link>

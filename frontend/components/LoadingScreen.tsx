@@ -50,18 +50,18 @@ export default function LoadingScreen() {
   return (
     <div className="loading-screen fixed inset-0 bg-black z-50 flex items-center justify-center">
       <div className="flex flex-col items-center gap-8">
-        <div className="flex flex-wrap items-center justify-center gap-4 md:gap-6">
+        <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-4 md:gap-6">
           <div className="flex">
             {Array.from('SHINOBI').map((letter, i) => (
-              <span key={i} className="shinobi-letter font-anton text-6xl sm:text-7xl md:text-9xl text-white">
+              <span key={i} className="shinobi-letter font-anton text-5xl sm:text-6xl md:text-7xl lg:text-9xl text-white">
                 {letter}
               </span>
             ))}
           </div>
-          <img src="/kunai.svg" alt="" className="kunai w-32 h-10 md:w-48 md:h-16" />
+          <img src="/kunai.svg" alt="" className="kunai w-20 h-8 sm:w-32 sm:h-10 md:w-48 md:h-16" />
           <div className="flex">
             {Array.from('STORE').map((letter, i) => (
-              <span key={i} className="store-letter font-anton text-6xl sm:text-7xl md:text-9xl text-white">
+              <span key={i} className="store-letter font-anton text-5xl sm:text-6xl md:text-7xl lg:text-9xl text-white">
                 {letter}
               </span>
             ))}

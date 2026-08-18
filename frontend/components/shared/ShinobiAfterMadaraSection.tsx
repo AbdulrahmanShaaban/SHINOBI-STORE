@@ -77,9 +77,8 @@ function MarqueeRow({ row }: { row: (typeof MARQUEE_ROWS)[number] }) {
     <div
       ref={rowRef}
       aria-hidden="true"
-      className={`relative overflow-hidden whitespace-nowrap select-none ${
-        row.theme === "accent" ? "bg-[#FF5A2A]" : "bg-[#101014]"
-      }`}
+      className={`relative overflow-hidden whitespace-nowrap select-none ${row.theme === "accent" ? "bg-[#FF5A2A]" : "bg-[#101014]"
+        }`}
     >
       <div
         ref={trackRef}
@@ -88,9 +87,8 @@ function MarqueeRow({ row }: { row: (typeof MARQUEE_ROWS)[number] }) {
         {Array.from({ length: MARQUEE_COPIES }).map((_, i) => (
           <span
             key={i}
-            className={`font-anton uppercase leading-none tracking-[0.02em] ${
-              row.theme === "accent" ? "text-[#101014]" : "text-[#F5E6C8]"
-            }`}
+            className={`font-anton uppercase leading-none tracking-[0.02em] ${row.theme === "accent" ? "text-[#101014]" : "text-[#F5E6C8]"
+              }`}
             style={{ fontSize: "clamp(52px, 6.4vw, 120px)" }}
           >
             {row.text}
@@ -121,18 +119,18 @@ const CHARACTERS: Character[] = [
     description:
       "The Yellow Flash. Precision, speed, and a will strong enough to protect everyone behind him.",
     subline: "THE YELLOW FLASH",
-    image: "/minato-default.png",
+    image: "/minato.png",
     alt: "Minato Namikaze",
   },
   {
     number: "02",
-    eyebrow: "THE SHARINGAN",
-    title: "ITACHI UCHIHA",
+    eyebrow: "THE AKATSUKI FOUNDER",
+    title: "PAIN",
     description:
-      "A shinobi who carried the weight of an entire clan, choosing sacrifice over recognition.",
-    subline: "THE MAN BEHIND THE CALM",
-    image: "/itachi-default.png",
-    alt: "Itachi Uchiha",
+      "Those who do not understand true pain can never understand true peace.",
+    subline: "THE SIX PATHS OF PAIN",
+    image: "/pain.png",
+    alt: "Pain",
   },
   {
     number: "03",
@@ -412,11 +410,11 @@ export default function ShinobiAfterMadaraSection() {
 
       mm.add("(prefers-reduced-motion: reduce)", () => {
         const chars = quoteText.querySelectorAll<HTMLElement>(".quote-char");
-        gsap.set(chars, { opacity: 1, yPercent: 0, rotationX: 0, filter: "none", color: "#F5E6C8", clearProps: "transform,perspective" });
-        if (attribution) gsap.set(attribution, { opacity: 1, y: 0, clearProps: "transform" });
-        if (quoteWrap) gsap.set(quoteWrap, { opacity: 1, clearProps: "transform" });
-        if (showcaseHeading) gsap.set(showcaseHeading, { opacity: 0, clearProps: "transform" });
-        if (trackWrap) gsap.set(trackWrap, { opacity: 0, clearProps: "transform" });
+        gsap.set(chars, { clearProps: "all" });
+        if (attribution) gsap.set(attribution, { clearProps: "all" });
+        if (quoteWrap) gsap.set(quoteWrap, { clearProps: "all" });
+        if (showcaseHeading) gsap.set(showcaseHeading, { clearProps: "all" });
+        if (trackWrap) gsap.set(trackWrap, { clearProps: "all" });
       });
 
       mm.add("(prefers-reduced-motion: no-preference)", () => {
@@ -522,19 +520,19 @@ export default function ShinobiAfterMadaraSection() {
           const sel = (cls: string) => panel.querySelector<HTMLElement>(cls);
           const elements = isIntro
             ? {
-                eyebrow: sel(".showcase-intro-eyebrow"),
-                title: sel(".showcase-intro-title"),
-                copy: sel(".showcase-intro-copy"),
-                cta: sel(".showcase-intro-cta"),
-                visual: sel(".showcase-intro-visual"),
-              }
+              eyebrow: sel(".showcase-intro-eyebrow"),
+              title: sel(".showcase-intro-title"),
+              copy: sel(".showcase-intro-copy"),
+              cta: sel(".showcase-intro-cta"),
+              visual: sel(".showcase-intro-visual"),
+            }
             : {
-                eyebrow: sel(".showcase-eyebrow"),
-                title: sel(".showcase-title"),
-                copy: sel(".showcase-desc"),
-                cta: sel(".showcase-cta"),
-                visual: sel(".showcase-visual"),
-              };
+              eyebrow: sel(".showcase-eyebrow"),
+              title: sel(".showcase-title"),
+              copy: sel(".showcase-desc"),
+              cta: sel(".showcase-cta"),
+              visual: sel(".showcase-visual"),
+            };
 
           const panelTl = gsap.timeline({
             scrollTrigger: {
@@ -652,19 +650,19 @@ export default function ShinobiAfterMadaraSection() {
                   const sel = (cls: string) => panel.querySelector<HTMLElement>(cls);
                   const elements = isIntro
                     ? {
-                        eyebrow: sel(".showcase-intro-eyebrow"),
-                        title: sel(".showcase-intro-title"),
-                        copy: sel(".showcase-intro-copy"),
-                        cta: sel(".showcase-intro-cta"),
-                        visual: sel(".showcase-intro-visual"),
-                      }
+                      eyebrow: sel(".showcase-intro-eyebrow"),
+                      title: sel(".showcase-intro-title"),
+                      copy: sel(".showcase-intro-copy"),
+                      cta: sel(".showcase-intro-cta"),
+                      visual: sel(".showcase-intro-visual"),
+                    }
                     : {
-                        eyebrow: sel(".showcase-eyebrow"),
-                        title: sel(".showcase-title"),
-                        copy: sel(".showcase-desc"),
-                        cta: sel(".showcase-cta"),
-                        visual: sel(".showcase-visual"),
-                      };
+                      eyebrow: sel(".showcase-eyebrow"),
+                      title: sel(".showcase-title"),
+                      copy: sel(".showcase-desc"),
+                      cta: sel(".showcase-cta"),
+                      visual: sel(".showcase-visual"),
+                    };
 
                   const revealTl = gsap.timeline({ defaults: { ease: "power3.out" } });
                   if (elements.eyebrow) {
