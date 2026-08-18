@@ -25,6 +25,7 @@ export default function CardStack() {
           scrub: 1.5,
           pin: true,
           anticipatePin: 1,
+          invalidateOnRefresh: true,
         },
       });
 
@@ -74,6 +75,7 @@ export default function CardStack() {
           scrub: 0.8,
           pin: true,
           anticipatePin: 1,
+          invalidateOnRefresh: true,
         },
       });
 

@@ -71,14 +71,25 @@ export default function ShinobiCharacterCards() {
 
   const addItem = useCartStore((s) => s.addItem);
 
-  const handleMouseEnter = (defaultRef: React.RefObject<HTMLImageElement | null>, jutsuRef: React.RefObject<HTMLImageElement | null>) => {
+  const handlePointerEnter = (defaultRef: React.RefObject<HTMLImageElement | null>, jutsuRef: React.RefObject<HTMLImageElement | null>) => {
     gsap.to(defaultRef.current, { opacity: 0, duration: 0.4, ease: "power2.out" });
     gsap.to(jutsuRef.current, { opacity: 1, scale: 1.04, duration: 0.4, ease: "power2.out" });
   };
 
-  const handleMouseLeave = (defaultRef: React.RefObject<HTMLImageElement | null>, jutsuRef: React.RefObject<HTMLImageElement | null>) => {
+  const handlePointerLeave = (defaultRef: React.RefObject<HTMLImageElement | null>, jutsuRef: React.RefObject<HTMLImageElement | null>) => {
     gsap.to(defaultRef.current, { opacity: 1, duration: 0.4, ease: "power2.out" });
     gsap.to(jutsuRef.current, { opacity: 0, scale: 1, duration: 0.4, ease: "power2.out" });
+  };
+
+  // Touch toggle: tap to swap between default/jutsu on touch devices
+  const handleTouchToggle = (defaultRef: React.RefObject<HTMLImageElement | null>, jutsuRef: React.RefObject<HTMLImageElement | null>) => {
+    if (!jutsuRef.current) return;
+    const isShowing = Number(jutsuRef.current.style.opacity) > 0;
+    if (isShowing) {
+      handlePointerLeave(defaultRef, jutsuRef);
+    } else {
+      handlePointerEnter(defaultRef, jutsuRef);
+    }
   };
 
   return (
@@ -90,8 +101,9 @@ export default function ShinobiCharacterCards() {
           ref={narutoRef}
           className="flex flex-col rounded-xl overflow-hidden"
           style={{ backgroundColor: "var(--naruto-card-bg)", border: "2px solid var(--primary)" }}
-          onMouseEnter={() => handleMouseEnter(narutoDefaultRef, narutoJutsuRef)}
-          onMouseLeave={() => handleMouseLeave(narutoDefaultRef, narutoJutsuRef)}
+          onPointerEnter={() => handlePointerEnter(narutoDefaultRef, narutoJutsuRef)}
+          onPointerLeave={() => handlePointerLeave(narutoDefaultRef, narutoJutsuRef)}
+          onTouchStart={() => handleTouchToggle(narutoDefaultRef, narutoJutsuRef)}
         >
           <div className="flex flex-col items-center w-full flex-1 p-5 md:p-6 lg:p-8 pb-0">
             <div className="font-anton uppercase text-[24px] md:text-[28px] lg:text-[32px] leading-none" style={{ color: "#F5E6C8" }}>NARUTO</div>
@@ -132,8 +144,9 @@ export default function ShinobiCharacterCards() {
           ref={itachiRef}
           className="flex flex-col rounded-xl overflow-hidden"
           style={{ backgroundColor: "var(--itachi-card-bg)", border: "2px solid var(--itachi-card-accent)" }}
-          onMouseEnter={() => handleMouseEnter(itachiDefaultRef, itachiJutsuRef)}
-          onMouseLeave={() => handleMouseLeave(itachiDefaultRef, itachiJutsuRef)}
+          onPointerEnter={() => handlePointerEnter(itachiDefaultRef, itachiJutsuRef)}
+          onPointerLeave={() => handlePointerLeave(itachiDefaultRef, itachiJutsuRef)}
+          onTouchStart={() => handleTouchToggle(itachiDefaultRef, itachiJutsuRef)}
         >
           <div className="flex flex-col items-center w-full flex-1 p-5 md:p-6 lg:p-8 pb-0">
             <div className="font-anton uppercase text-[24px] md:text-[28px] lg:text-[32px] leading-none" style={{ color: "#F5E6C8" }}>ITACHI</div>
@@ -174,8 +187,9 @@ export default function ShinobiCharacterCards() {
           ref={sasukeRef}
           className="flex flex-col rounded-xl overflow-hidden"
           style={{ backgroundColor: "var(--sasuke-card-bg)", border: "2px solid var(--sasuke-accent)" }}
-          onMouseEnter={() => handleMouseEnter(sasukeDefaultRef, sasukeJutsuRef)}
-          onMouseLeave={() => handleMouseLeave(sasukeDefaultRef, sasukeJutsuRef)}
+          onPointerEnter={() => handlePointerEnter(sasukeDefaultRef, sasukeJutsuRef)}
+          onPointerLeave={() => handlePointerLeave(sasukeDefaultRef, sasukeJutsuRef)}
+          onTouchStart={() => handleTouchToggle(sasukeDefaultRef, sasukeJutsuRef)}
         >
           <div className="flex flex-col items-center w-full flex-1 p-5 md:p-6 lg:p-8 pb-0">
             <div className="font-anton uppercase text-[24px] md:text-[28px] lg:text-[32px] leading-none" style={{ color: "#F5E6C8" }}>SASUKE</div>
