@@ -13,85 +13,105 @@ export default function HeroSection() {
   useGSAP(() => {
     const mm = gsap.matchMedia();
 
-    mm.add('(min-width: 768px)', () => {
-      const tl = gsap.timeline({ delay: 0.2 });
-      tl.from('.naruto1-character', { x: 200, opacity: 0, duration: 1.2, ease: 'power3.out' }, '-=1');
+    mm.add(
+      {
+        isDesktop: '(min-width: 768px)',
+        isMobile: '(max-width: 767px)',
+        reduceMotion: '(prefers-reduced-motion: reduce)',
+      },
+      (context) => {
+        const { isDesktop, isMobile, reduceMotion } = context.conditions as {
+          isDesktop: boolean;
+          isMobile: boolean;
+          reduceMotion: boolean;
+        };
 
-      gsap.to('.naruto1-character', {
-        y: -10,
-        duration: 2,
-        repeat: -1,
-        yoyo: true,
-        ease: 'sine.inOut',
-      });
+        if (reduceMotion) {
+          // Keep it simple and accessible, no complex pinning or scaling
+          return;
+        }
 
-      gsap.utils.toArray('.petal').forEach((petal: any) => {
-        gsap.to(petal, {
-          y: '100vh',
-          x: gsap.utils.random(-100, 100),
-          rotation: gsap.utils.random(0, 360),
-          duration: gsap.utils.random(4, 8),
-          repeat: -1,
-          delay: gsap.utils.random(0, 5),
-          ease: 'none',
-        });
-      });
+        if (isDesktop) {
+          const tl = gsap.timeline({ delay: 0.2 });
+          tl.from('.naruto1-character', { x: 200, opacity: 0, duration: 1.2, ease: 'power3.out' }, '-=1');
 
-      gsap.to('#hero-logo', {
-        scrollTrigger: {
-          trigger: 'section',
-          start: 'top top',
-          end: '+=100%',
-          scrub: 1.5,
-        },
-        position: 'fixed',
-        top: '60px',
-        left: '20px',
-        width: '300px',
-        scale: 1.5,
-        ease: 'power2.inOut',
-      });
-    });
+          gsap.to('.naruto1-character', {
+            y: -10,
+            duration: 2,
+            repeat: -1,
+            yoyo: true,
+            ease: 'sine.inOut',
+          });
 
-    mm.add('(max-width: 767px)', () => {
-      const tl = gsap.timeline({ delay: 0.2 });
-      tl.from('.naruto1-character', { x: 100, opacity: 0, duration: 1, ease: 'power3.out' }, '-=1');
+          gsap.utils.toArray('.petal').forEach((petal: any) => {
+            gsap.to(petal, {
+              y: '100vh',
+              x: gsap.utils.random(-100, 100),
+              rotation: gsap.utils.random(0, 360),
+              duration: gsap.utils.random(4, 8),
+              repeat: -1,
+              delay: gsap.utils.random(0, 5),
+              ease: 'none',
+            });
+          });
 
-      gsap.to('.naruto1-character', {
-        y: -6,
-        duration: 2.5,
-        repeat: -1,
-        yoyo: true,
-        ease: 'sine.inOut',
-      });
+          gsap.to('#hero-logo', {
+            scrollTrigger: {
+              trigger: 'section',
+              start: 'top top',
+              end: '+=100%',
+              scrub: 1.5,
+            },
+            position: 'fixed',
+            top: '60px',
+            left: '20px',
+            width: '300px',
+            scale: 1.5,
+            ease: 'power2.inOut',
+          });
+        }
 
-      gsap.utils.toArray('.petal').forEach((petal: any) => {
-        gsap.to(petal, {
-          y: '100vh',
-          x: gsap.utils.random(-40, 40),
-          rotation: gsap.utils.random(0, 360),
-          duration: gsap.utils.random(5, 9),
-          repeat: -1,
-          delay: gsap.utils.random(0, 5),
-          ease: 'none',
-        });
-      });
+        if (isMobile) {
+          const tl = gsap.timeline({ delay: 0.2 });
+          tl.from('.naruto1-character', { x: 100, opacity: 0, duration: 1, ease: 'power3.out' }, '-=1');
 
-      gsap.to('#hero-logo', {
-        scrollTrigger: {
-          trigger: 'section',
-          start: 'top top',
-          end: '+=100%',
-          scrub: 1.5,
-        },
-        position: 'fixed',
-        top: '20px',
-        left: '10px',
-        width: '160px',
-        scale: 1,
-        ease: 'power2.inOut',
-      });
-    });
+          gsap.to('.naruto1-character', {
+            y: -6,
+            duration: 2.5,
+            repeat: -1,
+            yoyo: true,
+            ease: 'sine.inOut',
+          });
+
+          gsap.utils.toArray('.petal').forEach((petal: any) => {
+            gsap.to(petal, {
+              y: '100vh',
+              x: gsap.utils.random(-40, 40),
+              rotation: gsap.utils.random(0, 360),
+              duration: gsap.utils.random(5, 9),
+              repeat: -1,
+              delay: gsap.utils.random(0, 5),
+              ease: 'none',
+            });
+          });
+
+          gsap.to('#hero-logo', {
+            scrollTrigger: {
+              trigger: 'section',
+              start: 'top top',
+              end: '+=100%',
+              scrub: 1.5,
+            },
+            position: 'fixed',
+            top: '20px',
+            left: '10px',
+            width: '160px',
+            scale: 1,
+            ease: 'power2.inOut',
+          });
+        }
+      }
+    );
 
     return () => mm.revert();
   }, []);

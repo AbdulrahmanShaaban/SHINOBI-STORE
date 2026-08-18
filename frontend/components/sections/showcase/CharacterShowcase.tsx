@@ -51,11 +51,10 @@ const CHARACTERS: Character[] = [
   },
 ];
 
-const INTRO_WIDTH = "w-[88vw] md:w-[78vw] lg:w-[72vw] xl:w-[68vw]";
+const INTRO_WIDTH = "w-[88vw] md:w-[45vw] lg:w-[40vw] xl:w-[35vw]";
 const CARD_WIDTH = "w-[82vw] md:w-[74vw] lg:w-[68vw] xl:w-[64vw]";
 
 function IntroPanel() {
-  const c = CHARACTERS[0];
   return (
     <article
       className={`showcase-panel showcase-intro relative flex h-[68svh] min-h-[420px] md:min-h-[520px] shrink-0 ${INTRO_WIDTH} overflow-hidden rounded-2xl border`}
@@ -65,7 +64,7 @@ function IntroPanel() {
       }}
     >
       <div className="flex h-full w-full">
-        <div className="relative z-10 flex w-[45%] flex-col justify-center px-8 py-10 md:px-12 lg:px-16">
+        <div className="relative z-10 flex w-full flex-col justify-center px-8 py-10 md:px-12 lg:px-16">
           <h2
             className="showcase-intro-title font-anton text-[clamp(48px,7vw,100px)] uppercase leading-[0.85] tracking-[0.01em]"
             style={{ color: "#F5E6C8" }}
@@ -103,58 +102,6 @@ function IntroPanel() {
               </div>
               <div className="mt-1 font-inter text-[9px] uppercase tracking-[0.22em] md:text-[10px]" style={{ color: "#FF5A2A" }}>
                 INTERACTIVE JOURNEY
-              </div>
-            </div>
-          </div>
-        </div>
-        <div className="flex w-[55%] items-center justify-center p-6 md:p-8 lg:p-10">
-          <div
-            className="relative flex h-full w-full max-w-[560px] overflow-hidden rounded-xl border"
-            style={{
-              borderColor: "rgba(245,230,200,0.10)",
-              backgroundColor: "#121218",
-            }}
-          >
-            <span
-              className="pointer-events-none absolute bottom-[-5%] right-[-2%] z-0 select-none font-anton text-[22vw] leading-none"
-              style={{ color: "#8B1A1A", opacity: 0.06 }}
-              aria-hidden="true"
-            >
-              {c.number}
-            </span>
-            <div className="relative h-full w-[50%] overflow-hidden">
-              <div aria-hidden="true" className="absolute inset-0"
-                style={{ background: "radial-gradient(circle at 55% 48%, rgba(255,90,42,0.10), transparent 63%)" }}
-              />
-              <Image
-                src={c.image} alt={c.alt} fill
-                sizes="(max-width: 767px) 40vw, 28vw"
-                className="relative z-10 object-contain object-bottom"
-                style={{ filter: "drop-shadow(0 28px 55px rgba(0,0,0,0.55))" }}
-              />
-            </div>
-            <div className="relative z-20 flex w-[50%] flex-col justify-center px-5 py-6 md:px-7">
-              <span className="font-inter text-[9px] uppercase tracking-[0.18em] md:text-[10px]" style={{ color: "#FF5A2A" }}>
-                {c.eyebrow}
-              </span>
-              <h3 className="mt-2 font-anton text-[clamp(22px,3vw,36px)] uppercase leading-[0.88] tracking-[0.02em] md:mt-3"
-                style={{ color: "#F5E6C8" }}>
-                {c.title}
-              </h3>
-              <p className="mt-3 font-inter text-[11px] leading-relaxed md:text-xs"
-                style={{ color: "rgba(245,230,200,0.50)" }}>
-                {c.description}
-              </p>
-              <span className="mt-3 font-inter text-[8px] uppercase tracking-[0.22em] md:text-[9px]"
-                style={{ color: "rgba(245,230,200,0.30)" }}>
-                {c.subline}
-              </span>
-              <div className="mt-4 flex items-center gap-2 font-anton text-[10px] uppercase tracking-[0.20em] md:text-[11px]"
-                style={{ color: "#FF5A2A" }}>
-                EXPLORE
-                <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                  <path d="M5 12h14M12 5l7 7-7 7" />
-                </svg>
               </div>
             </div>
           </div>
@@ -288,55 +235,67 @@ export default function CharacterShowcase() {
 
       const mm = gsap.matchMedia();
 
-      mm.add("(min-width: 768px)", () => {
-        const getDistance = () =>
-          Math.max(0, track.scrollWidth - window.innerWidth);
+      mm.add(
+        {
+          isDesktop: "(min-width: 768px)",
+          reduceMotion: "(prefers-reduced-motion: reduce)",
+        },
+        (context) => {
+          const { isDesktop, reduceMotion } = context.conditions as { isDesktop: boolean; reduceMotion: boolean };
+          if (!isDesktop) return;
 
-        const SCROLL_SPEED_FACTOR = 2;
-        const getPinDistance = () => getDistance() * SCROLL_SPEED_FACTOR;
+          const getDistance = () =>
+            Math.max(0, track.scrollWidth - window.innerWidth);
 
-        gsap.to(track, {
-          x: () => -getDistance(),
-          ease: "none",
-          scrollTrigger: {
-            trigger: stage,
-            start: "top top",
-            end: () => `+=${getPinDistance()}`,
-            pin: stage,
-            scrub: 1,
-            anticipatePin: 1,
-            invalidateOnRefresh: true,
-            refreshPriority: -3,
-          },
-        });
+          const SCROLL_SPEED_FACTOR = 2;
+          const getPinDistance = () => getDistance() * SCROLL_SPEED_FACTOR;
 
-        // Per-panel reveals driven by the horizontal tween
-        const panels = Array.from(
-          track.querySelectorAll<HTMLElement>(".showcase-panel")
-        );
-        panels.forEach((panel, index) => {
-          const isIntro = panel.classList.contains("showcase-intro");
-          const sel = (cls: string) => panel.querySelector<HTMLElement>(cls);
-          const elements = isIntro
-            ? { eyebrow: sel(".showcase-intro-eyebrow"), title: sel(".showcase-intro-title"), copy: sel(".showcase-intro-copy"), cta: sel(".showcase-intro-cta"), visual: sel(".showcase-intro-visual") }
-            : { eyebrow: sel(".showcase-eyebrow"), title: sel(".showcase-title"), copy: sel(".showcase-desc"), cta: sel(".showcase-cta"), visual: sel(".showcase-visual") };
-
-          const panelTl = gsap.timeline({
+          gsap.to(track, {
+            x: () => -getDistance(),
+            ease: "none",
             scrollTrigger: {
-              trigger: panel,
-              start: index === 0 ? "left 80%" : "left 70%",
-              end: index === 0 ? "left 40%" : "left 30%",
-              scrub: 0.7,
+              trigger: stage,
+              start: "top top",
+              end: () => `+=${getPinDistance()}`,
+              pin: stage,
+              scrub: 1,
+              anticipatePin: 1,
+              invalidateOnRefresh: true,
+              refreshPriority: -3,
             },
           });
 
-          if (elements.eyebrow) panelTl.fromTo(elements.eyebrow, { y: 18, opacity: 0 }, { y: 0, opacity: 1, duration: 0.45 }, 0);
-          if (elements.title) panelTl.fromTo(elements.title, { y: 36, opacity: 0 }, { y: 0, opacity: 1, duration: 0.7 }, 0.05);
-          if (elements.copy) panelTl.fromTo(elements.copy, { y: 22, opacity: 0 }, { y: 0, opacity: 0.82, duration: 0.55 }, 0.16);
-          if (elements.cta) panelTl.fromTo(elements.cta, { y: 16, opacity: 0 }, { y: 0, opacity: 1, duration: 0.5 }, 0.28);
-          if (elements.visual) panelTl.fromTo(elements.visual, { x: 42, opacity: 0.65, scale: 0.97 }, { x: 0, opacity: 1, scale: 1, duration: 0.8, ease: "power2.out" }, 0);
-        });
-      });
+          // If reduced motion is preferred, skip the individual panel animations
+          if (reduceMotion) return;
+
+          // Per-panel reveals driven by the horizontal tween
+          const panels = Array.from(
+            track.querySelectorAll<HTMLElement>(".showcase-panel")
+          );
+          panels.forEach((panel, index) => {
+            const isIntro = panel.classList.contains("showcase-intro");
+            const sel = (cls: string) => panel.querySelector<HTMLElement>(cls);
+            const elements = isIntro
+              ? { eyebrow: sel(".showcase-intro-eyebrow"), title: sel(".showcase-intro-title"), copy: sel(".showcase-intro-copy"), cta: sel(".showcase-intro-cta"), visual: sel(".showcase-intro-visual") }
+              : { eyebrow: sel(".showcase-eyebrow"), title: sel(".showcase-title"), copy: sel(".showcase-desc"), cta: sel(".showcase-cta"), visual: sel(".showcase-visual") };
+
+            const panelTl = gsap.timeline({
+              scrollTrigger: {
+                trigger: panel,
+                start: index === 0 ? "left 80%" : "left 70%",
+                end: index === 0 ? "left 40%" : "left 30%",
+                scrub: 0.7,
+              },
+            });
+
+            if (elements.eyebrow) panelTl.fromTo(elements.eyebrow, { y: 18, opacity: 0 }, { y: 0, opacity: 1, duration: 0.45 }, 0);
+            if (elements.title) panelTl.fromTo(elements.title, { y: 36, opacity: 0 }, { y: 0, opacity: 1, duration: 0.7 }, 0.05);
+            if (elements.copy) panelTl.fromTo(elements.copy, { y: 22, opacity: 0 }, { y: 0, opacity: 0.82, duration: 0.55 }, 0.16);
+            if (elements.cta) panelTl.fromTo(elements.cta, { y: 16, opacity: 0 }, { y: 0, opacity: 1, duration: 0.5 }, 0.28);
+            if (elements.visual) panelTl.fromTo(elements.visual, { x: 42, opacity: 0.65, scale: 0.97 }, { x: 0, opacity: 1, scale: 1, duration: 0.8, ease: "power2.out" }, 0);
+          });
+        }
+      );
 
       return () => mm.revert();
     },
@@ -351,6 +310,9 @@ export default function CharacterShowcase() {
 
       const scrollContainer = track.parentElement;
       if (!scrollContainer) return;
+
+      const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      if (reducedMotion) return;
 
       const panels = Array.from(
         track.querySelectorAll<HTMLElement>(".showcase-panel")
@@ -423,6 +385,7 @@ export default function CharacterShowcase() {
           }}>
           <div ref={trackRef} className="flex w-max items-center gap-5 px-4 will-change-transform md:gap-8 md:px-10 xl:gap-10 xl:px-14">
             <IntroPanel />
+            <CharacterPanel character={CHARACTERS[0]} />
             <CharacterPanel character={CHARACTERS[1]} />
             <CharacterPanel character={CHARACTERS[2]} />
             <div aria-hidden="true" className="h-1 w-[8vw] shrink-0" />
@@ -451,6 +414,7 @@ export default function CharacterShowcase() {
             className="flex w-max items-center gap-5 px-4 md:gap-8 md:px-10 xl:gap-10 xl:px-14"
           >
             <IntroPanel />
+            <CharacterPanel character={CHARACTERS[0]} />
             <CharacterPanel character={CHARACTERS[1]} />
             <CharacterPanel character={CHARACTERS[2]} />
             <div aria-hidden="true" className="h-1 w-[8vw] shrink-0" />

@@ -18,47 +18,72 @@ export default function ChooseShinobi() {
   useGSAP(() => {
     if (!sectionRef.current || !headingRef.current || !outlineRowRef.current) return;
 
-    const tl = gsap.timeline({
-      scrollTrigger: {
-        trigger: sectionRef.current,
-        start: "top 80%",
-        once: true,
-      },
-    });
+    const mm = gsap.matchMedia();
 
-    // "CHOOSE YOUR" fades in and drops down from 40px above
-    tl.fromTo(
-      headingRef.current,
-      { y: -40, opacity: 0 },
-      { y: 0, opacity: 1, duration: 0.8, ease: "power3.out" }
-    );
-
-    // Each letter of "SHINOBI" animates in individually
-    const validLetters = lettersRef.current.filter(Boolean);
-    tl.fromTo(
-      validLetters,
-      { y: 80, opacity: 0 },
+    mm.add(
       {
-        y: 0,
-        opacity: 1,
-        duration: 0.6,
-        ease: "power3.out",
-        stagger: 0.06,
+        reduceMotion: "(prefers-reduced-motion: reduce)",
+        noPreference: "(prefers-reduced-motion: no-preference)",
       },
-      "-=0.3"
+      (context) => {
+        const { reduceMotion, noPreference } = context.conditions as {
+          reduceMotion: boolean;
+          noPreference: boolean;
+        };
+
+        if (reduceMotion) {
+          gsap.set(headingRef.current, { y: 0, opacity: 1 });
+          gsap.set(lettersRef.current.filter(Boolean), { y: 0, opacity: 1 });
+          return;
+        }
+
+        if (noPreference) {
+          const tl = gsap.timeline({
+            scrollTrigger: {
+              trigger: sectionRef.current,
+              start: "top 80%",
+              once: true,
+            },
+          });
+
+          // "CHOOSE YOUR" fades in and drops down from 40px above
+          tl.fromTo(
+            headingRef.current,
+            { y: -40, opacity: 0 },
+            { y: 0, opacity: 1, duration: 0.8, ease: "power3.out" }
+          );
+
+          // Each letter of "SHINOBI" animates in individually
+          const validLetters = lettersRef.current.filter(Boolean);
+          tl.fromTo(
+            validLetters,
+            { y: 80, opacity: 0 },
+            {
+              y: 0,
+              opacity: 1,
+              duration: 0.6,
+              ease: "power3.out",
+              stagger: 0.06,
+            },
+            "-=0.3"
+          );
+
+          // After all letters land, subtle scale pulse on the whole word
+          tl.to(outlineRowRef.current, {
+            scale: 1.03,
+            duration: 0.8,
+            ease: "power2.inOut",
+          });
+          tl.to(outlineRowRef.current, {
+            scale: 1,
+            duration: 0.8,
+            ease: "power2.inOut",
+          });
+        }
+      }
     );
 
-    // After all letters land, subtle scale pulse on the whole word
-    tl.to(outlineRowRef.current, {
-      scale: 1.03,
-      duration: 0.8,
-      ease: "power2.inOut",
-    });
-    tl.to(outlineRowRef.current, {
-      scale: 1,
-      duration: 0.8,
-      ease: "power2.inOut",
-    });
+    return () => mm.revert();
   }, []);
 
   return (

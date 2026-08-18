@@ -26,7 +26,7 @@ export default function Navbar() {
       <div className="mx-auto w-full max-w-[1600px] px-4 md:px-6 lg:px-10 h-full">
         <div className="flex items-center justify-end h-full">
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-4 lg:gap-6 xl:gap-8">
+          <div className="hidden lg:flex items-center gap-4 lg:gap-6 xl:gap-8">
             <Link href="/" className="px-2 lg:px-3 py-2 text-[#F0F0F0] font-cinzel font-bold text-sm lg:text-base xl:text-lg hover:text-[#FF6B00] transition-colors">
               HOME
             </Link>
@@ -51,10 +51,10 @@ export default function Navbar() {
             </button>
           </div>
 
-          {/* Mobile Menu Button */}
+          {/* Mobile/Tablet Menu Button */}
           <button
             onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="md:hidden p-2 text-[#F0F0F0] hover:text-[#FF6B00] transition-colors"
+            className="lg:hidden p-2 text-[#F0F0F0] hover:text-[#FF6B00] transition-colors"
             aria-label={isMenuOpen ? "Close menu" : "Open menu"}
           >
             <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -67,9 +67,9 @@ export default function Navbar() {
           </button>
         </div>
 
-        {/* Mobile Menu */}
+        {/* Mobile/Tablet Menu */}
         {isMenuOpen && (
-          <div className="md:hidden py-6 px-2 border-t border-[#2A2A3A] bg-[#0A0A0F]/95 backdrop-blur-md">
+          <div className="lg:hidden py-6 px-2 border-t border-[#2A2A3A] bg-[#0A0A0F]/95 backdrop-blur-md">
             <div className="flex flex-col gap-4">
               <Link href="/" onClick={() => setIsMenuOpen(false)} className="text-[#F0F0F0] font-cinzel font-bold text-base tracking-wide hover:text-[#FF6B00] transition-colors py-2">
                 HOME
