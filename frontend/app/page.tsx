@@ -166,7 +166,7 @@ export default function Home() {
       {/* Legendary Madara Special Card */}
       <MadaraSpecialCard />
 
-      {/* Post-Madara scroll experience: marquees → statement → editorial showcase */}
+      {/* Post-Madara scroll experience: marquees → quote → showcase */}
       <ShinobiAfterMadaraSection />
 
       {/* Large closing footer */}
