@@ -169,8 +169,6 @@ export default function Home() {
       {/* Post-Madara scroll experience: marquees → statement → editorial showcase */}
       <ShinobiAfterMadaraSection />
 
-      {/* Normal product content */}
-      
       {/* Large closing footer */}
       <StoreFooter />
       </main>

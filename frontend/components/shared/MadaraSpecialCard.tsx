@@ -294,6 +294,26 @@ export default function MadaraSpecialCard({
           .to(coffin, { yPercent: 88, duration: 0.28, ease: "power2.in" }, "disturbance")
           .to(dust, { scale: 0.9, opacity: 1, duration: 0.24, ease: "power2.out" }, "disturbance+=0.02")
           .to(crater, { scale: 1.15, opacity: 1, duration: 0.38, ease: "power3.out" }, "disturbance")
+          // Per-particle burst: each dust speck kicks outward from its initial
+          // angle by a small offset, so the disturbance reads as scattered
+          // debris rather than a single scaling blob.
+          .call(() => {
+            const particles = dust?.querySelectorAll<HTMLSpanElement>("span");
+            if (!particles) return;
+            particles.forEach((el, i) => {
+              const p = DUST_PARTICLES[i];
+              const burstX = Math.cos(p.angle) * p.distance * 32;
+              const burstY = Math.sin(p.angle) * p.distance * 14 + p.y * 22;
+              gsap.to(el, {
+                x: burstX,
+                y: burstY,
+                rotation: `+=${p.rotate * 0.4}`,
+                duration: 0.26,
+                delay: p.delay,
+                ease: "power3.out",
+              });
+            });
+          }, [], "disturbance+=0.02")
           .addLabel("emerge")
           .to(coffin, { yPercent: -4, scale: 1.01, duration: 0.48, ease: "power4.out" }, "emerge")
           .to(dust, { scale: 1.35, opacity: 0.9, duration: 0.36, ease: "power3.out" }, "emerge+=0.05")
@@ -636,22 +656,22 @@ export default function MadaraSpecialCard({
             {DUST_PARTICLES.map((particle, i) => (
               <span
                 key={i}
-                className="absolute rounded-full"
-                style={{
-                  left: "50%",
-                  top: "86%",
-                  width: `${particle.size}px`,
-                  height: `${particle.size * (0.55 + particle.distance * 0.45)}px`,
-                  opacity: 0.3 + particle.distance * 0.55,
-                  background:
-                    i % 3 === 0
-                      ? "#6f4926"
-                      : i % 3 === 1
-                        ? "#a9793e"
-                        : "#d2ae6b",
-                  filter: i % 4 === 0 ? "blur(2px)" : "blur(.4px)",
-                  transform: `translate(-50%, -50%) rotate(${particle.rotate}deg)`,
-                }}
+                  className="absolute rounded-full"
+                  style={{
+                    left: `${50 + Math.cos(particle.angle) * particle.distance * 42}%`,
+                    top: `${86 + particle.y * 100 + Math.sin(particle.angle) * particle.distance * 8}%`,
+                    width: `${particle.size}px`,
+                    height: `${particle.size * (0.55 + particle.distance * 0.45)}px`,
+                    opacity: 0.3 + particle.distance * 0.55,
+                    background:
+                      i % 3 === 0
+                        ? "#6f4926"
+                        : i % 3 === 1
+                          ? "#a9793e"
+                          : "#d2ae6b",
+                    filter: i % 4 === 0 ? "blur(2px)" : "blur(.4px)",
+                    transform: `rotate(${particle.rotate}deg)`,
+                  }}
               />
             ))}
           </div>
@@ -911,7 +931,7 @@ export default function MadaraSpecialCard({
            */}
           <div
             ref={coffinRef}
-            className="pointer-events-none absolute left-1/2 top-[-90px] z-[25] h-[calc(100%+180px)] w-[calc(100%+140px)] max-w-[840px] -translate-x-1/2"
+            className="pointer-events-none absolute left-1/2 top-[-90px] z-[60] h-[calc(100%+180px)] w-[calc(100%+140px)] max-w-[840px] -translate-x-1/2"
             style={{ transformOrigin: "50% 100%" }}
             aria-hidden="true"
           >
