@@ -159,28 +159,33 @@ function IntroPanel() {
         backgroundColor: "#101014",
       }}
     >
-      <div className="flex h-full w-full flex-col md:flex-row">
-        <div className="relative z-10 flex w-full flex-col justify-center px-7 py-10 md:w-[48%] md:px-10 lg:px-12 xl:px-16">
-          <span
-            className="showcase-intro-eyebrow font-inter text-[10px] uppercase tracking-[0.28em] md:text-xs"
-            style={{ color: "#FF5A2A" }}
-          >
-            THE ICONS
-          </span>
+      <div className="flex h-full w-full">
+        {/* Left: heading + description + CTA */}
+        <div className="relative z-10 flex w-[45%] flex-col justify-center px-8 py-10 md:px-12 lg:px-16">
           <h2
-            className="showcase-intro-title mt-4 font-anton text-[clamp(56px,8vw,112px)] uppercase leading-[0.82] tracking-[0.01em]"
+            className="showcase-intro-title font-anton text-[clamp(48px,7vw,100px)] uppercase leading-[0.85] tracking-[0.01em]"
             style={{ color: "#F5E6C8" }}
           >
-            BEYOND<br />THE SHINOBI.
+            BEYOND
+            <br />
+            <span style={{
+              background: "linear-gradient(90deg, #FF5A2A, #FF8C42)",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+            }}>
+              THE SHINOBI.
+            </span>
           </h2>
+
           <p
-            className="showcase-intro-copy mt-6 max-w-[440px] font-inter text-sm leading-relaxed md:mt-8 md:text-base lg:text-lg"
+            className="showcase-intro-copy mt-6 max-w-[380px] font-inter text-sm leading-relaxed md:mt-8 md:text-base"
             style={{ color: "rgba(245,230,200,0.58)" }}
           >
             Legends, symbols, and moments that shaped the world. Explore the
             icons that made Naruto unforgettable.
           </p>
-          <div className="showcase-intro-cta mt-7 flex items-center gap-4 md:mt-10 md:gap-5">
+
+          <div className="showcase-intro-cta mt-8 flex items-center gap-4 md:mt-10">
             <div
               className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border md:h-14 md:w-14"
               style={{ borderColor: "rgba(245,230,200,0.20)" }}
@@ -200,20 +205,66 @@ function IntroPanel() {
             </div>
           </div>
         </div>
-        <div className="showcase-intro-visual relative flex h-full w-full items-end justify-center overflow-hidden md:w-[52%] md:items-center md:justify-end">
-          <div aria-hidden="true" className="absolute inset-0"
-            style={{ background: "radial-gradient(circle at center, rgba(255,90,42,0.13), transparent 64%)" }}
-          />
-          <Image
-            src={c.image} alt={c.alt} fill priority={false}
-            sizes="(max-width: 767px) 75vw, (max-width: 1279px) 38vw, 32vw"
-            className="relative z-10 object-contain object-bottom md:object-right"
-            style={{ filter: "drop-shadow(0 28px 55px rgba(0,0,0,0.55))" }}
-          />
-          <span className="pointer-events-none absolute bottom-2 right-4 z-20 select-none font-anton text-[24vw] leading-none md:right-6 md:text-[15vw]"
-            style={{ color: "#8B1A1A", opacity: 0.08 }} aria-hidden="true">
-            {c.number}
-          </span>
+
+        {/* Right: character preview card */}
+        <div className="flex w-[55%] items-center justify-center p-6 md:p-8 lg:p-10">
+          <div
+            className="relative flex h-full w-full max-w-[560px] overflow-hidden rounded-xl border"
+            style={{
+              borderColor: "rgba(245,230,200,0.10)",
+              backgroundColor: "#121218",
+            }}
+          >
+            {/* Background number */}
+            <span
+              className="pointer-events-none absolute bottom-[-5%] right-[-2%] z-0 select-none font-anton text-[22vw] leading-none"
+              style={{ color: "#8B1A1A", opacity: 0.06 }}
+              aria-hidden="true"
+            >
+              {c.number}
+            </span>
+
+            {/* Image */}
+            <div className="relative h-full w-[50%] overflow-hidden">
+              <div
+                aria-hidden="true"
+                className="absolute inset-0"
+                style={{ background: "radial-gradient(circle at 55% 48%, rgba(255,90,42,0.10), transparent 63%)" }}
+              />
+              <Image
+                src={c.image} alt={c.alt} fill
+                sizes="(max-width: 767px) 40vw, 28vw"
+                className="relative z-10 object-contain object-bottom"
+                style={{ filter: "drop-shadow(0 28px 55px rgba(0,0,0,0.55))" }}
+              />
+            </div>
+
+            {/* Text */}
+            <div className="relative z-20 flex w-[50%] flex-col justify-center px-5 py-6 md:px-7">
+              <span className="font-inter text-[9px] uppercase tracking-[0.18em] md:text-[10px]" style={{ color: "#FF5A2A" }}>
+                {c.eyebrow}
+              </span>
+              <h3 className="mt-2 font-anton text-[clamp(22px,3vw,36px)] uppercase leading-[0.88] tracking-[0.02em] md:mt-3"
+                style={{ color: "#F5E6C8" }}>
+                {c.title}
+              </h3>
+              <p className="mt-3 font-inter text-[11px] leading-relaxed md:text-xs"
+                style={{ color: "rgba(245,230,200,0.50)" }}>
+                {c.description}
+              </p>
+              <span className="mt-3 font-inter text-[8px] uppercase tracking-[0.22em] md:text-[9px]"
+                style={{ color: "rgba(245,230,200,0.30)" }}>
+                {c.subline}
+              </span>
+              <div className="mt-4 flex items-center gap-2 font-anton text-[10px] uppercase tracking-[0.20em] md:text-[11px]"
+                style={{ color: "#FF5A2A" }}>
+                EXPLORE
+                <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <path d="M5 12h14M12 5l7 7-7 7" />
+                </svg>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </article>
@@ -226,45 +277,81 @@ function CharacterPanel({ character }: { character: Character }) {
       className={`showcase-panel showcase-character relative flex h-[68svh] min-h-[520px] shrink-0 ${CARD_WIDTH} overflow-hidden rounded-2xl border`}
       style={{ borderColor: "rgba(245,230,200,0.10)", backgroundColor: "#121218" }}
     >
-      <span className="showcase-number pointer-events-none absolute bottom-[-5%] right-[-2%] z-0 select-none font-anton text-[30vw] leading-none md:text-[18vw]"
-        style={{ color: "#8B1A1A", opacity: 0.08 }} aria-hidden="true">
+      {/* Background number */}
+      <span
+        className="showcase-number pointer-events-none absolute bottom-[-5%] right-[-2%] z-0 select-none font-anton text-[28vw] leading-none md:text-[18vw]"
+        style={{ color: "#8B1A1A", opacity: 0.06 }}
+        aria-hidden="true"
+      >
         {character.number}
       </span>
-      <div className="relative flex h-full w-full flex-col md:flex-row">
-        <div className="showcase-content relative z-20 flex h-[54%] w-full flex-col justify-center px-7 py-7 md:h-full md:w-[56%] md:px-10 lg:px-12 xl:px-14">
-          <span className="showcase-eyebrow font-inter text-[10px] uppercase tracking-[0.18em] md:text-xs" style={{ color: "#FF5A2A" }}>
-            {character.eyebrow}
-          </span>
-          <h3 className="showcase-title mt-3 max-w-[620px] font-anton text-[clamp(40px,6.5vw,82px)] uppercase leading-[0.87] tracking-[0.02em] md:mt-4"
-            style={{ color: "#F5E6C8" }}>
-            {character.title}
-          </h3>
-          <p className="showcase-desc mt-4 max-w-[510px] font-inter text-sm leading-relaxed md:mt-5 md:text-base lg:text-lg"
-            style={{ color: "rgba(245,230,200,0.58)" }}>
-            {character.description}
-          </p>
-          <span className="showcase-subline mt-5 font-inter text-[9px] uppercase tracking-[0.24em] md:mt-7 md:text-[10px]"
-            style={{ color: "rgba(245,230,200,0.36)" }}>
-            {character.subline}
-          </span>
-          <div className="showcase-cta mt-6 flex items-center gap-3 font-anton text-xs uppercase tracking-[0.24em] md:mt-8 md:text-sm"
-            style={{ color: "#FF5A2A" }}>
-            EXPLORE
-            <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-              <path d="M5 12h14M12 5l7 7-7 7" />
-            </svg>
-          </div>
-        </div>
-        <div className="showcase-visual relative flex h-[46%] w-full items-end justify-center overflow-hidden md:h-full md:w-[44%] md:items-center md:justify-end">
-          <div aria-hidden="true" className="absolute inset-0"
+
+      <div className="relative flex h-full w-full">
+        {/* Left: image */}
+        <div className="showcase-visual relative flex w-[45%] items-end justify-center overflow-hidden md:items-center">
+          <div
+            aria-hidden="true"
+            className="absolute inset-0"
             style={{ background: "radial-gradient(circle at 55% 48%, rgba(255,90,42,0.10), transparent 63%)" }}
           />
           <Image
-            src={character.image} alt={character.alt} fill
-            sizes="(max-width: 767px) 65vw, (max-width: 1279px) 36vw, 30vw"
+            src={character.image}
+            alt={character.alt}
+            fill
+            sizes="(max-width: 767px) 50vw, 32vw"
             className="relative z-10 object-contain object-bottom md:object-right"
             style={{ filter: "drop-shadow(0 28px 55px rgba(0,0,0,0.55))" }}
           />
+        </div>
+
+        {/* Right: text content */}
+        <div className="showcase-content relative z-20 flex w-[55%] flex-col justify-center px-8 py-8 md:px-12 lg:px-14">
+          <span
+            className="showcase-eyebrow font-inter text-[10px] uppercase tracking-[0.18em] md:text-xs"
+            style={{ color: "#FF5A2A" }}
+          >
+            {character.eyebrow}
+          </span>
+
+          <h3
+            className="showcase-title mt-3 max-w-[520px] font-anton text-[clamp(32px,5.5vw,72px)] uppercase leading-[0.87] tracking-[0.02em] md:mt-4"
+            style={{ color: "#F5E6C8" }}
+          >
+            {character.title}
+          </h3>
+
+          <p
+            className="showcase-desc mt-4 max-w-[440px] font-inter text-sm leading-relaxed md:mt-5 md:text-base"
+            style={{ color: "rgba(245,230,200,0.58)" }}
+          >
+            {character.description}
+          </p>
+
+          <span
+            className="showcase-subline mt-4 font-inter text-[9px] uppercase tracking-[0.24em] md:mt-6 md:text-[10px]"
+            style={{ color: "rgba(245,230,200,0.36)" }}
+          >
+            {character.subline}
+          </span>
+
+          <div
+            className="showcase-cta mt-6 flex items-center gap-3 font-anton text-xs uppercase tracking-[0.24em] md:mt-8 md:text-sm"
+            style={{ color: "#FF5A2A" }}
+          >
+            EXPLORE
+            <svg
+              className="h-5 w-5"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M5 12h14M12 5l7 7-7 7" />
+            </svg>
+          </div>
         </div>
       </div>
     </article>
