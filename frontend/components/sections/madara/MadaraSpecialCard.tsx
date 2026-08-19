@@ -626,7 +626,7 @@ export default function MadaraSpecialCard({
   return (
     <section
       ref={sectionRef}
-      className="w-full py-12 md:py-16 min-h-[80vh] md:min-h-[90vh] flex flex-col items-center"
+      className="w-full py-12 md:py-16 min-h-auto md:min-h-[90vh] flex flex-col items-center"
     >
       <div className="w-full max-w-[1900px] px-4 md:px-6 lg:px-8">
         <div ref={titleRef} className="flex justify-center mb-10 md:mb-14">
@@ -747,7 +747,7 @@ export default function MadaraSpecialCard({
                   The world will know true peace.
                 </div>
                 <div
-                  className="relative w-full flex-1 min-h-[500px] md:min-h-[620px] lg:min-h-[720px] overflow-hidden rounded-lg flex items-center justify-center mt-4"
+                  className="relative w-full flex-1 min-h-[350px] sm:min-h-[500px] md:min-h-[620px] lg:min-h-[720px] overflow-hidden rounded-lg flex items-center justify-center mt-4"
                   onMouseEnter={handleMouseEnter}
                   onMouseLeave={handleMouseLeave}
                 >

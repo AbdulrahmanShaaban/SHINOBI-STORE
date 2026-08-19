@@ -118,7 +118,7 @@ export default function CardStack() {
 
   return (
     <section className="card-stack-container min-h-screen bg-[#0A0A0F] py-12 md:py-20">
-      <div className="container absolute top-50 left-1/2 -translate-x-1/2 px-4 md:px-6">
+      <div className="container relative md:absolute md:top-50 md:left-1/2 md:-translate-x-1/2 px-4 md:px-6">
         <div className="max-w-2xl mx-auto relative">
           {/* Card 1 */}
           <div className="card-item absolute top-0 left-0 right-0">
@@ -137,7 +137,7 @@ export default function CardStack() {
                 ))}
               </div>
             </div>
-            <div className="card-body bg-[#1A1A1A] rounded-b-xl p-5 md:p-8 flex flex-col items-center text-center pb-[20vh] md:pb-[35vh]">
+            <div className="card-body bg-[#1A1A1A] rounded-b-xl p-5 md:p-8 flex flex-col items-center text-center pb-[12vh] md:pb-[35vh]">
               <div className="card-content flex flex-col items-center text-center">
                 <img src="/kunai.svg" alt="" className="w-14 h-14 md:w-20 md:h-20 mb-4 md:mb-6" />
                 <p className="text-[#F0F0F0] text-base md:text-lg leading-relaxed max-w-md">
@@ -164,7 +164,7 @@ export default function CardStack() {
                 ))}
               </div>
             </div>
-            <div className="card-body bg-[#1A1A1A] rounded-b-xl p-5 md:p-8 flex flex-col items-center text-center pb-[20vh] md:pb-[35vh]">
+            <div className="card-body bg-[#1A1A1A] rounded-b-xl p-5 md:p-8 flex flex-col items-center text-center pb-[12vh] md:pb-[35vh]">
               <div className="card-content flex flex-col items-center text-center">
                 <svg className="w-16 h-16 md:w-24 md:h-24 mb-4 md:mb-6 text-[#FF7F00]" viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="2">
                   {/* Shuriken */}
@@ -195,7 +195,7 @@ export default function CardStack() {
                 ))}
               </div>
             </div>
-            <div className="card-body bg-[#1A1A1A] rounded-b-xl p-5 md:p-8 flex flex-col items-center text-center pb-[20vh] md:pb-[35vh]">
+            <div className="card-body bg-[#1A1A1A] rounded-b-xl p-5 md:p-8 flex flex-col items-center text-center pb-[12vh] md:pb-[35vh]">
               <div className="card-content flex flex-col items-center text-center">
                 <svg className="w-16 h-16 md:w-24 md:h-24 mb-4 md:mb-6 text-[#FF7F00]" viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="2">
                   {/* Chakra Flame */}
@@ -227,7 +227,7 @@ export default function CardStack() {
                 ))}
               </div>
             </div>
-            <div className="card-body bg-[#1A1A1A] rounded-b-xl p-5 md:p-8 flex flex-col items-center text-center pb-[20vh] md:pb-[35vh]">
+            <div className="card-body bg-[#1A1A1A] rounded-b-xl p-5 md:p-8 flex flex-col items-center text-center pb-[12vh] md:pb-[35vh]">
               <div className="card-content flex flex-col items-center text-center">
                 <svg className="w-16 h-16 md:w-24 md:h-24 mb-4 md:mb-6 text-[#FF7F00]" viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="2">
                   {/* Ninja Headband */}

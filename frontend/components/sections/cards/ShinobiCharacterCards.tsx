@@ -93,7 +93,7 @@ export default function ShinobiCharacterCards() {
   };
 
   return (
-    <section ref={sectionRef} className="w-full py-8 md:py-12 min-h-[90vh] md:min-h-[95vh] mb-16 md:mb-20 flex justify-center">
+    <section ref={sectionRef} className="w-full py-8 md:py-12 min-h-auto md:min-h-[95vh] mb-16 md:mb-20 flex justify-center">
       <div className="w-full max-w-[1900px] px-4 md:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-[8px]">
         {/* NARUTO */}
@@ -110,7 +110,7 @@ export default function ShinobiCharacterCards() {
             <div className="font-inter text-sm mt-1 text-center" style={{ color: "rgba(245,230,200,0.85)" }}>
               Never gives up. Never backs down.
             </div>
-            <div className="relative w-full flex-1 min-h-[450px] md:min-h-[550px] lg:min-h-[650px] overflow-hidden rounded-lg flex items-center justify-center mt-4">
+            <div className="relative w-full flex-1 min-h-[320px] sm:min-h-[450px] md:min-h-[550px] lg:min-h-[650px] overflow-hidden rounded-lg flex items-center justify-center mt-4">
               <img ref={narutoDefaultRef} src="/naruto-default.png" alt="Naruto" className="absolute inset-0 w-full h-full object-contain" />
               <img ref={narutoJutsuRef} src="/naruto-rasengan.png" alt="Naruto Rasengan" className="absolute inset-0 w-full h-full object-contain" style={{ opacity: 0 }} />
             </div>
@@ -153,7 +153,7 @@ export default function ShinobiCharacterCards() {
             <div className="font-inter text-sm mt-1 text-center" style={{ color: "rgba(245,230,200,0.85)" }}>
               Sacrifice everything for peace.
             </div>
-            <div className="relative w-full flex-1 min-h-[450px] md:min-h-[550px] lg:min-h-[650px] overflow-hidden rounded-lg flex items-center justify-center mt-4">
+            <div className="relative w-full flex-1 min-h-[320px] sm:min-h-[450px] md:min-h-[550px] lg:min-h-[650px] overflow-hidden rounded-lg flex items-center justify-center mt-4">
               <img ref={itachiDefaultRef} src="/itachi-default.png" alt="Itachi" className="absolute inset-0 w-full h-full object-contain" />
               <img ref={itachiJutsuRef} src="/itachi-mangekyou.png" alt="Itachi Mangekyo" className="absolute inset-0 w-full h-full object-contain" style={{ opacity: 0 }} />
             </div>
@@ -196,7 +196,7 @@ export default function ShinobiCharacterCards() {
             <div className="font-inter text-sm mt-1 text-center" style={{ color: "rgba(245,230,200,0.85)" }}>
               Power at any cost.
             </div>
-            <div className="relative w-full flex-1 min-h-[450px] md:min-h-[550px] lg:min-h-[650px] overflow-hidden rounded-lg flex items-center justify-center mt-4">
+            <div className="relative w-full flex-1 min-h-[320px] sm:min-h-[450px] md:min-h-[550px] lg:min-h-[650px] overflow-hidden rounded-lg flex items-center justify-center mt-4">
               <img ref={sasukeDefaultRef} src="/sasuke-default.png" alt="Sasuke" className="absolute inset-0 w-full h-full object-contain" />
               <img ref={sasukeJutsuRef} src="/sasuke-chidori.png" alt="Sasuke Chidori" className="absolute inset-0 w-full h-full object-contain" style={{ opacity: 0 }} />
             </div>

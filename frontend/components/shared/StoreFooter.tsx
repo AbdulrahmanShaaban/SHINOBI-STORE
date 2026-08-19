@@ -104,7 +104,7 @@ export default function StoreFooter() {
       className="flex flex-col w-full bg-[#0D0A08] border-t"
       style={{ borderColor: "rgba(245,230,200,0.20)" }}
     >
-      <div className="mx-auto w-full max-w-[1600px] px-4 md:px-10 lg:px-12 xl:px-[72px] flex-1 flex flex-col justify-center py-16 md:py-24 gap-14 md:gap-20 md:min-h-[80svh]">
+      <div className="mx-auto w-full max-w-[1600px] px-4 md:px-10 lg:px-12 xl:px-[72px] flex-1 flex flex-col justify-center py-10 md:py-24 gap-8 md:gap-20 md:min-h-[80svh]">
         {/* Giant brand block */}
         <div className="footer-brand text-center md:text-left">
           <div

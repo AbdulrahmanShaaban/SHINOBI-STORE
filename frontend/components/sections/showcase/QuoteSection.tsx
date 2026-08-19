@@ -80,7 +80,7 @@ function MarqueeRow({ row }: { row: (typeof MARQUEE_ROWS)[number] }) {
     >
       <div
         ref={trackRef}
-        className="flex w-max will-change-transform py-5 md:py-7"
+        className="flex w-max will-change-transform py-3 md:py-7"
       >
         {Array.from({ length: MARQUEE_COPIES }).map((_, i) => (
           <span
@@ -266,7 +266,7 @@ export default function QuoteSection() {
   return (
     <section ref={sectionRef} className="relative w-full overflow-hidden bg-[#101014]">
       {/* Marquees */}
-      <div className="pt-[clamp(96px,12vh,180px)]">
+      <div className="pt-[clamp(48px,6vh,90px)] md:pt-[clamp(96px,12vh,180px)]">
         {MARQUEE_ROWS.map((row) => (
           <MarqueeRow key={row.text} row={row} />
         ))}

@@ -187,11 +187,11 @@ export default function HeroSection() {
         <div className="absolute w-1 h-1 bg-[#FF6B00] rounded-full" style={{ left: '95%', top: '5%', opacity: 0.5 }} />
       </div>
 
-      <div className="relative z-10 container mx-auto px-4 md:px-6 h-full flex items-center">
-        <div id="hero-logo" className="w-[45%] sm:w-[55%] md:w-1/2 absolute top-4 left-0 md:top-10 md:left-[-50px]">
+      <div className="relative z-10 h-full md:container md:mx-auto md:px-6 md:flex md:items-center">
+        <div id="hero-logo" className="relative w-[70%] mx-auto mt-6 md:w-1/2 md:absolute md:top-10 md:left-[-50px] md:mx-0 md:mt-0 z-20">
           <ShinobiLogo />
         </div>
-        <div className="w-[50%] sm:w-[65%] md:w-1/2 h-[75vh] sm:h-[90vh] md:h-[120vh] lg:h-[150vh] absolute right-0 sm:right-2 top-14 sm:top-10 md:right-[50px] md:top-[25px]">
+        <div className="absolute inset-0 w-full h-full md:w-1/2 md:h-[120vh] lg:h-[150vh] md:absolute md:right-[50px] md:top-[25px] z-10">
           <Naruto1 />
         </div>
       </div>
