@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 
 export default function Navbar() {
@@ -14,6 +14,27 @@ export default function Navbar() {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  const closeMenu = useCallback(() => setIsMenuOpen(false), []);
+
+  useEffect(() => {
+    if (!isMenuOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') closeMenu();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isMenuOpen, closeMenu]);
+
+  const prefersReducedMotion = typeof window !== 'undefined'
+    && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  const overlayTransition = prefersReducedMotion
+    ? ''
+    : 'transition-opacity duration-300 ease-in-out';
+  const contentTransition = prefersReducedMotion
+    ? ''
+    : 'transition-all duration-300 ease-out';
 
   return (
     <nav
@@ -66,31 +87,46 @@ export default function Navbar() {
             </svg>
           </button>
         </div>
+      </div>
 
-        {/* Mobile/Tablet Menu */}
-        {isMenuOpen && (
-          <div className="lg:hidden py-6 px-2 border-t border-[#2A2A3A] bg-[#0A0A0F]/95 backdrop-blur-md">
-            <div className="flex flex-col gap-4">
-              <Link href="/" onClick={() => setIsMenuOpen(false)} className="text-[#F0F0F0] font-cinzel font-bold text-base tracking-wide hover:text-[#FF6B00] transition-colors py-2">
-                HOME
-              </Link>
-              <Link href="/products" onClick={() => setIsMenuOpen(false)} className="text-[#F0F0F0] font-cinzel font-bold text-base tracking-wide hover:text-[#FF6B00] transition-colors py-2">
-                SHOP
-              </Link>
-              <Link href="/about" onClick={() => setIsMenuOpen(false)} className="text-[#F0F0F0] font-cinzel font-bold text-base tracking-wide hover:text-[#FF6B00] transition-colors py-2">
-                ABOUT
-              </Link>
-              <Link href="/contact" onClick={() => setIsMenuOpen(false)} className="text-[#F0F0F0] font-cinzel font-bold text-base tracking-wide hover:text-[#FF6B00] transition-colors py-2">
-                CONTACT
-              </Link>
-              <Link href="/cart" onClick={() => setIsMenuOpen(false)} className="text-[#F0F0F0] font-cinzel font-bold text-base tracking-wide hover:text-[#FF6B00] transition-colors py-2">
-                CART
-              </Link>
-            </div>
-          </div>
-        )}
+      {/* Full-screen overlay */}
+      <div
+        className={`lg:hidden fixed inset-0 z-[60] flex flex-col items-center justify-center bg-[#0A0A0F] ${
+          isMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+        } ${overlayTransition}`}
+      >
+        {/* Close button */}
+        <button
+          onClick={closeMenu}
+          className="absolute top-5 right-5 p-2 text-[#F0F0F0] hover:text-[#FF6B00] transition-colors"
+          aria-label="Close menu"
+        >
+          <svg className="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M6 18 L18 6 M6 6 L18 18" />
+          </svg>
+        </button>
+
+        {/* Nav links */}
+        <nav className={`flex flex-col items-center gap-8 ${contentTransition} ${
+          isMenuOpen ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+        }`}>
+          <Link href="/" onClick={closeMenu} className="font-cinzel font-bold text-3xl tracking-[0.15em] text-[#F0F0F0] hover:text-[#FF6B00] transition-colors">
+            HOME
+          </Link>
+          <Link href="/products" onClick={closeMenu} className="font-cinzel font-bold text-3xl tracking-[0.15em] text-[#F0F0F0] hover:text-[#FF6B00] transition-colors">
+            SHOP
+          </Link>
+          <Link href="/about" onClick={closeMenu} className="font-cinzel font-bold text-3xl tracking-[0.15em] text-[#F0F0F0] hover:text-[#FF6B00] transition-colors">
+            ABOUT
+          </Link>
+          <Link href="/contact" onClick={closeMenu} className="font-cinzel font-bold text-3xl tracking-[0.15em] text-[#F0F0F0] hover:text-[#FF6B00] transition-colors">
+            CONTACT
+          </Link>
+          <Link href="/cart" onClick={closeMenu} className="font-cinzel font-bold text-3xl tracking-[0.15em] text-[#F0F0F0] hover:text-[#FF6B00] transition-colors">
+            CART
+          </Link>
+        </nav>
       </div>
     </nav>
   );
 }
-
