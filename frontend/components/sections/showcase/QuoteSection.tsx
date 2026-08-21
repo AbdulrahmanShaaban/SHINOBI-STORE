@@ -282,14 +282,27 @@ export default function QuoteSection() {
           <div className="w-full max-w-[1300px] px-6 text-center">
             <h2
               ref={quoteTextRef}
-              className="font-anton text-[clamp(34px,10vw,68px)] uppercase leading-[0.88] tracking-[0.02em] md:text-[clamp(52px,6.5vw,120px)]"
+              className="font-anton text-[clamp(34px,10vw,68px)] uppercase leading-[0.88] tracking-[0.02em] md:text-[clamp(48px,5.5vw,100px)]"
               style={{ color: "#F5E6C8" }}
             >
-              {QUOTE_CHARS.map((char, index) => (
-                <span key={index} className="inline-block overflow-hidden">
-                  <span className="quote-char inline-block will-change-transform" style={{ color: "#F5E6C8" }}>
-                    {char === " " ? "\u00A0" : char}
+              {QUOTE.split(" ").map((word, wordIndex, arr) => (
+                <span key={wordIndex} style={{ display: "inline" }}>
+                  <span style={{ display: "inline-flex" }}>
+                    {Array.from(word).map((char, charIndex) => (
+                      <span key={`${wordIndex}-${charIndex}`} className="inline-block overflow-hidden">
+                        <span className="quote-char inline-block will-change-transform" style={{ color: "#F5E6C8" }}>
+                          {char}
+                        </span>
+                      </span>
+                    ))}
                   </span>
+                  {wordIndex !== arr.length - 1 && (
+                    <span className="inline-block overflow-hidden">
+                      <span className="quote-char inline-block will-change-transform" style={{ color: "#F5E6C8" }}>
+                        {"\u00A0"}
+                      </span>
+                    </span>
+                  )}
                 </span>
               ))}
             </h2>
@@ -316,14 +329,27 @@ export default function QuoteSection() {
           <div className="w-full max-w-[1300px]">
             <h2
               ref={mobileQuoteTextRef}
-              className="font-anton text-[clamp(34px,10vw,68px)] uppercase leading-[0.88] tracking-[0.02em]"
+              className="font-anton text-[clamp(30px,8vw,56px)] uppercase leading-[0.88] tracking-[0.02em]"
               style={{ color: "#F5E6C8" }}
             >
-              {QUOTE_CHARS.map((char, index) => (
-                <span key={index} className="inline-block overflow-hidden">
-                  <span className="quote-char inline-block will-change-transform" style={{ color: "#F5E6C8" }}>
-                    {char === " " ? "\u00A0" : char}
+              {QUOTE.split(" ").map((word, wordIndex, arr) => (
+                <span key={wordIndex} style={{ display: "inline" }}>
+                  <span style={{ display: "inline-flex" }}>
+                    {Array.from(word).map((char, charIndex) => (
+                      <span key={`${wordIndex}-${charIndex}`} className="inline-block overflow-hidden">
+                        <span className="quote-char inline-block will-change-transform" style={{ color: "#F5E6C8" }}>
+                          {char}
+                        </span>
+                      </span>
+                    ))}
                   </span>
+                  {wordIndex !== arr.length - 1 && (
+                    <span className="inline-block overflow-hidden">
+                      <span className="quote-char inline-block will-change-transform" style={{ color: "#F5E6C8" }}>
+                        {"\u00A0"}
+                      </span>
+                    </span>
+                  )}
                 </span>
               ))}
             </h2>

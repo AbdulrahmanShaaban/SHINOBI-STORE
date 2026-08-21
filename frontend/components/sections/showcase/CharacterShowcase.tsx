@@ -79,52 +79,53 @@ function CharacterPanel({ character }: { character: Character }) {
         
         {/* Right Side: Content (Glassmorphism) */}
         {/* OPACITY CONTROLS: The background opacity of this card is managed here by 'bg-black/60'. Change '60' to a higher/lower number (e.g. 40, 80) to adjust transparency. */}
-        <div className="relative z-20 flex w-full h-[55%] md:h-full md:w-[55%] flex-col justify-center p-6 sm:p-8 md:p-12 lg:p-16 xl:p-20 bg-black/60 backdrop-blur-xl">
+        <div className="relative z-20 flex w-full h-[55%] md:h-full md:w-[55%] flex-col justify-center p-6 sm:p-8 md:p-10 lg:p-14 bg-black/60 backdrop-blur-xl overflow-hidden">
           {/* Background Number */}
           <span
-            className="pointer-events-none absolute bottom-2 right-2 md:bottom-6 md:right-8 z-0 select-none font-anton text-[140px] md:text-[200px] leading-none"
-            style={{ color: "#ffffff", opacity: 0.03 }}
+            className="pointer-events-none absolute bottom-0 right-2 md:bottom-4 md:right-6 z-0 select-none font-anton text-[120px] md:text-[180px] lg:text-[220px] leading-none"
+            style={{ color: "#ffffff", opacity: 0.04 }}
             aria-hidden="true"
           >
             {character.number}
           </span>
           
           <div className="relative z-10">
-            <span className="showcase-eyebrow font-inter text-[10px] md:text-[12px] font-black uppercase tracking-[0.2em] text-[#F97316]">
+            <span className="showcase-eyebrow font-inter text-[10px] md:text-[11px] font-black uppercase tracking-[0.2em] text-[#F97316]">
               {character.eyebrow}
             </span>
             
-            <h3 className="showcase-title mt-1 md:mt-2 font-anton text-[36px] md:text-[48px] lg:text-[56px] xl:text-[68px] uppercase leading-[1.05] tracking-[0.02em] text-white">
+            <h3 className="showcase-title mt-1 md:mt-2 font-anton text-[32px] md:text-[40px] lg:text-[52px] xl:text-[60px] uppercase leading-[1.05] tracking-[0.02em] text-white">
               {character.title}
             </h3>
             
-            <p className="showcase-desc mt-3 md:mt-5 max-w-[480px] font-inter text-[14px] md:text-[16px] leading-[1.65] text-white/70">
+            <p className="showcase-desc mt-3 md:mt-5 max-w-[440px] font-inter text-[13px] md:text-[15px] leading-[1.7] text-white/70">
               {character.description}
             </p>
 
-            <div className="mt-6 md:mt-8 flex flex-wrap gap-3 md:gap-4">
+            <div className="mt-5 md:mt-7 flex flex-wrap gap-2 md:gap-3">
               {character.skills.map(skill => (
-                <span key={skill} className="px-4 py-1.5 md:px-5 md:py-2 text-[10px] md:text-[12px] font-medium tracking-wide text-white/60 border border-white/20 rounded-full bg-transparent">
+                <span key={skill} className="px-3 py-1 md:px-4 md:py-1.5 text-[10px] md:text-[11px] font-medium tracking-wide text-white/60 border border-white/20 rounded-full bg-transparent">
                   {skill}
                 </span>
               ))}
             </div>
-            
-            <div className="showcase-cta mt-8 md:mt-12 flex items-center gap-3 font-anton text-[13px] md:text-[15px] uppercase tracking-[0.25em] text-white hover:text-[#F97316] transition-colors cursor-pointer w-max">
-              EXPLORE
-              <svg
-                className="h-4 w-4 md:h-5 md:w-5"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden="true"
-              >
-                <path d="M5 12h14M12 5l7 7-7 7" />
-              </svg>
-            </div>
+          </div>
+          
+          {/* CTA — pinned to bottom-left of the glass panel */}
+          <div className="showcase-cta absolute bottom-6 left-6 sm:bottom-8 sm:left-8 md:bottom-10 md:left-10 lg:bottom-14 lg:left-14 z-10 flex items-center gap-3 font-anton text-[14px] md:text-[17px] uppercase tracking-[0.25em] text-white hover:text-[#F97316] transition-colors cursor-pointer w-max">
+            EXPLORE
+            <svg
+              className="h-5 w-5 md:h-6 md:w-6"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M5 12h14M12 5l7 7-7 7" />
+            </svg>
           </div>
         </div>
       </div>
