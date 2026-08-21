@@ -4,7 +4,7 @@ import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import ShinobiLogo from '@/components/shared/ShinobiLogo';
-import Naruto1 from '@/components/sections/hero/NarutoHeroImage';
+import Naruto from '@/components/sections/hero/NarutoHeroImage';
 import SlidingImage from '@/components/sections/hero/SlidingImage';
 
 gsap.registerPlugin(ScrollTrigger);
@@ -33,9 +33,9 @@ export default function HeroSection() {
 
         if (isDesktop) {
           const tl = gsap.timeline({ delay: 0.2 });
-          tl.from('.naruto1-character', { x: 200, opacity: 0, duration: 1.2, ease: 'power3.out' }, '-=1');
+          tl.from('.naruto-character', { y: 80, opacity: 0, scale: 0.95, duration: 1.2, ease: 'power3.out' }, '-=1');
 
-          gsap.to('.naruto1-character', {
+          gsap.to('.naruto-character', {
             y: -10,
             duration: 2,
             repeat: -1,
@@ -73,9 +73,9 @@ export default function HeroSection() {
 
         if (isMobile) {
           const tl = gsap.timeline({ delay: 0.2 });
-          tl.from('.naruto1-character', { x: 100, opacity: 0, duration: 1, ease: 'power3.out' }, '-=1');
+          tl.from('.naruto-character', { y: 60, opacity: 0, scale: 0.95, duration: 1, ease: 'power3.out' }, '-=1');
 
-          gsap.to('.naruto1-character', {
+          gsap.to('.naruto-character', {
             y: -6,
             duration: 2.5,
             repeat: -1,
@@ -187,12 +187,18 @@ export default function HeroSection() {
         <div className="absolute w-1 h-1 bg-[#FF6B00] rounded-full" style={{ left: '95%', top: '5%', opacity: 0.5 }} />
       </div>
 
-      <div className="relative z-10 h-full md:container md:mx-auto md:px-6 md:flex md:items-center">
-        <div id="hero-logo" className="relative w-[70%] mx-auto mt-6 md:w-1/2 md:absolute md:top-10 md:left-[-50px] md:mx-0 md:mt-0 z-20">
+      {/* Content layer */}
+      <div className="relative z-10 h-full flex flex-col">
+        {/* Logo - top left on all screens */}
+        <div id="hero-logo" className="absolute z-20" style={{ width: 'clamp(160px, 25vw, 380px)', top: 'clamp(12px, 2.5vw, 36px)', left: 'clamp(12px, 3vw, 40px)' }}>
           <ShinobiLogo />
         </div>
-        <div className="absolute inset-0 w-full h-full md:w-1/2 md:h-[120vh] lg:h-[150vh] md:absolute md:right-[50px] md:top-[25px] z-10">
-          <Naruto1 />
+
+        {/* Naruto - centered, bottom-anchored, fluid width */}
+        <div className="naruto-wrapper absolute inset-x-0 bottom-0 flex justify-center z-10 pointer-events-none">
+          <div className="relative pointer-events-auto" style={{ width: 'clamp(380px, 140vw, 750px)' }}>
+            <Naruto />
+          </div>
         </div>
       </div>
     </section>

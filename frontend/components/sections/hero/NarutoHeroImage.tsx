@@ -1,10 +1,10 @@
-export default function Naruto1() {
+export default function Naruto() {
   return (
-    <div className="naruto1-character w-full h-full overflow-x-visible">
+    <div className="naruto-character w-full pointer-events-auto">
       <img
         src="/naruto.png"
         alt="Naruto"
-        className="w-full h-full object-cover object-top overflow-x-visible"
+        className="w-full h-auto object-contain"
       />
     </div>
   );
