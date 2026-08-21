@@ -16,6 +16,7 @@ type Character = {
   subline: string;
   image: string;
   alt: string;
+  skills: string[];
 };
 
 const CHARACTERS: Character[] = [
@@ -23,165 +24,107 @@ const CHARACTERS: Character[] = [
     number: "01",
     eyebrow: "THE FOURTH HOKAGE",
     title: "MINATO NAMIKAZE",
-    description:
-      "The Yellow Flash. Precision, speed, and a will strong enough to protect everyone behind him.",
+    description: "The Yellow Flash. Precision, speed, and a will strong enough to protect everyone behind him.",
     subline: "THE YELLOW FLASH",
     image: "/minato.png",
     alt: "Minato Namikaze",
+    skills: ["Flying Thunder God", "Rasengan", "Fuinjutsu"],
   },
   {
     number: "02",
     eyebrow: "THE AKATSUKI FOUNDER",
     title: "PAIN NAGATO",
-    description:
-      "Those who do not understand true pain can never understand true peace.",
+    description: "Those who do not understand true pain can never understand true peace.",
     subline: "THE SIX PATHS OF PAIN",
     image: "/pain.png",
     alt: "Pain Nagato",
+    skills: ["Rinnegan", "Almighty Push", "Planetary Devastation"],
   },
   {
     number: "03",
     eyebrow: "THE MAN BEHIND THE MASK",
     title: "OBITO UCHIHA",
-    description:
-      "A broken dream, a borrowed identity, and a world he wanted to reshape in his own image.",
+    description: "A broken dream, a borrowed identity, and a world he wanted to reshape in his own image.",
     subline: "THE MASKED SHINOBI",
     image: "/obito-default.png",
     alt: "Obito Uchiha",
+    skills: ["Kamui", "Sharingan", "Wood Release"],
   },
 ];
 
-const INTRO_WIDTH = "w-[88vw] md:w-[45vw] lg:w-[40vw] xl:w-[35vw]";
-const CARD_WIDTH = "w-[82vw] md:w-[74vw] lg:w-[68vw] xl:w-[64vw]";
-
-function IntroPanel() {
-  return (
-    <article
-      className={`showcase-panel showcase-intro relative flex h-[68svh] min-h-[420px] md:min-h-[520px] shrink-0 ${INTRO_WIDTH} overflow-hidden rounded-2xl border`}
-      style={{
-        borderColor: "rgba(245,230,200,0.10)",
-        backgroundColor: "#101014",
-      }}
-    >
-      <div className="flex h-full w-full">
-        <div className="relative z-10 flex w-full flex-col justify-center px-8 py-10 md:px-12 lg:px-16">
-          <h2
-            className="showcase-intro-title font-anton text-[clamp(48px,7vw,100px)] uppercase leading-[0.85] tracking-[0.01em]"
-            style={{ color: "#F5E6C8" }}
-          >
-            BEYOND
-            <br />
-            <span style={{
-              background: "linear-gradient(90deg, #FF5A2A, #FF8C42)",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-            }}>
-              THE SHINOBI.
-            </span>
-          </h2>
-          <p
-            className="showcase-intro-copy mt-6 max-w-[380px] font-inter text-sm leading-relaxed md:mt-8 md:text-base"
-            style={{ color: "rgba(245,230,200,0.58)" }}
-          >
-            Legends, symbols, and moments that shaped the world. Explore the
-            icons that made Naruto unforgettable.
-          </p>
-          <div className="showcase-intro-cta mt-8 flex items-center gap-4 md:mt-10">
-            <div
-              className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border md:h-14 md:w-14"
-              style={{ borderColor: "rgba(245,230,200,0.20)" }}
-              aria-hidden="true"
-            >
-              <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="#F5E6C8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M5 12h14M12 5l7 7-7 7" />
-              </svg>
-            </div>
-            <div>
-              <div className="font-anton text-xs uppercase tracking-[0.22em] md:text-sm" style={{ color: "#F5E6C8" }}>
-                SWIPE TO DISCOVER
-              </div>
-              <div className="mt-1 font-inter text-[9px] uppercase tracking-[0.22em] md:text-[10px]" style={{ color: "#FF5A2A" }}>
-                INTERACTIVE JOURNEY
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </article>
-  );
-}
+const CARD_WIDTH = "w-[85vw] md:w-[74vw] lg:w-[68vw] xl:w-[64vw]";
 
 function CharacterPanel({ character }: { character: Character }) {
   return (
     <article
-      className={`showcase-panel showcase-character relative flex h-[68svh] min-h-[420px] md:min-h-[520px] shrink-0 ${CARD_WIDTH} overflow-hidden rounded-2xl border`}
-      style={{ borderColor: "rgba(245,230,200,0.10)", backgroundColor: "#121218" }}
+      className={`showcase-panel relative flex h-[75svh] min-h-[550px] md:min-h-[520px] shrink-0 ${CARD_WIDTH} overflow-hidden rounded-[2rem] border border-white/10 shadow-2xl`}
     >
-      <span
-        className="showcase-number pointer-events-none absolute bottom-[-5%] right-[-2%] z-0 select-none font-anton text-[28vw] leading-none md:text-[18vw]"
-        style={{ color: "#8B1A1A", opacity: 0.06 }}
-        aria-hidden="true"
-      >
-        {character.number}
-      </span>
-      <div className="relative flex h-full w-full">
-        <div className="showcase-visual relative flex w-[45%] items-end justify-center overflow-hidden md:items-center">
+      <div className="relative flex flex-col md:flex-row h-full w-full z-10">
+        {/* Left Side: Image */}
+        <div className="showcase-visual relative flex w-full h-[45%] md:h-full md:w-[45%] items-end justify-center overflow-visible md:items-center bg-[#1A1A1A] md:rounded-l-[2rem]">
           <div
             aria-hidden="true"
             className="absolute inset-0"
-            style={{ background: "radial-gradient(circle at 55% 48%, rgba(255,90,42,0.10), transparent 63%)" }}
+            style={{ background: "radial-gradient(circle at 50% 50%, rgba(255,90,42,0.05), transparent 70%)" }}
           />
           <Image
             src={character.image}
             alt={character.alt}
             fill
-            sizes="(max-width: 767px) 50vw, 32vw"
-            className="relative z-10 object-contain object-bottom md:object-right"
-            style={{ filter: "drop-shadow(0 28px 55px rgba(0,0,0,0.55))" }}
+            sizes="(max-width: 767px) 100vw, 32vw"
+            className="relative z-10 object-contain object-bottom md:object-right scale-[1.05] md:scale-100 origin-bottom md:origin-center"
+            style={{ filter: "drop-shadow(0 28px 55px rgba(0,0,0,0.65))" }}
           />
         </div>
-        <div className="showcase-content relative z-20 flex w-[55%] flex-col justify-center px-8 py-8 md:px-12 lg:px-14">
+        
+        {/* Right Side: Content (Glassmorphism) */}
+        {/* OPACITY CONTROLS: The background opacity of this card is managed here by 'bg-black/60'. Change '60' to a higher/lower number (e.g. 40, 80) to adjust transparency. */}
+        <div className="relative z-20 flex w-full h-[55%] md:h-full md:w-[55%] flex-col justify-center p-6 sm:p-8 md:p-12 lg:p-16 xl:p-20 bg-black/60 backdrop-blur-xl">
+          {/* Background Number */}
           <span
-            className="showcase-eyebrow font-inter text-[10px] uppercase tracking-[0.18em] md:text-xs"
-            style={{ color: "#FF5A2A" }}
+            className="pointer-events-none absolute bottom-2 right-2 md:bottom-6 md:right-8 z-0 select-none font-anton text-[140px] md:text-[200px] leading-none"
+            style={{ color: "#ffffff", opacity: 0.03 }}
+            aria-hidden="true"
           >
-            {character.eyebrow}
+            {character.number}
           </span>
-          <h3
-            className="showcase-title mt-3 max-w-[520px] font-anton text-[clamp(32px,5.5vw,72px)] uppercase leading-[0.87] tracking-[0.02em] md:mt-4"
-            style={{ color: "#F5E6C8" }}
-          >
-            {character.title}
-          </h3>
-          <p
-            className="showcase-desc mt-4 max-w-[440px] font-inter text-sm leading-relaxed md:mt-5 md:text-base"
-            style={{ color: "rgba(245,230,200,0.58)" }}
-          >
-            {character.description}
-          </p>
-          <span
-            className="showcase-subline mt-4 font-inter text-[9px] uppercase tracking-[0.24em] md:mt-6 md:text-[10px]"
-            style={{ color: "rgba(245,230,200,0.36)" }}
-          >
-            {character.subline}
-          </span>
-          <div
-            className="showcase-cta mt-6 flex items-center gap-3 font-anton text-xs uppercase tracking-[0.24em] md:mt-8 md:text-sm"
-            style={{ color: "#FF5A2A" }}
-          >
-            EXPLORE
-            <svg
-              className="h-5 w-5"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              aria-hidden="true"
-            >
-              <path d="M5 12h14M12 5l7 7-7 7" />
-            </svg>
+          
+          <div className="relative z-10">
+            <span className="showcase-eyebrow font-inter text-[10px] md:text-[12px] font-black uppercase tracking-[0.2em] text-[#F97316]">
+              {character.eyebrow}
+            </span>
+            
+            <h3 className="showcase-title mt-1 md:mt-2 font-anton text-[36px] md:text-[48px] lg:text-[56px] xl:text-[68px] uppercase leading-[1.05] tracking-[0.02em] text-white">
+              {character.title}
+            </h3>
+            
+            <p className="showcase-desc mt-3 md:mt-5 max-w-[480px] font-inter text-[14px] md:text-[16px] leading-[1.65] text-white/70">
+              {character.description}
+            </p>
+
+            <div className="mt-6 md:mt-8 flex flex-wrap gap-3 md:gap-4">
+              {character.skills.map(skill => (
+                <span key={skill} className="px-4 py-1.5 md:px-5 md:py-2 text-[10px] md:text-[12px] font-medium tracking-wide text-white/60 border border-white/20 rounded-full bg-transparent">
+                  {skill}
+                </span>
+              ))}
+            </div>
+            
+            <div className="showcase-cta mt-8 md:mt-12 flex items-center gap-3 font-anton text-[13px] md:text-[15px] uppercase tracking-[0.25em] text-white hover:text-[#F97316] transition-colors cursor-pointer w-max">
+              EXPLORE
+              <svg
+                className="h-4 w-4 md:h-5 md:w-5"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M5 12h14M12 5l7 7-7 7" />
+              </svg>
+            </div>
           </div>
         </div>
       </div>
@@ -189,9 +132,36 @@ function CharacterPanel({ character }: { character: Character }) {
   );
 }
 
+function IntroPanel() {
+  return (
+    <div className="flex w-[90vw] md:w-[45vw] lg:w-[40vw] xl:w-[35vw] flex-col justify-center px-6 md:px-10 lg:px-14 z-0">
+      <h2 className="font-anton text-[clamp(48px,8vw,100px)] uppercase leading-[0.85] tracking-[0.01em] text-white">
+        BEYOND
+        <br />
+        <span className="bg-gradient-to-r from-[#9333EA] via-[#EC4899] to-[#F97316] bg-clip-text text-transparent">
+          THE SHINOBI.
+        </span>
+      </h2>
+      <p className="mt-6 md:mt-10 max-w-[420px] font-inter text-[15px] md:text-[17px] leading-[1.8] text-white/60">
+        Legends, symbols, and moments that shaped the world. Explore the icons that made Naruto unforgettable.
+      </p>
+      <div className="mt-10 md:mt-12 flex items-center gap-5">
+        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-white/20">
+          <svg className="h-5 w-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M5 12h14M12 5l7 7-7 7" />
+          </svg>
+        </div>
+        <div>
+          <div className="font-anton text-xs uppercase tracking-[0.22em] text-white/80 md:text-sm">SWIPE TO DISCOVER</div>
+          <div className="mt-1 font-inter text-[9px] uppercase tracking-[0.22em] text-[#F97316] md:text-[10px]">INTERACTIVE JOURNEY</div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function CharacterShowcase() {
   const sectionRef = useRef<HTMLElement>(null);
-  const headingRef = useRef<HTMLDivElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
 
@@ -201,28 +171,10 @@ export default function CharacterShowcase() {
       const track = trackRef.current;
       if (!stage || !track) return;
 
-      if (headingRef.current) {
-        gsap.fromTo(
-          headingRef.current,
-          { y: 40, opacity: 0 },
-          {
-            y: 0,
-            opacity: 1,
-            duration: 0.7,
-            ease: "power3.out",
-            scrollTrigger: {
-              trigger: headingRef.current,
-              start: "top 85%",
-              once: true,
-            },
-          }
-        );
-      }
-
       const getDistance = () =>
         Math.max(0, track.scrollWidth - window.innerWidth);
 
-      const SCROLL_SPEED_FACTOR = 2;
+      const SCROLL_SPEED_FACTOR = 1.5;
       const getPinDistance = () => getDistance() * SCROLL_SPEED_FACTOR;
 
       gsap.to(track, {
@@ -242,22 +194,24 @@ export default function CharacterShowcase() {
 
       const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
       if (!reducedMotion) {
-        // Per-panel reveals driven by the horizontal tween
         const panels = Array.from(
           track.querySelectorAll<HTMLElement>(".showcase-panel")
         );
-        panels.forEach((panel, index) => {
-          const isIntro = panel.classList.contains("showcase-intro");
+        panels.forEach((panel) => {
           const sel = (cls: string) => panel.querySelector<HTMLElement>(cls);
-          const elements = isIntro
-            ? { eyebrow: sel(".showcase-intro-eyebrow"), title: sel(".showcase-intro-title"), copy: sel(".showcase-intro-copy"), cta: sel(".showcase-intro-cta"), visual: sel(".showcase-intro-visual") }
-            : { eyebrow: sel(".showcase-eyebrow"), title: sel(".showcase-title"), copy: sel(".showcase-desc"), cta: sel(".showcase-cta"), visual: sel(".showcase-visual") };
+          const elements = { 
+            eyebrow: sel(".showcase-eyebrow"), 
+            title: sel(".showcase-title"), 
+            copy: sel(".showcase-desc"), 
+            cta: sel(".showcase-cta"), 
+            visual: sel(".showcase-visual") 
+          };
 
           const panelTl = gsap.timeline({
             scrollTrigger: {
               trigger: panel,
-              start: index === 0 ? "left 80%" : "left 70%",
-              end: index === 0 ? "left 40%" : "left 30%",
+              start: "left 80%",
+              end: "left 30%",
               scrub: 0.7,
             },
           });
@@ -274,28 +228,27 @@ export default function CharacterShowcase() {
   );
 
   return (
-    <section ref={sectionRef} className="relative w-full overflow-hidden bg-[#101014] pt-8 md:pt-0">
-      <div
-        ref={headingRef}
-        className="mx-auto w-full px-6 pb-8 text-center md:px-10 md:pb-10 xl:px-14"
-      >
-        <h2 className="font-anton text-[clamp(48px,7vw,112px)] uppercase leading-[0.86] tracking-[0.02em]"
-          style={{ color: "#F5E6C8" }}>
-          THE ICONS
-        </h2>
-      </div>
-      <div ref={stageRef} className="relative flex min-h-[100svh] items-center overflow-hidden border-y"
-        style={{
-          borderColor: "rgba(245,230,200,0.10)",
-          backgroundImage: "repeating-linear-gradient(135deg, rgba(245,230,200,0.035) 0 1px, transparent 1px 42px)",
-        }}>
-        <div ref={trackRef} className="flex w-max items-center gap-5 px-4 will-change-transform md:gap-8 md:px-10 xl:gap-10 xl:px-14">
+    <section ref={sectionRef} className="relative w-full overflow-hidden bg-[#0A0A0A]">
+      <div ref={stageRef} className="relative flex min-h-[100svh] items-center overflow-hidden border-y border-white/5">
+        
+        {/* Fixed Intro Card (First Card) */}
+        <div className="absolute left-0 top-0 flex h-full items-center z-0">
           <IntroPanel />
+        </div>
+
+        {/* Scrolling Track (Overlays the Intro Card) */}
+        <div 
+          ref={trackRef} 
+          className="relative z-10 flex w-max items-center gap-5 will-change-transform md:gap-8 xl:gap-12"
+        >
+          {/* Spacer guarantees the first character card is positioned beside the Intro text initially */}
+          <div className="w-[90vw] md:w-[45vw] lg:w-[40vw] xl:w-[35vw] shrink-0" aria-hidden="true" />
           <CharacterPanel character={CHARACTERS[0]} />
           <CharacterPanel character={CHARACTERS[1]} />
           <CharacterPanel character={CHARACTERS[2]} />
           <div aria-hidden="true" className="h-1 w-[8vw] shrink-0" />
         </div>
+        
       </div>
     </section>
   );
