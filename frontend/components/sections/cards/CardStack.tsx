@@ -117,8 +117,8 @@ export default function CardStack() {
   }, []);
 
   return (
-    <section className="card-stack-container min-h-screen bg-[#0A0A0F] py-12 md:py-20">
-      <div className="container relative md:absolute md:top-50 md:left-1/2 md:-translate-x-1/2 px-4 md:px-6">
+    <section className="card-stack-container min-h-screen bg-[#0A0A0F] py-12 md:py-20 flex justify-center">
+      <div className="w-full max-w-3xl px-4 md:px-6">
         <div className="max-w-2xl mx-auto relative">
           {/* Card 1 */}
           <div className="card-item absolute top-0 left-0 right-0">

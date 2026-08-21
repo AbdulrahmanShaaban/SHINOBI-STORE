@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useRef, useState, useEffect } from "react";
+import { useRef } from "react";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -189,25 +189,11 @@ function CharacterPanel({ character }: { character: Character }) {
   );
 }
 
-function useIsMobile() {
-  const [isMobile, setIsMobile] = useState(false);
-  useEffect(() => {
-    const mql = window.matchMedia("(max-width: 767px)");
-    setIsMobile(mql.matches);
-    const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches);
-    mql.addEventListener("change", handler);
-    return () => mql.removeEventListener("change", handler);
-  }, []);
-  return isMobile;
-}
-
 export default function CharacterShowcase() {
-  const isMobile = useIsMobile();
   const sectionRef = useRef<HTMLElement>(null);
   const headingRef = useRef<HTMLDivElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
-  const mobileTrackRef = useRef<HTMLDivElement>(null);
 
   useGSAP(
     () => {
@@ -233,201 +219,82 @@ export default function CharacterShowcase() {
         );
       }
 
-      const mm = gsap.matchMedia();
+      const getDistance = () =>
+        Math.max(0, track.scrollWidth - window.innerWidth);
 
-      mm.add(
-        {
-          isDesktop: "(min-width: 768px)",
-          reduceMotion: "(prefers-reduced-motion: reduce)",
+      const SCROLL_SPEED_FACTOR = 2;
+      const getPinDistance = () => getDistance() * SCROLL_SPEED_FACTOR;
+
+      gsap.to(track, {
+        x: () => -getDistance(),
+        ease: "none",
+        scrollTrigger: {
+          trigger: stage,
+          start: "top top",
+          end: () => `+=${getPinDistance()}`,
+          pin: stage,
+          scrub: 1,
+          anticipatePin: 1,
+          invalidateOnRefresh: true,
+          refreshPriority: -3,
         },
-        (context) => {
-          const { isDesktop, reduceMotion } = context.conditions as { isDesktop: boolean; reduceMotion: boolean };
-          if (!isDesktop) return;
+      });
 
-          const getDistance = () =>
-            Math.max(0, track.scrollWidth - window.innerWidth);
+      const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      if (!reducedMotion) {
+        // Per-panel reveals driven by the horizontal tween
+        const panels = Array.from(
+          track.querySelectorAll<HTMLElement>(".showcase-panel")
+        );
+        panels.forEach((panel, index) => {
+          const isIntro = panel.classList.contains("showcase-intro");
+          const sel = (cls: string) => panel.querySelector<HTMLElement>(cls);
+          const elements = isIntro
+            ? { eyebrow: sel(".showcase-intro-eyebrow"), title: sel(".showcase-intro-title"), copy: sel(".showcase-intro-copy"), cta: sel(".showcase-intro-cta"), visual: sel(".showcase-intro-visual") }
+            : { eyebrow: sel(".showcase-eyebrow"), title: sel(".showcase-title"), copy: sel(".showcase-desc"), cta: sel(".showcase-cta"), visual: sel(".showcase-visual") };
 
-          const SCROLL_SPEED_FACTOR = 2;
-          const getPinDistance = () => getDistance() * SCROLL_SPEED_FACTOR;
-
-          gsap.to(track, {
-            x: () => -getDistance(),
-            ease: "none",
+          const panelTl = gsap.timeline({
             scrollTrigger: {
-              trigger: stage,
-              start: "top top",
-              end: () => `+=${getPinDistance()}`,
-              pin: stage,
-              scrub: 1,
-              anticipatePin: 1,
-              invalidateOnRefresh: true,
-              refreshPriority: -3,
+              trigger: panel,
+              start: index === 0 ? "left 80%" : "left 70%",
+              end: index === 0 ? "left 40%" : "left 30%",
+              scrub: 0.7,
             },
           });
 
-          // If reduced motion is preferred, skip the individual panel animations
-          if (reduceMotion) return;
-
-          // Per-panel reveals driven by the horizontal tween
-          const panels = Array.from(
-            track.querySelectorAll<HTMLElement>(".showcase-panel")
-          );
-          panels.forEach((panel, index) => {
-            const isIntro = panel.classList.contains("showcase-intro");
-            const sel = (cls: string) => panel.querySelector<HTMLElement>(cls);
-            const elements = isIntro
-              ? { eyebrow: sel(".showcase-intro-eyebrow"), title: sel(".showcase-intro-title"), copy: sel(".showcase-intro-copy"), cta: sel(".showcase-intro-cta"), visual: sel(".showcase-intro-visual") }
-              : { eyebrow: sel(".showcase-eyebrow"), title: sel(".showcase-title"), copy: sel(".showcase-desc"), cta: sel(".showcase-cta"), visual: sel(".showcase-visual") };
-
-            const panelTl = gsap.timeline({
-              scrollTrigger: {
-                trigger: panel,
-                start: index === 0 ? "left 80%" : "left 70%",
-                end: index === 0 ? "left 40%" : "left 30%",
-                scrub: 0.7,
-              },
-            });
-
-            if (elements.eyebrow) panelTl.fromTo(elements.eyebrow, { y: 18, opacity: 0 }, { y: 0, opacity: 1, duration: 0.45 }, 0);
-            if (elements.title) panelTl.fromTo(elements.title, { y: 36, opacity: 0 }, { y: 0, opacity: 1, duration: 0.7 }, 0.05);
-            if (elements.copy) panelTl.fromTo(elements.copy, { y: 22, opacity: 0 }, { y: 0, opacity: 0.82, duration: 0.55 }, 0.16);
-            if (elements.cta) panelTl.fromTo(elements.cta, { y: 16, opacity: 0 }, { y: 0, opacity: 1, duration: 0.5 }, 0.28);
-            if (elements.visual) panelTl.fromTo(elements.visual, { x: 42, opacity: 0.65, scale: 0.97 }, { x: 0, opacity: 1, scale: 1, duration: 0.8, ease: "power2.out" }, 0);
-          });
-        }
-      );
-
-      return () => mm.revert();
+          if (elements.eyebrow) panelTl.fromTo(elements.eyebrow, { y: 18, opacity: 0 }, { y: 0, opacity: 1, duration: 0.45 }, 0);
+          if (elements.title) panelTl.fromTo(elements.title, { y: 36, opacity: 0 }, { y: 0, opacity: 1, duration: 0.7 }, 0.05);
+          if (elements.copy) panelTl.fromTo(elements.copy, { y: 22, opacity: 0 }, { y: 0, opacity: 0.82, duration: 0.55 }, 0.16);
+          if (elements.cta) panelTl.fromTo(elements.cta, { y: 16, opacity: 0 }, { y: 0, opacity: 1, duration: 0.5 }, 0.28);
+          if (elements.visual) panelTl.fromTo(elements.visual, { x: 42, opacity: 0.65, scale: 0.97 }, { x: 0, opacity: 1, scale: 1, duration: 0.8, ease: "power2.out" }, 0);
+        });
+      }
     },
     { scope: sectionRef }
   );
 
-  // Mobile: native scroll-snap with IntersectionObserver
-  useGSAP(
-    () => {
-      const track = mobileTrackRef.current;
-      if (!track || !isMobile) return;
-
-      const scrollContainer = track.parentElement;
-      if (!scrollContainer) return;
-
-      const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-      if (reducedMotion) return;
-
-      const panels = Array.from(
-        track.querySelectorAll<HTMLElement>(".showcase-panel")
-      );
-
-      // Set initial state — hide content so animation reveals it
-      panels.forEach((panel) => {
-        const isIntro = panel.classList.contains("showcase-intro");
-        const sel = (cls: string) => panel.querySelector<HTMLElement>(cls);
-        const elements = isIntro
-          ? { eyebrow: sel(".showcase-intro-eyebrow"), title: sel(".showcase-intro-title"), copy: sel(".showcase-intro-copy"), cta: sel(".showcase-intro-cta"), visual: sel(".showcase-intro-visual") }
-          : { eyebrow: sel(".showcase-eyebrow"), title: sel(".showcase-title"), copy: sel(".showcase-desc"), cta: sel(".showcase-cta"), visual: sel(".showcase-visual") };
-
-        if (elements.eyebrow) gsap.set(elements.eyebrow, { y: 18, opacity: 0 });
-        if (elements.title) gsap.set(elements.title, { y: 36, opacity: 0 });
-        if (elements.copy) gsap.set(elements.copy, { y: 22, opacity: 0 });
-        if (elements.cta) gsap.set(elements.cta, { y: 16, opacity: 0 });
-        if (elements.visual) gsap.set(elements.visual, { x: 42, opacity: 0.65, scale: 0.97 });
-      });
-
-      const observer = new IntersectionObserver(
-        (entries) => {
-          entries.forEach((entry) => {
-            if (entry.isIntersecting) {
-              const panel = entry.target as HTMLElement;
-              const isIntro = panel.classList.contains("showcase-intro");
-              const sel = (cls: string) => panel.querySelector<HTMLElement>(cls);
-              const elements = isIntro
-                ? { eyebrow: sel(".showcase-intro-eyebrow"), title: sel(".showcase-intro-title"), copy: sel(".showcase-intro-copy"), cta: sel(".showcase-intro-cta"), visual: sel(".showcase-intro-visual") }
-                : { eyebrow: sel(".showcase-eyebrow"), title: sel(".showcase-title"), copy: sel(".showcase-desc"), cta: sel(".showcase-cta"), visual: sel(".showcase-visual") };
-
-              const revealTl = gsap.timeline({ defaults: { ease: "power3.out" } });
-              if (elements.eyebrow) revealTl.fromTo(elements.eyebrow, { y: 18, opacity: 0 }, { y: 0, opacity: 1, duration: 0.45 }, 0);
-              if (elements.title) revealTl.fromTo(elements.title, { y: 36, opacity: 0 }, { y: 0, opacity: 1, duration: 0.7 }, 0.05);
-              if (elements.copy) revealTl.fromTo(elements.copy, { y: 22, opacity: 0 }, { y: 0, opacity: 0.82, duration: 0.55 }, 0.16);
-              if (elements.cta) revealTl.fromTo(elements.cta, { y: 16, opacity: 0 }, { y: 0, opacity: 1, duration: 0.5 }, 0.28);
-              if (elements.visual) revealTl.fromTo(elements.visual, { x: 42, opacity: 0.65, scale: 0.97 }, { x: 0, opacity: 1, scale: 1, duration: 0.8, ease: "power2.out" }, 0);
-
-              observer.unobserve(panel);
-            }
-          });
-        },
-        { root: scrollContainer, threshold: 0.3 }
-      );
-
-      panels.forEach((panel) => observer.observe(panel));
-
-      return () => observer.disconnect();
-    },
-    { scope: sectionRef, dependencies: [isMobile] }
-  );
-
   return (
     <section ref={sectionRef} className="relative w-full overflow-hidden bg-[#101014] pt-8 md:pt-0">
-      {/* Desktop: pinned horizontal scroll */}
-      <div className="hidden md:block">
-        <div
-          ref={headingRef}
-          className="mx-auto w-full px-6 pb-8 text-center md:px-10 md:pb-10 xl:px-14"
-        >
-          <h2 className="font-anton text-[clamp(48px,7vw,112px)] uppercase leading-[0.86] tracking-[0.02em]"
-            style={{ color: "#F5E6C8" }}>
-            THE ICONS
-          </h2>
-        </div>
-        <div ref={stageRef} className="relative flex min-h-[100svh] items-center overflow-hidden border-y"
-          style={{
-            borderColor: "rgba(245,230,200,0.10)",
-            backgroundImage: "repeating-linear-gradient(135deg, rgba(245,230,200,0.035) 0 1px, transparent 1px 42px)",
-          }}>
-          <div ref={trackRef} className="flex w-max items-center gap-5 px-4 will-change-transform md:gap-8 md:px-10 xl:gap-10 xl:px-14">
-            <IntroPanel />
-            <CharacterPanel character={CHARACTERS[0]} />
-            <CharacterPanel character={CHARACTERS[1]} />
-            <CharacterPanel character={CHARACTERS[2]} />
-            <div aria-hidden="true" className="h-1 w-[8vw] shrink-0" />
-          </div>
-        </div>
+      <div
+        ref={headingRef}
+        className="mx-auto w-full px-6 pb-8 text-center md:px-10 md:pb-10 xl:px-14"
+      >
+        <h2 className="font-anton text-[clamp(48px,7vw,112px)] uppercase leading-[0.86] tracking-[0.02em]"
+          style={{ color: "#F5E6C8" }}>
+          THE ICONS
+        </h2>
       </div>
-
-      {/* Mobile: native scroll-snap */}
-      <div className="block md:hidden">
-        <div className="px-6 pb-8 text-center">
-          <h2 className="font-anton text-[clamp(48px,7vw,112px)] uppercase leading-[0.86] tracking-[0.02em]"
-            style={{ color: "#F5E6C8" }}>
-            THE ICONS
-          </h2>
-        </div>
-        <div
-          className="flex snap-x snap-mandatory overflow-x-auto"
-          style={{
-            scrollBehavior: "smooth",
-            WebkitOverflowScrolling: "touch",
-            backgroundImage: "repeating-linear-gradient(135deg, rgba(245,230,200,0.035) 0 1px, transparent 1px 42px)",
-          }}
-        >
-          <div
-            ref={mobileTrackRef}
-            className="flex w-max items-center gap-5 px-4 md:gap-8 md:px-10 xl:gap-10 xl:px-14"
-          >
-            <IntroPanel />
-            <CharacterPanel character={CHARACTERS[0]} />
-            <CharacterPanel character={CHARACTERS[1]} />
-            <CharacterPanel character={CHARACTERS[2]} />
-            <div aria-hidden="true" className="h-1 w-[8vw] shrink-0" />
-          </div>
-        </div>
-        <div className="flex justify-center py-6">
-          <div className="flex items-center gap-2 font-anton text-[10px] uppercase tracking-[0.22em]"
-            style={{ color: "rgba(245,230,200,0.30)" }}>
-            <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M5 12h14M12 5l7 7-7 7" />
-            </svg>
-            SWIPE TO EXPLORE
-          </div>
+      <div ref={stageRef} className="relative flex min-h-[100svh] items-center overflow-hidden border-y"
+        style={{
+          borderColor: "rgba(245,230,200,0.10)",
+          backgroundImage: "repeating-linear-gradient(135deg, rgba(245,230,200,0.035) 0 1px, transparent 1px 42px)",
+        }}>
+        <div ref={trackRef} className="flex w-max items-center gap-5 px-4 will-change-transform md:gap-8 md:px-10 xl:gap-10 xl:px-14">
+          <IntroPanel />
+          <CharacterPanel character={CHARACTERS[0]} />
+          <CharacterPanel character={CHARACTERS[1]} />
+          <CharacterPanel character={CHARACTERS[2]} />
+          <div aria-hidden="true" className="h-1 w-[8vw] shrink-0" />
         </div>
       </div>
     </section>
