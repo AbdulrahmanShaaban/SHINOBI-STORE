@@ -57,8 +57,9 @@ export default function ShinobiCharacterCards() {
     const tl = gsap.timeline({
       scrollTrigger: {
         trigger: sectionRef.current,
-        start: "top 75%",
-        once: true,
+        start: "top 85%",
+        end: "top 35%",
+        scrub: 1,
       },
     });
 
