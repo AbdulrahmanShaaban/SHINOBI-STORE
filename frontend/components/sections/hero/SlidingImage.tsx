@@ -19,29 +19,25 @@ const SlidingImage = () => {
       xPercent: xPercent,
     });
     gsap.set(secondImage.current, {
-      xPercent: xPercent,
+      xPercent: xPercent - 100,
     });
-    xPercent += 0.07 * direction;
+    xPercent += 0.05 * direction;
     requestAnimationFrame(animation);
   };
   
   return (
-    <div className="absolute -bottom-10 flex w-full h-full">
-      <Image
+    <div className="absolute -bottom-10 left-0 flex w-full h-full pointer-events-none overflow-hidden">
+      <img
         ref={firstImage}
         src={"/cloud.webp"}
         alt="cloud"
-        fill
-        priority
-        className="absolute left-0 top-0 z-1 object-cover"
+        className="absolute left-0 bottom-0 h-full min-w-full w-auto max-w-none object-cover"
       />
-      <Image
-        style={{ left: "-100%" }}
+      <img
         ref={secondImage}
         src={"/cloud.webp"}
         alt="cloud"
-        fill
-        className="absolute left-full z-1 top-0 object-cover"
+        className="absolute left-0 bottom-0 h-full min-w-full w-auto max-w-none object-cover"
       />
     </div>
   );

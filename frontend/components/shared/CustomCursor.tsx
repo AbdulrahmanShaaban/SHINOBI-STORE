@@ -68,8 +68,8 @@ export default function CustomCursor() {
         gsap.to(ring, {
           x: e.clientX,
           y: e.clientY,
-          duration: 0.45,
-          ease: "power3.out",
+          duration: 0.7,
+          ease: "power2.out",
           overwrite: "auto",
         });
       }
@@ -111,7 +111,7 @@ export default function CustomCursor() {
       <div
         ref={dotRef}
         aria-hidden="true"
-        className="pointer-events-none fixed left-0 top-0 z-[9999] h-2 w-2 rounded-full"
+        className="pointer-events-none fixed left-0 top-0 z-[9999] h-1.5 w-1.5 rounded-full"
         style={{ backgroundColor: "var(--primary)", margin: "-4px 0 0 -4px" }}
       />
       <div

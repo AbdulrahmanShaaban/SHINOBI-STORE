@@ -1,11 +1,12 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import Link from 'next/link';
 
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const overlayRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -26,6 +27,17 @@ export default function Navbar() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isMenuOpen, closeMenu]);
 
+  // Lock body scroll when menu is open and reset overlay scroll position
+  useEffect(() => {
+    if (isMenuOpen) {
+      document.body.style.overflow = 'hidden';
+      overlayRef.current?.scrollTo(0, 0);
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => { document.body.style.overflow = ''; };
+  }, [isMenuOpen]);
+
   const prefersReducedMotion = typeof window !== 'undefined'
     && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -37,8 +49,9 @@ export default function Navbar() {
     : 'transition-all duration-300 ease-out';
 
   return (
-    <nav
-      className={`fixed top-0 left-0 right-0 z-40 h-16 transition-all duration-300 ${
+    <>
+      <nav
+        className={`fixed top-0 left-0 right-0 z-40 h-16 transition-all duration-300 ${
         isScrolled
           ? 'bg-[#0A0A0F]/90 backdrop-blur-md border-b border-[#FF6B00]/20'
           : 'bg-transparent'
@@ -119,10 +132,12 @@ export default function Navbar() {
           </div>
         </div>
       </div>
+    </nav>
 
       {/* Full-screen overlay */}
       <div
-        className={`lg:hidden fixed inset-0 z-[60] flex flex-col items-center justify-center bg-[#0A0A0F] ${
+        ref={overlayRef}
+        className={`lg:hidden fixed inset-0 z-[60] flex flex-col items-center justify-center bg-[#0A0A0F] overflow-y-auto ${
           isMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
         } ${overlayTransition}`}
       >
@@ -158,6 +173,6 @@ export default function Navbar() {
           </Link>
         </nav>
       </div>
-    </nav>
+    </>
   );
 }

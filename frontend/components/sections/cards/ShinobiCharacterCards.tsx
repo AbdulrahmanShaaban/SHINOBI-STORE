@@ -54,20 +54,49 @@ export default function ShinobiCharacterCards() {
   useGSAP(() => {
     if (!sectionRef.current) return;
 
-    const tl = gsap.timeline({
-      scrollTrigger: {
-        trigger: sectionRef.current,
-        start: "top 85%",
-        end: "top 35%",
-        scrub: 1,
-      },
+    const mm = gsap.matchMedia();
+
+    // Mobile: each card has its own ScrollTrigger for individual in/out
+    mm.add("(max-width: 767px)", () => {
+      const cards = [itachiRef.current, narutoRef.current, sasukeRef.current];
+      cards.forEach((card) => {
+        if (!card) return;
+        gsap.fromTo(card,
+          { y: 80, opacity: 0, scale: 0.92 },
+          {
+            y: 0, opacity: 1, scale: 1,
+            duration: 0.6,
+            ease: "power3.out",
+            scrollTrigger: {
+              trigger: card,
+              start: "top 90%",
+              end: "top 50%",
+              scrub: 1,
+            },
+          }
+        );
+      });
     });
 
-    tl.fromTo(
-      [itachiRef.current, narutoRef.current, sasukeRef.current],
-      { y: 100, opacity: 0, scale: 0.9 },
-      { y: 0, opacity: 1, scale: 1, duration: 0.8, ease: "power3.out", stagger: 0.15 }
-    );
+    // Desktop: all cards animate together with stagger
+    mm.add("(min-width: 768px)", () => {
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: sectionRef.current,
+          start: "top 85%",
+          end: "top 35%",
+          scrub: 1,
+        },
+      });
+
+      tl.fromTo(
+        [itachiRef.current, narutoRef.current, sasukeRef.current],
+        { y: 100, opacity: 0, scale: 0.9 },
+        { y: 0, opacity: 1, scale: 1, duration: 0.8, ease: "power3.out", stagger: 0.15 }
+      );
+    });
+
+    return () => mm.revert();
   }, []);
 
   const addItem = useCartStore((s) => s.addItem);
