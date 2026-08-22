@@ -3,12 +3,15 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { selectTotalItems, useCartStore } from '@/lib/cart-store';
 
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const overlayRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
+  const openCart = useCartStore((s) => s.openCart);
+  const cartCount = useCartStore(selectTotalItems);
   const isHomePage = pathname === '/';
   const showScrolledState = isScrolled || !isHomePage;
 
@@ -95,29 +98,47 @@ export default function Navbar() {
               <Link href="/contact" className="px-2 lg:px-4 py-2 text-[#F0F0F0] font-cinzel font-bold text-lg md:text-xl lg:text-2xl xl:text-3xl hover:text-[#FF6B00] transition-colors">
                 CONTACT
               </Link>
-              <button className="relative p-2 text-[#F0F0F0] hover:text-[#FF6B00] transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center">
+              <button
+                onClick={openCart}
+                aria-label={`Open cart, ${cartCount} ${cartCount === 1 ? 'item' : 'items'}`}
+                className="relative p-2 text-[#F0F0F0] hover:text-[#FF6B00] transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
+              >
                 <svg className="w-[clamp(24px,3vh,28px)] h-[clamp(24px,3vh,28px)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M6 2 L3 6 L3 20 L21 20 L21 6 L18 2 Z" strokeLinecap="round" strokeLinejoin="round" />
                   <circle cx="9" cy="10" r="1" fill="currentColor" />
                   <circle cx="15" cy="10" r="1" fill="currentColor" />
                 </svg>
-                <span className="absolute top-0 right-0 bg-[#CC0000] text-[#F0F0F0] text-xs w-[clamp(18px,2.5vh,22px)] h-[clamp(18px,2.5vh,22px)] rounded-full flex items-center justify-center font-bebas">
-                  0
-                </span>
+                {cartCount > 0 && (
+                  <span
+                    aria-hidden="true"
+                    className="absolute top-0 right-0 bg-[#CC0000] text-[#F0F0F0] text-xs min-w-[clamp(18px,2.5vh,22px)] h-[clamp(18px,2.5vh,22px)] px-1 rounded-full flex items-center justify-center font-bebas"
+                  >
+                    {cartCount > 99 ? '99+' : cartCount}
+                  </span>
+                )}
               </button>
             </div>
 
             {/* Mobile/Tablet Controls */}
             <div className="flex items-center gap-2 lg:hidden">
-              <button className="relative p-2 text-[#F0F0F0] hover:text-[#FF6B00] transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center">
+              <button
+                onClick={openCart}
+                aria-label={`Open cart, ${cartCount} ${cartCount === 1 ? 'item' : 'items'}`}
+                className="relative p-2 text-[#F0F0F0] hover:text-[#FF6B00] transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
+              >
                 <svg className="w-[clamp(24px,4vh,32px)] h-[clamp(24px,4vh,32px)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M6 2 L3 6 L3 20 L21 20 L21 6 L18 2 Z" strokeLinecap="round" strokeLinejoin="round" />
                   <circle cx="9" cy="10" r="1" fill="currentColor" />
                   <circle cx="15" cy="10" r="1" fill="currentColor" />
                 </svg>
-                <span className="absolute top-0 right-0 bg-[#CC0000] text-[#F0F0F0] text-xs w-[clamp(18px,2.5vh,22px)] h-[clamp(18px,2.5vh,22px)] rounded-full flex items-center justify-center font-bebas">
-                  0
-                </span>
+                {cartCount > 0 && (
+                  <span
+                    aria-hidden="true"
+                    className="absolute top-0 right-0 bg-[#CC0000] text-[#F0F0F0] text-xs min-w-[clamp(18px,2.5vh,22px)] h-[clamp(18px,2.5vh,22px)] px-1 rounded-full flex items-center justify-center font-bebas"
+                  >
+                    {cartCount > 99 ? '99+' : cartCount}
+                  </span>
+                )}
               </button>
               <button
                 onClick={() => setIsMenuOpen(!isMenuOpen)}

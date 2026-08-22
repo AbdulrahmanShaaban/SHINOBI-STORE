@@ -1,0 +1,251 @@
+{
+  "openapi": "3.0.0",
+  "paths": {
+    "/health": {
+      "get": {
+        "operationId": "HealthController_live",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Process alive"
+          }
+        },
+        "summary": "Liveness probe",
+        "tags": [
+          "Health"
+        ]
+      }
+    },
+    "/health/ready": {
+      "get": {
+        "operationId": "HealthController_ready",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "All dependencies up"
+          },
+          "503": {
+            "description": "One or more dependencies down"
+          }
+        },
+        "summary": "Readiness probe (checks PostgreSQL and Redis)",
+        "tags": [
+          "Health"
+        ]
+      }
+    },
+    "/api/v1/products": {
+      "get": {
+        "operationId": "CatalogController_list",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Paginated active products"
+          }
+        },
+        "summary": "List active products (public)",
+        "tags": [
+          "catalog"
+        ]
+      }
+    },
+    "/api/v1/products/{slug}": {
+      "get": {
+        "operationId": "CatalogController_detail",
+        "parameters": [
+          {
+            "name": "slug",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "example": "naruto-rasengan-hoodie"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Active product with variants, images and taxonomy"
+          },
+          "404": {
+            "description": "Unknown or non-active slug"
+          }
+        },
+        "summary": "Product detail by slug (public; drafts are invisible)",
+        "tags": [
+          "catalog"
+        ]
+      }
+    },
+    "/api/v1/taxonomies/categories": {
+      "get": {
+        "operationId": "TaxonomiesController_categories",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Category list"
+          }
+        },
+        "summary": "Active categories with active-product counts",
+        "tags": [
+          "taxonomies"
+        ]
+      }
+    },
+    "/api/v1/taxonomies/animes": {
+      "get": {
+        "operationId": "TaxonomiesController_animes",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Anime list"
+          }
+        },
+        "summary": "Animes with active-product counts",
+        "tags": [
+          "taxonomies"
+        ]
+      }
+    },
+    "/api/v1/taxonomies/characters": {
+      "get": {
+        "operationId": "TaxonomiesController_characters",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Character list"
+          }
+        },
+        "summary": "Characters with their anime",
+        "tags": [
+          "taxonomies"
+        ]
+      }
+    },
+    "/api/v1/taxonomies/tags": {
+      "get": {
+        "operationId": "TaxonomiesController_tags",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Tag list"
+          }
+        },
+        "summary": "All tags",
+        "tags": [
+          "taxonomies"
+        ]
+      }
+    },
+    "/api/v1/admin/products": {
+      "post": {
+        "operationId": "AdminCatalogController_createProduct",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          },
+          "401": {
+            "description": "Missing/invalid session or insufficient role"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Create product (admin)",
+        "tags": [
+          "admin"
+        ]
+      }
+    },
+    "/api/v1/admin/products/{id}": {
+      "patch": {
+        "operationId": "AdminCatalogController_updateProduct",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "401": {
+            "description": "Missing/invalid session or insufficient role"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Update product (admin)",
+        "tags": [
+          "admin"
+        ]
+      },
+      "delete": {
+        "operationId": "AdminCatalogController_archiveProduct",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "401": {
+            "description": "Missing/invalid session or insufficient role"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Archive product (admin)",
+        "tags": [
+          "admin"
+        ]
+      },
+      "get": {
+        "operationId": "AdminCatalogController_getProduct",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "401": {
+            "description": "Missing/invalid session or insufficient role"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Fetch product incl. drafts (admin)",
+        "tags": [
+          "admin"
+        ]
+      }
+    }
+  },
+  "info": {
+    "title": "Shinobi Store API",
+    "description": "Authoritative API for Shinobi Store — storefront, admin CRM and future clients.",
+    "version": "0.1",
+    "contact": {}
+  },
+  "tags": [],
+  "servers": [],
+  "components": {
+    "securitySchemes": {
+      "bearer": {
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "type": "http"
+      },
+      "cookie": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "shinobi_session"
+      }
+    },
+    "schemas": {}
+  }
+}

@@ -1,0 +1,300 @@
+// Shinobi Store — Prisma schema.
+// Domain models added phase by phase per SHINOBI-STORE-IMPLEMENTATION-PLAN.md §10.
+// Phase 1: identity slice (§10.1) + catalog domain (§10.2) + MediaEntry (needed by ProductImage FK).
+//
+// Conventions: snake_case in DB (@map), camelCase in TS. Money = integer cents.
+// DB-only constructs managed via raw migration SQL (see prisma/migrations):
+//   - extensions: citext, pg_trgm
+//   - products.search: generated tsvector column + GIN index
+//   - functional/partial unique indexes and CHECK constraints
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─────────────────────────── §10.1 Identity & access ───────────────────────────
+
+enum user_role {
+  customer
+  content_manager
+  order_manager
+  admin
+  super_admin
+}
+
+model User {
+  id           String    @id @default(uuid()) @db.Uuid
+  email        String    @unique @db.Citext
+  passwordHash String    @map("password_hash")
+  fullName     String    @map("full_name")
+  role         user_role @default(customer)
+  phone        String?
+  isActive     Boolean   @default(true) @map("is_active")
+  deletedAt    DateTime? @map("deleted_at") @db.Timestamptz(6)
+  createdAt    DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt    DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  sessions            Session[]
+  passwordResetTokens PasswordResetToken[]
+  reviews             Review[]
+  mediaUploads        MediaEntry[]         @relation("MediaUploads")
+
+  @@index([role])
+  @@map("users")
+}
+
+model Session {
+  id        String    @id @default(uuid()) @db.Uuid
+  userId    String    @map("user_id") @db.Uuid
+  tokenHash String    @unique @map("token_hash") @db.Char(64)
+  userAgent String?   @map("user_agent")
+  ip        String?
+  expiresAt DateTime  @map("expires_at") @db.Timestamptz(6)
+  revokedAt DateTime? @map("revoked_at") @db.Timestamptz(6)
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+  @@map("sessions")
+}
+
+model PasswordResetToken {
+  id        String    @id @default(uuid()) @db.Uuid
+  userId    String    @map("user_id") @db.Uuid
+  tokenHash String    @unique @map("token_hash") @db.Char(64)
+  expiresAt DateTime  @map("expires_at") @db.Timestamptz(6)
+  usedAt    DateTime? @map("used_at") @db.Timestamptz(6)
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("password_reset_tokens")
+}
+
+// ───────────────────────────── §10.2 Catalog ─────────────────────────────
+
+model Category {
+  id        String     @id @default(uuid()) @db.Uuid
+  slug      String     @unique
+  name      String
+  parentId  String?    @map("parent_id") @db.Uuid
+  sortOrder Int        @default(0) @map("sort_order")
+  isActive  Boolean    @default(true) @map("is_active")
+  createdAt DateTime   @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime   @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  parent   Category?  @relation("CategoryTree", fields: [parentId], references: [id], onDelete: SetNull)
+  children Category[] @relation("CategoryTree")
+  products Product[]
+
+  @@index([parentId])
+  @@map("categories")
+}
+
+model Anime {
+  id          String   @id @default(uuid()) @db.Uuid
+  slug        String   @unique
+  name        String
+  description String?
+  imageUrl    String?  @map("image_url")
+  isFeatured  Boolean  @default(false) @map("is_featured")
+  sortOrder   Int      @default(0) @map("sort_order")
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt   DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  characters Character[]
+  products   Product[]
+
+  @@map("animes")
+}
+
+model Character {
+  id          String   @id @default(uuid()) @db.Uuid
+  slug        String   @unique
+  name        String
+  animeId     String?  @map("anime_id") @db.Uuid
+  description String?
+  imageUrl    String?  @map("image_url")
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt   DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  anime    Anime?    @relation(fields: [animeId], references: [id], onDelete: SetNull)
+  products Product[]
+
+  @@index([animeId])
+  @@map("characters")
+}
+
+model Tag {
+  id        String   @id @default(uuid()) @db.Uuid
+  slug      String   @unique
+  name      String
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  products ProductTag[]
+
+  @@map("tags")
+}
+
+enum product_status {
+  draft
+  active
+  archived
+}
+
+model Product {
+  id          String         @id @default(uuid()) @db.Uuid
+  slug        String         @unique
+  name        String
+  description String
+  categoryId  String         @map("category_id") @db.Uuid
+  animeId     String?        @map("anime_id") @db.Uuid
+  characterId String?        @map("character_id") @db.Uuid
+  status      product_status @default(draft)
+  featured    Boolean        @default(false)
+  ratingAvg   Decimal        @default(0) @map("rating_avg") @db.Decimal(3, 2)
+  reviewCount Int            @default(0) @map("review_count")
+  // Cheapest active variant price, maintained by trigger (see migration).
+  // NULL ⇔ no active variants. Enables indexed price sorting for the catalog.
+  priceFromCents Int?        @map("price_from_cents")
+  // Generated in migration SQL (name/description/tags/anime/character weights).
+  // Excluded from the Prisma Client; queried via raw SQL (Phase 3 FTS).
+  search      Unsupported("tsvector")?
+  createdAt   DateTime       @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt   DateTime       @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  category Category       @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  anime    Anime?         @relation(fields: [animeId], references: [id], onDelete: SetNull)
+  character Character?    @relation(fields: [characterId], references: [id], onDelete: SetNull)
+  tags     ProductTag[]
+  variants ProductVariant[]
+  images   ProductImage[]
+  reviews  Review[]
+
+  @@index([status, featured])
+  @@index([status, priceFromCents])
+  @@index([categoryId])
+  @@index([animeId])
+  @@index([characterId])
+  @@index([ratingAvg])
+  @@map("products")
+}
+
+model ProductTag {
+  productId String @map("product_id") @db.Uuid
+  tagId     String @map("tag_id") @db.Uuid
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  tag     Tag     @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([productId, tagId])
+  @@index([tagId])
+  @@map("product_tags")
+}
+
+model ProductVariant {
+  id                  String   @id @default(uuid()) @db.Uuid
+  productId           String   @map("product_id") @db.Uuid
+  sku                 String   @unique
+  optionSize          String?  @map("option_size")
+  optionColor         String?  @map("option_color")
+  priceCents          Int      @map("price_cents")
+  compareAtPriceCents Int?     @map("compare_at_price_cents")
+  stockOnHand         Int      @default(0) @map("stock_on_hand")
+  reserved            Int      @default(0)
+  weightGrams         Int?     @map("weight_grams")
+  isActive            Boolean  @default(true) @map("is_active")
+  createdAt           DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt           DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([isActive])
+  @@index([productId])
+  // Uniqueness of (product_id, option_size, option_color) treating NULL as ""
+  // is enforced by a functional unique index in migration SQL — a plain UNIQUE
+  // constraint would allow duplicate "Default" variants because NULL != NULL.
+  @@map("product_variants")
+}
+
+model ProductImage {
+  id        String  @id @default(uuid()) @db.Uuid
+  productId String  @map("product_id") @db.Uuid
+  mediaId   String? @map("media_id") @db.Uuid
+  url       String
+  altText   String? @map("alt_text")
+  sortOrder Int     @default(0) @map("sort_order")
+  isPrimary Boolean @default(false) @map("is_primary")
+
+  product Product     @relation(fields: [productId], references: [id], onDelete: Cascade)
+  media   MediaEntry? @relation(fields: [mediaId], references: [id], onDelete: SetNull)
+
+  @@index([productId])
+  // One primary image per product: partial unique index in migration SQL.
+  @@map("product_images")
+}
+
+model Review {
+  id        String        @id @default(uuid()) @db.Uuid
+  productId String        @map("product_id") @db.Uuid
+  userId    String        @map("user_id") @db.Uuid
+  // orderItemId FK arrives with the commerce tables (§10.3) — additive migration.
+  rating    Int
+  title     String?
+  body      String
+  status    review_status @default(pending)
+  createdAt DateTime      @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime      @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Restrict)
+
+  @@unique([userId, productId])
+  @@index([productId, status])
+  @@map("reviews")
+}
+
+enum review_status {
+  pending
+  approved
+  rejected
+}
+
+// ───────────────────── Platform slice required by catalog ─────────────────────
+
+model MediaEntry {
+  id               String    @id @default(uuid()) @db.Uuid
+  provider         String    @default("cloudinary")
+  publicId         String    @unique @map("public_id")
+  url              String
+  width            Int
+  height           Int
+  format           String
+  bytes            Int
+  folder           media_folder @default(general)
+  altText          String?   @map("alt_text")
+  uploadedByAdminId String?  @map("uploaded_by_admin_id") @db.Uuid
+  createdAt        DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  uploadedBy   User?          @relation("MediaUploads", fields: [uploadedByAdminId], references: [id], onDelete: SetNull)
+  productImages ProductImage[]
+
+  @@map("media_entries")
+}
+
+enum media_folder {
+  products
+  characters
+  hero
+  banners
+  collections
+  general
+}

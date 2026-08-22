@@ -50,3 +50,13 @@ Thumbs.db
 
 # Misc
 *.log
+
+# AI agent scratchpads / tooling artifacts
+.agent/
+.playwright-mcp/
+
+# Legacy archived code (read-only reference)
+legacy/*/node_modules/
+
+# Zombie-handle leftovers from legacy deletion (delete after reboot)
+_legacy-cleanup-pending/

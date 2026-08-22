@@ -5,7 +5,6 @@ import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Link from "next/link";
-import { useCartStore } from "@/components/shared/Cart";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -99,8 +98,6 @@ export default function ShinobiCharacterCards() {
     return () => mm.revert();
   }, []);
 
-  const addItem = useCartStore((s) => s.addItem);
-
   const handlePointerEnter = (defaultRef: React.RefObject<HTMLImageElement | null>, jutsuRef: React.RefObject<HTMLImageElement | null>) => {
     gsap.to(defaultRef.current, { opacity: 0, duration: 0.4, ease: "power2.out" });
     gsap.to(jutsuRef.current, { opacity: 1, scale: 1.04, duration: 0.4, ease: "power2.out" });
@@ -147,16 +144,16 @@ export default function ShinobiCharacterCards() {
           </div>
           <div className="w-full p-4 sm:p-5 md:p-6 lg:p-8 pt-4 md:pt-5 pb-8 sm:pb-12 lg:pb-14 mt-auto">
             <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 md:gap-4 mx-0 sm:mx-4 md:mx-6 lg:mx-8">
-              <button
-                onClick={() => addItem({ id: "naruto", name: "NARUTO", price: 29.99, quantity: 1, image: "/naruto-default.png" })}
+              <Link
+                href="/products/naruto-rasengan-hoodie"
                 className="flex-1 h-[52px] sm:h-[64px] md:h-[68px] lg:h-[72px] px-4 sm:px-8 md:px-10 lg:px-12 rounded-lg font-cinzel font-bold text-[13px] sm:text-[15px] md:text-[16px] flex items-center justify-between transition-all hover:brightness-110 active:scale-[0.97]"
                 style={{ backgroundColor: "#F4E9D3", color: "#1A1A1A" }}
               >
-                <span>ADD TO CART</span>
+                <span>BUY NOW</span>
                 <span className="font-inter text-[12px] sm:text-[13px] md:text-[14px] font-semibold">$29.99</span>
-              </button>
+              </Link>
               <Link
-                href={`/product/naruto`}
+                href="/products/naruto-rasengan-hoodie"
                 className="flex-1 h-[52px] sm:h-[64px] md:h-[68px] lg:h-[72px] px-4 sm:px-8 md:px-10 lg:px-12 rounded-lg font-cinzel font-bold text-[13px] sm:text-[15px] md:text-[16px] flex items-center justify-between transition-all hover:brightness-110 active:scale-[0.97]"
                 style={{ backgroundColor: "transparent", color: "white", border: "1.5px solid white" }}
               >
@@ -190,16 +187,16 @@ export default function ShinobiCharacterCards() {
           </div>
           <div className="w-full p-4 sm:p-5 md:p-6 lg:p-8 pt-4 md:pt-5 pb-8 sm:pb-12 lg:pb-14 mt-auto">
             <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 md:gap-4 mx-0 sm:mx-4 md:mx-6 lg:mx-8">
-              <button
-                onClick={() => addItem({ id: "itachi", name: "ITACHI", price: 34.99, quantity: 1, image: "/itachi-default.png" })}
+              <Link
+                href="/products/itachi-akatsuki-hoodie"
                 className="flex-1 h-[52px] sm:h-[64px] md:h-[68px] lg:h-[72px] px-4 sm:px-8 md:px-10 lg:px-12 rounded-lg font-cinzel font-bold text-[13px] sm:text-[15px] md:text-[16px] flex items-center justify-between transition-all hover:brightness-110 active:scale-[0.97]"
                 style={{ backgroundColor: "#F4E9D3", color: "#1A1A1A" }}
               >
-                <span>ADD TO CART</span>
+                <span>BUY NOW</span>
                 <span className="font-inter text-[12px] sm:text-[13px] md:text-[14px] font-semibold">$34.99</span>
-              </button>
+              </Link>
               <Link
-                href={`/product/itachi`}
+                href="/products/itachi-akatsuki-hoodie"
                 className="flex-1 h-[52px] sm:h-[64px] md:h-[68px] lg:h-[72px] px-4 sm:px-8 md:px-10 lg:px-12 rounded-lg font-cinzel font-bold text-[13px] sm:text-[15px] md:text-[16px] flex items-center justify-between transition-all hover:brightness-110 active:scale-[0.97]"
                 style={{ backgroundColor: "transparent", color: "white", border: "1.5px solid white" }}
               >
@@ -233,16 +230,16 @@ export default function ShinobiCharacterCards() {
           </div>
           <div className="w-full p-4 sm:p-5 md:p-6 lg:p-8 pt-4 md:pt-5 pb-8 sm:pb-12 lg:pb-14 mt-auto">
             <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 md:gap-4 mx-0 sm:mx-4 md:mx-6 lg:mx-8">
-              <button
-                onClick={() => addItem({ id: "sasuke", name: "SASUKE", price: 31.99, quantity: 1, image: "/sasuke-default.png" })}
+              <Link
+                href="/products/sasuke-chidori-hoodie"
                 className="flex-1 h-[52px] sm:h-[64px] md:h-[68px] lg:h-[72px] px-4 sm:px-8 md:px-10 lg:px-12 rounded-lg font-cinzel font-bold text-[13px] sm:text-[15px] md:text-[16px] flex items-center justify-between transition-all hover:brightness-110 active:scale-[0.97]"
                 style={{ backgroundColor: "#F4E9D3", color: "#1A1A1A" }}
               >
-                <span>ADD TO CART</span>
+                <span>BUY NOW</span>
                 <span className="font-inter text-[12px] sm:text-[13px] md:text-[14px] font-semibold">$31.99</span>
-              </button>
+              </Link>
               <Link
-                href={`/product/sasuke`}
+                href="/products/sasuke-chidori-hoodie"
                 className="flex-1 h-[52px] sm:h-[64px] md:h-[68px] lg:h-[72px] px-4 sm:px-8 md:px-10 lg:px-12 rounded-lg font-cinzel font-bold text-[13px] sm:text-[15px] md:text-[16px] flex items-center justify-between transition-all hover:brightness-110 active:scale-[0.97]"
                 style={{ backgroundColor: "transparent", color: "white", border: "1.5px solid white" }}
               >

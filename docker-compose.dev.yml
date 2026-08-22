@@ -1,0 +1,50 @@
+version: "3.9"
+
+# Shinobi Store — local development infrastructure.
+# Usage: docker compose -f docker-compose.dev.yml up -d
+# The Next.js frontend, NestJS API, and workers run on the host (pnpm dev);
+# only stateful infrastructure is containerized.
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: shinobi-postgres
+    environment:
+      POSTGRES_USER: shinobi
+      POSTGRES_PASSWORD: shinobi_dev_password
+      POSTGRES_DB: shinobi_store
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U shinobi -d shinobi_store"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    container_name: shinobi-redis
+    command: ["redis-server", "--appendonly", "yes"]
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  # Local SMTP sink with web UI (http://localhost:8025) — emails never leave the machine.
+  mailpit:
+    image: axllent/mailpit:latest
+    container_name: shinobi-mailpit
+    ports:
+      - "1025:1025"   # SMTP
+      - "8025:8025"   # Web UI
+
+volumes:
+  postgres-data:
+  redis-data:

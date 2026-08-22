@@ -5,7 +5,6 @@ import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Link from "next/link";
-import { useCartStore } from "@/components/shared/Cart";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -104,7 +103,6 @@ export default function MadaraSpecialCard({
     useRef<HTMLDivElement>(null),
   ];
   const sandOrbitRef = useRef<HTMLDivElement>(null);
-  const addItem = useCartStore((s) => s.addItem);
 
   useGSAP(
     () => {
@@ -894,26 +892,18 @@ export default function MadaraSpecialCard({
               </div>
               <div className="w-full p-4 sm:p-6 md:p-8 lg:p-10 pt-4 md:pt-5 pb-8 sm:pb-12 lg:pb-14 mt-auto">
                 <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 md:gap-4 mx-0 sm:mx-4 md:mx-6 lg:mx-8">
-                  <button
-                    onClick={() =>
-                      addItem({
-                        id: "madara",
-                        name: "MADARA",
-                        price: 49.99,
-                        quantity: 1,
-                        image: defaultImg,
-                      })
-                    }
+                  <Link
+                    href="/products/madara-uchiha-hoodie"
                     className="flex-1 h-[52px] sm:h-[64px] md:h-[68px] lg:h-[72px] px-4 sm:px-8 md:px-10 lg:px-12 rounded-lg font-cinzel font-bold text-[13px] sm:text-[15px] md:text-[16px] flex items-center justify-between transition-all hover:brightness-110 active:scale-[0.97]"
                     style={{ backgroundColor: "#F4E9D3", color: "#1A1A1A" }}
                   >
-                    <span>ADD TO CART</span>
+                    <span>BUY NOW</span>
                     <span className="font-inter text-[12px] sm:text-[13px] md:text-[14px] font-semibold">
                       $49.99
                     </span>
-                  </button>
+                  </Link>
                   <Link
-                    href="/product/madara"
+                    href="/products/madara-uchiha-hoodie"
                     className="flex-1 h-[52px] sm:h-[64px] md:h-[68px] lg:h-[72px] px-4 sm:px-8 md:px-10 lg:px-12 rounded-lg font-cinzel font-bold text-[13px] sm:text-[15px] md:text-[16px] flex items-center justify-between transition-all hover:brightness-110 active:scale-[0.97]"
                     style={{
                       backgroundColor: "transparent",

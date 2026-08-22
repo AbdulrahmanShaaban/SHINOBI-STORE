@@ -1,0 +1,15 @@
+{
+  "name": "@shinobi/contracts",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Generated OpenAPI spec and TypeScript types for the Shinobi Store API",
+  "main": "api.d.ts",
+  "types": "api.d.ts",
+  "scripts": {
+    "generate:spec": "pnpm --filter backend openapi:generate",
+    "generate": "openapi-typescript ./openapi.json -o ./api.d.ts"
+  },
+  "devDependencies": {
+    "openapi-typescript": "^7.9.1"
+  }
+}

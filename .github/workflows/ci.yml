@@ -1,0 +1,106 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  quality:
+    name: Lint · Typecheck · Test · Build
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: shinobi
+          POSTGRES_PASSWORD: shinobi_dev_password
+          POSTGRES_DB: shinobi_store
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U shinobi -d shinobi_store"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
+
+    env:
+      DATABASE_URL: postgresql://shinobi:shinobi_dev_password@localhost:5432/shinobi_store?schema=public
+      REDIS_URL: redis://localhost:6379
+      NODE_ENV: test
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate Prisma client + OpenAPI contracts
+        run: |
+          pnpm --filter backend prisma:generate
+          pnpm --filter backend openapi:generate
+          pnpm --filter @shinobi/contracts generate
+
+      - name: Apply migrations + seed
+        run: |
+          pnpm --filter backend db:deploy
+          pnpm --filter backend db:seed
+
+      - name: Lint backend
+        run: pnpm --filter backend lint
+
+      # Non-blocking: legacy marketing components carry pre-existing lint debt
+      # (react-hooks rules in GSAP sections, unescaped entities). Tracked for the
+      # frontend rebuild phase — flip to blocking once cleaned up.
+      - name: Lint frontend (non-blocking)
+        run: pnpm --filter frontend lint
+        continue-on-error: true
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Unit tests (backend)
+        run: pnpm --filter backend test
+
+      # Runs the full request pipeline; with services up, readiness must be green.
+      - name: E2E API tests
+        run: pnpm test:e2e
+
+      # Real-database data correctness: visibility, filter matrix, triggers.
+      - name: Integration tests (live DB)
+        run: pnpm --filter backend test:int
+
+      - name: Build frontend
+        run: pnpm --filter frontend build
+
+      - name: Build backend
+        run: pnpm --filter backend build
+
+      # Non-blocking initially — triage existing advisories, then flip to blocking.
+      - name: Dependency audit (non-blocking)
+        run: pnpm audit --prod --audit-level high
+        continue-on-error: true
