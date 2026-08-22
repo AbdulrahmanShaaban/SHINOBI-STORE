@@ -2,11 +2,15 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const overlayRef = useRef<HTMLDivElement>(null);
+  const pathname = usePathname();
+  const isHomePage = pathname === '/';
+  const showScrolledState = isScrolled || !isHomePage;
 
   useEffect(() => {
     const handleScroll = () => {
@@ -52,7 +56,7 @@ export default function Navbar() {
     <>
       <nav
         className={`fixed top-0 left-0 right-0 z-40 h-16 transition-all duration-300 ${
-        isScrolled
+        showScrolledState
           ? 'bg-[#0A0A0F]/90 backdrop-blur-md border-b border-[#FF6B00]/20'
           : 'bg-transparent'
       }`}
@@ -63,7 +67,7 @@ export default function Navbar() {
           <Link href="/" className="flex items-center z-50 h-full">
             <div 
               className={`transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] origin-top-left flex items-center ${
-                isScrolled 
+                showScrolledState 
                   ? 'w-[200px] md:w-[260px] lg:w-[320px] translate-y-[20px] lg:translate-y-[25px] translate-x-0' 
                   : 'w-[300px] md:w-[420px] lg:w-[550px] xl:w-[650px] translate-y-[20vh] md:translate-y-[25vh] lg:translate-y-[30vh] translate-x-[calc(50vw-166px)] md:translate-x-[6vw] lg:translate-x-[8vw]'
               }`}
