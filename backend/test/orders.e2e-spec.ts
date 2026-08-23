@@ -38,7 +38,6 @@ function buildDb() {
   seed(VARIANT_A.id, VARIANT_A.stock);
   seed(VARIANT_B.id, VARIANT_B.stock);
 
-  let orderSeq = 100000;
   const orders = new Map<string, Record<string, unknown>>();
   const payments = new Map<string, Record<string, unknown>>();
   const events: unknown[] = [];

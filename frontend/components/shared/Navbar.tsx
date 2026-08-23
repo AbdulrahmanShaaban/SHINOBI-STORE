@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { selectTotalItems, useCartStore } from '@/lib/cart-store';
 import { useUser } from '@/lib/user-context';
@@ -77,9 +78,13 @@ export default function Navbar() {
                   : 'w-[300px] md:w-[420px] lg:w-[550px] xl:w-[650px] translate-y-[20vh] md:translate-y-[25vh] lg:translate-y-[30vh] translate-x-[calc(50vw-166px)] md:translate-x-[6vw] lg:translate-x-[8vw]'
               }`}
             >
-              <img 
-                src="/logo.png" 
-                alt="Shinobi Store Logo" 
+              <Image
+                src="/logo.png"
+                alt="Shinobi Store Logo"
+                width={1536}
+                height={1024}
+                priority
+                sizes="(max-width: 767px) 300px, (max-width: 1023px) 420px, (max-width: 1279px) 550px, 650px"
                 className="w-full h-auto object-contain drop-shadow-[0_4px_15px_rgba(0,0,0,0.5)]"
               />
             </div>
@@ -162,9 +167,11 @@ export default function Navbar() {
       </div>
     </nav>
 
-      {/* Full-screen overlay */}
+      {/* Full-screen overlay. inert when closed so its links never enter the
+          tab order while visually hidden (opacity-0 alone keeps them focusable). */}
       <div
         ref={overlayRef}
+        inert={!isMenuOpen}
         className={`lg:hidden fixed inset-0 z-[60] flex flex-col items-center justify-center bg-[#0A0A0F] overflow-y-auto ${
           isMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
         } ${overlayTransition}`}

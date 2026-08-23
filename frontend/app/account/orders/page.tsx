@@ -53,7 +53,9 @@ export default function OrdersPage() {
     <main className="mx-auto w-full max-w-3xl px-4 py-12">
       <h1 className="font-bebas text-5xl tracking-wide text-[#F0F0F0] mb-8">MY ORDERS</h1>
       {orders === null ? (
-        <p className="text-[#6B6B80]">Loading…</p>
+        <p className="text-[#6B6B80]" role="status" aria-live="polite">
+          Loading…
+        </p>
       ) : orders.length === 0 ? (
         <p className="text-[#B8B8CC]">
           No orders yet.{' '}

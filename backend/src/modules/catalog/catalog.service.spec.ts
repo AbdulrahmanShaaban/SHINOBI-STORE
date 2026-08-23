@@ -9,6 +9,16 @@ interface CapturedFindMany {
   take: number;
 }
 
+/** Passthrough cache stub — read-through behaves as "always miss" here. */
+function cacheStub() {
+  return {
+    cached: jest.fn().mockImplementation((_key: string, _ttl: number, producer: () => unknown) => producer()),
+    get: jest.fn().mockResolvedValue(null),
+    set: jest.fn().mockResolvedValue(undefined),
+    del: jest.fn().mockResolvedValue(undefined),
+  };
+}
+
 function makeService(productRows: unknown[] = [], total = productRows.length, searchIds: string[] = []) {
   const captured: CapturedFindMany = {} as CapturedFindMany;
   const facetCalls: Record<string, unknown> = {};
@@ -34,7 +44,7 @@ function makeService(productRows: unknown[] = [], total = productRows.length, se
     tag: { findMany: facetDelegate('tag') },
   };
   return {
-    service: new CatalogService(prisma as never),
+    service: new CatalogService(prisma as never, cacheStub() as never),
     captured,
     facetCalls,
     prisma,
@@ -219,7 +229,7 @@ describe('CatalogService.getFacets', () => {
       character: { findMany: jest.fn().mockResolvedValue([]) },
       tag: { findMany: jest.fn().mockResolvedValue([]) },
     };
-    const service = new CatalogService(prisma as never);
+    const service = new CatalogService(prisma as never, cacheStub() as never);
 
     const facets = await service.getFacets(query({ search: 'hoodie' }));
     expect(facets.categories.map((c) => c.slug)).toEqual(['c', 'a', 'b']);
@@ -273,7 +283,7 @@ describe('CatalogService.getBySlug', () => {
       images: [{ id: 'i1', url: '/a.png', altText: 'a' }],
     };
     const prisma = { product: { findFirst: jest.fn().mockResolvedValue(full) } };
-    const service = new CatalogService(prisma as never);
+    const service = new CatalogService(prisma as never, cacheStub() as never);
 
     const detail = await service.getBySlug('hoodie');
     expect(detail.variants[0].available).toBe(4);

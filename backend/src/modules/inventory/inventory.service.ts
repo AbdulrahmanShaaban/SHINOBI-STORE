@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from '../../common/prisma/prisma.service';
 
@@ -112,6 +112,43 @@ export class InventoryService {
       select: { productVariantId: true, quantity: true },
     });
     return items.map((i) => ({ variantId: i.productVariantId, quantity: i.quantity }));
+  }
+
+  /**
+   * §15 manual stock correction (admin CRM). Own transaction: one conditional
+   * UPDATE clamping at zero, then the ledger row. Unknown variant → 404.
+   */
+  async adjust(input: {
+    variantId: string;
+    delta: number;
+    reason: string;
+    actorUserId?: string;
+  }): Promise<{ variantId: string; stockOnHand: number }> {
+    return this.prisma.$transaction(async (tx) => {
+      const rows = await tx.$executeRaw`
+        UPDATE product_variants
+           SET stock_on_hand = GREATEST(0, stock_on_hand + ${input.delta})
+         WHERE id = ${input.variantId}::uuid
+      `;
+      if (rows !== 1) {
+        throw new NotFoundException({ code: 'VARIANT_NOT_FOUND', message: 'Variant not found' });
+      }
+      await tx.inventoryTransaction.create({
+        data: {
+          variantId: input.variantId,
+          type: 'adjust',
+          quantity: input.delta,
+          note: input.reason.slice(0, 255),
+          actorType: input.actorUserId ? 'admin' : 'system',
+          actorUserId: input.actorUserId,
+        },
+      });
+      const variant = await tx.productVariant.findUniqueOrThrow({
+        where: { id: input.variantId },
+        select: { stockOnHand: true },
+      });
+      return { variantId: input.variantId, stockOnHand: variant.stockOnHand };
+    });
   }
 
   /** Sweeper helper: pending orders whose reservations expired. */

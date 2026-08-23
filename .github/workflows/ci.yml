@@ -80,9 +80,6 @@ jobs:
       - name: Typecheck
         run: pnpm typecheck
 
-      - name: Typecheck
-        run: pnpm typecheck
-
       - name: Unit tests (backend)
         run: pnpm --filter backend test
 
@@ -104,3 +101,33 @@ jobs:
       - name: Dependency audit (non-blocking)
         run: pnpm audit --prod --audit-level high
         continue-on-error: true
+
+  security:
+    name: Secrets · Prod dependency audit (blocking)
+    runs-on: ubuntu-latest
+
+    steps:
+      # Full history so gitleaks scans every commit, not just the shallow clone.
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Secret scan (gitleaks)
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # Blocking gate: production dependencies must carry no moderate-or-worse
+      # advisories. Triage by upgrading/overriding, never by lowering this bar.
+      - name: Dependency audit (prod, blocking gate)
+        run: pnpm audit --prod --audit-level moderate

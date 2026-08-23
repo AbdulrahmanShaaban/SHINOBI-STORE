@@ -112,12 +112,12 @@ export default function CustomCursor() {
         ref={dotRef}
         aria-hidden="true"
         className="pointer-events-none fixed left-0 top-0 z-[9999] h-1.5 w-1.5 rounded-full"
-        style={{ backgroundColor: "var(--primary)", margin: "-4px 0 0 -4px" }}
+        style={{ backgroundColor: "var(--primary)", margin: "-5px 0 0 -5px" }}
       />
       <div
         ref={ringRef}
         aria-hidden="true"
-        className="pointer-events-none fixed left-0 top-0 z-[9999] h-10 w-10 rounded-full border-2"
+        className="pointer-events-none fixed left-0 top-0 z-[9999] h-8.5 w-8.5 rounded-full border-2"
         style={{
           borderColor: "var(--primary)",
           backgroundColor: `rgba(${RING_RGB}, 0)`,

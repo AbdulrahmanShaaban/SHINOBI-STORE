@@ -24,7 +24,7 @@ export class MockPaymentProvider implements PaymentProvider {
     };
   }
 
-  async retrievePayment(providerRef: string): Promise<RetrievedPayment> {
+  async retrievePayment(_providerRef: string): Promise<RetrievedPayment> {
     return { status: 'succeeded', amountReceivedCents: 0 };
   }
 }

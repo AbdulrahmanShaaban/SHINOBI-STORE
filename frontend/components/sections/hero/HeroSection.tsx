@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -9,7 +10,23 @@ import SlidingImage from '@/components/sections/hero/SlidingImage';
 
 gsap.registerPlugin(ScrollTrigger);
 
-export default function HeroSection() {
+export interface HeroSectionProps {
+  /** CMS-driven hero copy — all optional; absent values keep today's imagery-only hero. */
+  title?: string;
+  subtitle?: string;
+  /** Extra decorative art layer rendered between the mountain and the petals. */
+  imageUrl?: string;
+  ctaLabel?: string;
+  ctaHref?: string;
+}
+
+export default function HeroSection({
+  title = '',
+  subtitle = '',
+  imageUrl = '',
+  ctaLabel = '',
+  ctaHref = '',
+}: HeroSectionProps) {
   useGSAP(() => {
     const mm = gsap.matchMedia();
 
@@ -48,7 +65,7 @@ export default function HeroSection() {
             }
           );
 
-          gsap.utils.toArray('.petal').forEach((petal: any) => {
+          gsap.utils.toArray<Element>('.petal').forEach((petal: Element) => {
             gsap.to(petal, {
               y: '100vh',
               x: gsap.utils.random(-100, 100),
@@ -79,7 +96,7 @@ export default function HeroSection() {
             }
           );
 
-          gsap.utils.toArray('.petal').forEach((petal: any) => {
+          gsap.utils.toArray<Element>('.petal').forEach((petal: Element) => {
             gsap.to(petal, {
               y: '100vh',
               x: gsap.utils.random(-40, 40),
@@ -100,22 +117,37 @@ export default function HeroSection() {
 
   return (
     <section className="relative min-h-[100svh] h-screen overflow-hidden">
-      {/* Background sky */}
-      <img
+      {/* Background sky (decorative; LCP layer → priority) */}
+      <Image
         src="/sky.webp"
-        alt="Sky"
-        className="absolute z-0 inset-0 w-full h-full object-cover"
+        alt=""
+        fill
+        priority
+        sizes="100vw"
+        className="z-0 object-cover"
       />
 
-      {/* Mountain */}
-      <img
+      {/* Mountain (decorative) */}
+      <Image
         src="/mountain.webp"
-        alt="Mountain"
-        className="absolute z-5 inset-0 w-full h-full object-cover"
+        alt=""
+        fill
+        sizes="100vw"
+        className="z-5 object-cover"
       />
 
-      {/* Sakura petals */}
-      <div className="absolute z-5 inset-0 pointer-events-none">
+      {/* CMS-provided art layer (decorative, sits under petals/clouds) */}
+      {imageUrl ? (
+        <img
+          src={imageUrl}
+          alt=""
+          aria-hidden="true"
+          className="absolute inset-0 z-[4] h-full w-full object-cover"
+        />
+      ) : null}
+
+      {/* Sakura petals (decorative) */}
+      <div className="absolute z-5 inset-0 pointer-events-none" aria-hidden="true">
         <svg className="petal absolute w-3 h-3 md:w-4 md:h-4" style={{ left: '10%', top: '5%' }} viewBox="0 0 20 20">
           <path d="M10 0 C15 5 15 15 10 20 C5 15 5 5 10 0" fill="#FFB7C5" opacity="1" />
         </svg>
@@ -145,8 +177,8 @@ export default function HeroSection() {
       {/* Clouds */}
       <SlidingImage />
 
-      {/* Glowing particles */}
-      <div className="absolute inset-0 pointer-events-none">
+      {/* Glowing particles (decorative) */}
+      <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
         <div className="absolute w-1 h-1 bg-[#FF6B00] rounded-full" style={{ left: '10%', top: '10%', opacity: 0.3 }} />
         <div className="absolute w-1 h-1 bg-[#FF6B00] rounded-full" style={{ left: '20%', top: '30%', opacity: 0.4 }} />
         <div className="absolute w-1 h-1 bg-[#FF6B00] rounded-full" style={{ left: '30%', top: '50%', opacity: 0.2 }} />
@@ -172,6 +204,30 @@ export default function HeroSection() {
       {/* Content layer */}
       <div className="relative z-10 h-full flex flex-col">
 
+        {/* CMS-driven copy overlay — rendered only when the API supplies a title.
+            Without a title an sr-only h1 keeps exactly one page heading. */}
+        {title ? (
+          <div className="pointer-events-none relative z-20 flex flex-col items-start px-5 pt-[14svh] sm:px-8 md:px-12 md:pt-[16svh] lg:px-16">
+            <h1 className="max-w-[16ch] font-bebas text-[clamp(2.75rem,7vw,6rem)] uppercase leading-[0.95] tracking-wide text-[#F5E6C8] drop-shadow-[0_4px_18px_rgba(0,0,0,0.55)]">
+              {title}
+            </h1>
+            {subtitle ? (
+              <p className="mt-3 max-w-md font-inter text-sm leading-relaxed text-[#F5E6C8]/90 drop-shadow-[0_2px_10px_rgba(0,0,0,0.6)] md:mt-4 md:text-lg">
+                {subtitle}
+              </p>
+            ) : null}
+            {ctaHref && ctaLabel ? (
+              <a
+                href={ctaHref}
+                className="pointer-events-auto mt-6 inline-flex items-center gap-2 rounded-lg bg-[#FF6B00] px-6 py-3 font-cinzel text-sm font-bold tracking-wider text-black transition-colors hover:bg-[#FF8A33] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#F5E6C8] md:mt-8 md:text-base"
+              >
+                {ctaLabel}
+              </a>
+            ) : null}
+          </div>
+        ) : (
+          <h1 className="sr-only">Shinobi Store</h1>
+        )}
 
         {/* Naruto - centered, bottom-anchored, fluid width */}
         <div className="naruto-wrapper absolute inset-x-0 bottom-0 flex justify-center z-10 pointer-events-none">

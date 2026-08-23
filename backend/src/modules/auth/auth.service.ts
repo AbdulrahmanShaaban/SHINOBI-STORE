@@ -142,6 +142,15 @@ export class AuthService {
         where: { userId: claim.user_id, usedAt: null }, // other live tokens die too
       }),
     ]);
+    // M-1 fix: flush each live session's exact cache key — the DB revoke alone
+    // leaves Redis-authenticated stale tokens alive for the cache TTL.
+    const stillLive = await this.prisma.session.findMany({
+      where: { userId: claim.user_id },
+      select: { tokenHash: true },
+    });
+    for (const row of stillLive) {
+      await this.sessions.invalidateCache(row.tokenHash).catch(() => undefined);
+    }
   }
 
   /**

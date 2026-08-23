@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from '../../common/prisma/prisma.service';
+import { CacheService } from '../cache/cache.service';
 
 /**
  * Admin catalog writes. Every mutation goes through an explicit whitelist
@@ -62,41 +63,59 @@ function pick<T extends object>(input: T, allowed: readonly (keyof T)[]): Partia
 
 @Injectable()
 export class AdminCatalogService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly cache: CacheService,
+  ) {}
 
-  createProduct(input: ProductWriteInput) {
+  async createProduct(input: ProductWriteInput) {
     const data = pick(input, PRODUCT_FIELDS) as Prisma.ProductUncheckedCreateInput;
-    return this.prisma.product.create({ data });
+    const created = await this.prisma.product.create({ data });
+    // New rows shift the featured/facet aggregates even though no stale
+    // detail page exists yet (§16.1 targeted invalidation).
+    await this.cache.invalidateProduct(created.slug);
+    return created;
   }
 
   async updateProduct(id: string, input: Partial<ProductWriteInput>) {
-    await this.assertProductExists(id);
+    const existing = await this.assertProductExists(id);
     const data = pick(input, PRODUCT_FIELDS) as Prisma.ProductUncheckedUpdateInput;
-    return this.prisma.product.update({ where: { id }, data });
+    const updated = await this.prisma.product.update({ where: { id }, data });
+    // Slug renames orphan the old detail key; both faces are dropped.
+    await this.cache.invalidateProduct(existing.slug, updated.slug);
+    return updated;
   }
 
   /** Soft visibility flip — archived products vanish from public reads only. */
   async archiveProduct(id: string) {
-    await this.assertProductExists(id);
-    return this.prisma.product.update({ where: { id }, data: { status: 'archived' } });
+    const existing = await this.assertProductExists(id);
+    const archived = await this.prisma.product.update({ where: { id }, data: { status: 'archived' } });
+    await this.cache.invalidateProduct(existing.slug);
+    return archived;
   }
 
-  createCategory(input: TaxonomyWriteInput) {
-    return this.prisma.category.create({
+  async createCategory(input: TaxonomyWriteInput) {
+    const created = await this.prisma.category.create({
       data: pick(input, TAXONOMY_FIELDS) as Prisma.CategoryUncheckedCreateInput,
     });
+    await this.cache.invalidateFacets();
+    return created;
   }
 
-  createAnime(input: TaxonomyWriteInput) {
-    return this.prisma.anime.create({
+  async createAnime(input: TaxonomyWriteInput) {
+    const created = await this.prisma.anime.create({
       data: pick(input, TAXONOMY_FIELDS) as Prisma.AnimeUncheckedCreateInput,
     });
+    await this.cache.invalidateFacets();
+    return created;
   }
 
-  createCharacter(input: TaxonomyWriteInput) {
-    return this.prisma.character.create({
+  async createCharacter(input: TaxonomyWriteInput) {
+    const created = await this.prisma.character.create({
       data: pick(input, TAXONOMY_FIELDS) as Prisma.CharacterUncheckedCreateInput,
     });
+    await this.cache.invalidateFacets();
+    return created;
   }
 
   /** Fetch any product regardless of status — admin eyes only. */
@@ -108,10 +127,11 @@ export class AdminCatalogService {
     return product;
   }
 
-  private async assertProductExists(id: string): Promise<void> {
-    const exists = await this.prisma.product.findUnique({ where: { id }, select: { id: true } });
-    if (!exists) {
+  private async assertProductExists(id: string): Promise<{ slug: string }> {
+    const product = await this.prisma.product.findUnique({ where: { id }, select: { slug: true } });
+    if (!product) {
       throw new NotFoundException({ code: 'PRODUCT_NOT_FOUND', message: 'Product not found' });
     }
+    return product;
   }
 }

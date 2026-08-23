@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Post, Req, Res } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, HttpException, Post, Req, Res } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import type { Request, Response } from 'express';
 import { Throttle } from '@nestjs/throttler';
@@ -52,7 +52,14 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response,
   ) {
     // Per-identifier throttle (per-IP is enforced by the route decorator above).
-    await this.auth.checkIdentifierThrottle(body.email);
+    const allowed = await this.auth.checkIdentifierThrottle(body.email);
+    if (!allowed) {
+      res.header('Retry-After', '60');
+      throw new HttpException(
+        { code: 'TOO_MANY_ATTEMPTS', message: 'Too many attempts. Try again shortly.' },
+        HttpStatus.TOO_MANY_REQUESTS,
+      );
+    }
     const { token, expiresAt, user } = await this.auth.login(body, {
       userAgent: req.headers['user-agent'],
       ip: req.ip,

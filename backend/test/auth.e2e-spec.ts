@@ -64,6 +64,7 @@ function prismaStub() {
       findUnique: jest.fn().mockImplementation(({ where }) =>
         Promise.resolve(sessions.get(where.tokenHash) ?? null),
       ),
+      findMany: jest.fn().mockResolvedValue([]),
       updateMany: jest.fn().mockResolvedValue({ count: 1 }),
     },
     passwordResetToken: {

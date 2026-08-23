@@ -27,7 +27,17 @@ export async function configureApp(app: NestExpressApplication): Promise<AppConf
 
   // Security headers. CSP is intentionally not set here: this is a JSON API;
   // browser-facing CSP belongs to the frontend/edge layer.
-  app.use(helmet({ contentSecurityPolicy: false }));
+  // HSTS only makes sense behind TLS in production; maxAge is in SECONDS
+  // (180 days), subdomains included. Non-production bootstraps omit it so
+  // plain-http local/test traffic never gets poisoned with the policy.
+  app.use(
+    helmet({
+      contentSecurityPolicy: false,
+      strictTransportSecurity: config.isProduction
+        ? { maxAge: 180 * 24 * 60 * 60, includeSubDomains: true }
+        : false,
+    }),
+  );
 
   app.enableCors({
     origin: config.corsOrigins,

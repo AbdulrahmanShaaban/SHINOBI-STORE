@@ -115,12 +115,20 @@ export class SessionsService {
 
   /** "Logout all" — revokes every live session for the user instantly. */
   async revokeAllForUser(userId: string): Promise<number> {
+    // Select hashes FIRST so every live cache key can be flushed exactly —
+    // DEL does not glob, and a stale cache entry would keep authenticating
+    // the revoked token for the cache TTL (M-1 fix).
+    const live = await this.prisma.session.findMany({
+      where: { userId, revokedAt: null },
+      select: { tokenHash: true },
+    });
     const result = await this.prisma.session.updateMany({
       where: { userId, revokedAt: null },
       data: { revokedAt: new Date() },
     });
-    // Cache entries carry no revocation info — flush the namespace.
-    await this.redis.client.del('sessions:*').catch(() => undefined);
+    for (const row of live) {
+      await this.redis.client.del(this.cacheKey(row.tokenHash)).catch(() => undefined);
+    }
     return result.count;
   }
 
@@ -154,7 +162,8 @@ export class SessionsService {
     }
   }
 
-  private async invalidateCache(tokenHash: string): Promise<void> {
+  /** Exact-key cache flush; exposed for flows that revoke outside this service. */
+  async invalidateCache(tokenHash: string): Promise<void> {
     try {
       await this.redis.client.del(this.cacheKey(tokenHash));
     } catch {

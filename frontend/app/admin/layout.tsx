@@ -9,9 +9,12 @@ const NAV_ITEMS = [
   { href: '/admin', label: 'DASHBOARD' },
   { href: '/admin/orders', label: 'ORDERS' },
   { href: '/admin/products', label: 'PRODUCTS' },
+  { href: '/admin/content', label: 'CONTENT' },
+  { href: '/admin/media', label: 'MEDIA' },
   { href: '/admin/customers', label: 'CUSTOMERS' },
   { href: '/admin/coupons', label: 'COUPONS' },
   { href: '/admin/audit-log', label: 'AUDIT LOG' },
+  { href: '/admin/queues', label: 'QUEUES' },
 ];
 
 /**

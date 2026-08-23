@@ -39,8 +39,11 @@ function sessionsStub(overrides: Partial<{ validate: SessionsService['validate']
 }
 
 function exec(headers: Record<string, string>, method = 'GET'): ExecutionContext {
+  // One stable request object: the guard mutates req.user/req.sessionId in
+  // place, so every getRequest() call must observe the same instance.
+  const req = { headers, method };
   return {
-    switchToHttp: () => ({ getRequest: () => ({ headers, method }) }),
+    switchToHttp: () => ({ getRequest: () => req }),
     getHandler: () => undefined,
     getClass: () => undefined,
   } as unknown as ExecutionContext;
@@ -52,7 +55,7 @@ describe('SessionGuard (real, Phase 5)', () => {
     const ctx = exec({ cookie: `${SESSION_COOKIE}=valid-token-value-000000000` });
 
     await expect(guard.canActivate(ctx)).resolves.toBe(true);
-    const req = ctx.switchToHttp().getRequest() as { user?: unknown; sessionId?: string };
+    const req = ctx.switchToHttp().getRequest() as { user?: { id: string }; sessionId?: string };
     expect(req.user?.id).toBe('u1');
     expect(req.sessionId).toBe('s1');
   });

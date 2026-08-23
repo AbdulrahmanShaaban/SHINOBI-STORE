@@ -265,4 +265,44 @@ export const adminApi = {
       method: 'PATCH',
       body: JSON.stringify(body),
     }),
+
+  listQueues: () => request<QueueInfo[]>('/admin/queues'),
+
+  listFailedJobs: (queue: string, page?: number) =>
+    request<FailedJobsResult>(
+      withQuery(`/admin/queues/${encodeURIComponent(queue)}/failed`, { page }),
+    ),
+
+  requeueFailedJob: (queue: string, jobId: string) =>
+    request<unknown>(
+      `/admin/queues/${encodeURIComponent(queue)}/failed/${encodeURIComponent(jobId)}/requeue`,
+      { method: 'POST' },
+    ),
 };
+
+export interface QueueCounts {
+  completed: number;
+  failed: number;
+  active: number;
+  waiting: number;
+  delayed: number;
+}
+
+export interface QueueInfo {
+  name: string;
+  counts: QueueCounts;
+  dlqCount: number;
+}
+
+export interface FailedJob {
+  id: string;
+  name: string;
+  failedReason: string;
+  attemptsMade: number;
+  timestamp: number;
+}
+
+export interface FailedJobsResult {
+  items: FailedJob[];
+  meta: PageMeta;
+}

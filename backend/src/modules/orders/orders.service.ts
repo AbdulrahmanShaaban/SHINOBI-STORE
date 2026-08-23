@@ -440,12 +440,20 @@ export class OrdersService {
    * (documented trade-off; no PII beyond what was ordered).
    */
   async getByOrderNumberForGuest(orderNumber: string) {
+    // H-1 fix: minimal projection only — no contactEmail/shippingAddress/
+    // userId/idempotencyKey. PII lives behind the authed path.
     const order = await this.prisma.order.findUnique({
       where: { orderNumber },
-      include: {
-        items: true,
-        events: { orderBy: { createdAt: 'asc' } },
-        payments: { select: { status: true, providerRef: true, amountCents: true } },
+      select: {
+        orderNumber: true,
+        status: true,
+        totalCents: true,
+        currency: true,
+        createdAt: true,
+        items: {
+          select: { productName: true, variantName: true, quantity: true, totalCents: true },
+        },
+        events: { orderBy: { createdAt: 'asc' }, select: { type: true, toStatus: true, createdAt: true } },
       },
     });
     if (!order) throw new NotFoundException({ code: 'ORDER_NOT_FOUND', message: 'Order not found' });

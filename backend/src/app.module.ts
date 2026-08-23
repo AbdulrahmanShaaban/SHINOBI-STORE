@@ -17,6 +17,11 @@ import { OrdersModule } from './modules/orders/orders.module';
 import { PaymentsModule } from './modules/payments/payments.module';
 import { InventoryModule } from './modules/inventory/inventory.module';
 import { NotificationsModule } from './modules/notifications/notifications.module';
+import { QueueModule } from './modules/queue/queue.module';
+import { AuditModule } from './modules/audit/audit.module';
+import { AdminModule } from './modules/admin/admin.module';
+import { MediaModule } from './modules/media/media.module';
+import { ContentModule } from './modules/content/content.module';
 
 @Module({
   imports: [
@@ -39,14 +44,20 @@ import { NotificationsModule } from './modules/notifications/notifications.modul
     ]),
     PrismaModule,
     RedisModule,
+    // Global audit trail — every admin mutation records through it.
+    AuditModule,
     HealthModule,
     CatalogModule,
     AuthModule,
     CartModule,
     InventoryModule,
     NotificationsModule,
+    QueueModule,
     PaymentsModule,
     OrdersModule,
+    AdminModule,
+    MediaModule,
+    ContentModule,
   ],
   providers: [
     // Order matters: authentication first (attaches req.user), then

@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useCallback, useContext, useEffect, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { authApi, type AuthUser } from '@/lib/auth';
 
 interface UserContextValue {
@@ -56,11 +56,14 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     };
   }, []);
 
-  return (
-    <UserContext.Provider value={{ user, loading, refresh, setUser }}>
-      {children}
-    </UserContext.Provider>
+  // Stable value object: consumers only re-render when session state actually
+  // changes, not on every provider render.
+  const value = useMemo(
+    () => ({ user, loading, refresh, setUser }),
+    [user, loading, refresh, setUser],
   );
+
+  return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
 }
 
 export const useUser = () => useContext(UserContext);

@@ -103,7 +103,11 @@ export default async function ProductPage({ params }: PageProps) {
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{
+          // JSON.stringify does not escape "</script>" — without this a
+          // product name/description could terminate the ld+json block (XSS).
+          __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c'),
+        }}
       />
       <main className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-10 pt-28 lg:pt-32 pb-24">
         <ProductDetailView product={product} related={related} />

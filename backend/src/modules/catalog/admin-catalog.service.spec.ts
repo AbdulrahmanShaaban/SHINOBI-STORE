@@ -12,7 +12,13 @@ function makeService() {
     anime: { create: jest.fn().mockResolvedValue({ id: 'a1' }) },
     character: { create: jest.fn().mockResolvedValue({ id: 'ch1' }) },
   };
-  return { service: new AdminCatalogService(prisma as never), prisma };
+  // Cache is a pure observer here: mutations must fire targeted invalidation
+  // and never let cache failures surface.
+  const cache = {
+    invalidateProduct: jest.fn().mockResolvedValue(undefined),
+    invalidateFacets: jest.fn().mockResolvedValue(undefined),
+  };
+  return { service: new AdminCatalogService(prisma as never, cache as never), prisma, cache };
 }
 
 describe('AdminCatalogService — field whitelisting', () => {
@@ -55,7 +61,7 @@ describe('AdminCatalogService — field whitelisting', () => {
   });
 
   it('archives by status flip and refuses to touch unknown products', async () => {
-    const { service, prisma } = makeService();
+    const { service, prisma, cache } = makeService();
     await service.archiveProduct('p1');
     expect(prisma.product.update).toHaveBeenCalledWith({
       where: { id: 'p1' },
@@ -63,6 +69,35 @@ describe('AdminCatalogService — field whitelisting', () => {
     });
 
     (prisma.product.findUnique as jest.Mock).mockResolvedValue(null);
+    const callsBefore = cache.invalidateProduct.mock.calls.length;
     await expect(service.updateProduct('ghost', { name: 'x' })).rejects.toThrow(NotFoundException);
+    // Failed mutations must not fire invalidation.
+    expect(cache.invalidateProduct.mock.calls.length).toBe(callsBefore);
+  });
+
+  it('fires targeted cache invalidation for every product mutation path', async () => {
+    const { service, prisma, cache } = makeService();
+
+    (prisma.product.create as jest.Mock).mockResolvedValue({ id: 'p1', slug: 'hoodie' });
+    await service.createProduct({ name: 'Hoodie', description: 'd', categoryId: 'c-uuid' } as never);
+    expect(cache.invalidateProduct).toHaveBeenCalledWith('hoodie');
+
+    (prisma.product.findUnique as jest.Mock).mockResolvedValue({ id: 'p1', slug: 'old-slug' });
+    (prisma.product.update as jest.Mock).mockResolvedValue({ id: 'p1', slug: 'renamed' });
+    await service.updateProduct('p1', { slug: 'renamed' });
+    expect(cache.invalidateProduct).toHaveBeenCalledWith('old-slug', 'renamed');
+
+    await service.archiveProduct('p1');
+    expect(cache.invalidateProduct).toHaveBeenCalledWith('old-slug');
+  });
+
+  it('invalidates facets when taxonomy buckets change', async () => {
+    const { service, cache } = makeService();
+
+    await service.createCategory({ slug: 'apparel', name: 'Apparel' });
+    await service.createAnime({ slug: 'naruto', name: 'Naruto' });
+    await service.createCharacter({ slug: 'naruto', name: 'Naruto' });
+
+    expect(cache.invalidateFacets).toHaveBeenCalledTimes(3);
   });
 });

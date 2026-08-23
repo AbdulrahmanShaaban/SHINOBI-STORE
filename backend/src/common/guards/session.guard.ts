@@ -15,7 +15,13 @@ export function extractToken(req: Request): string | undefined {
   if (cookies) {
     for (const pair of cookies.split(';')) {
       const [name, ...rest] = pair.trim().split('=');
-      if (name === SESSION_COOKIE) return decodeURIComponent(rest.join('='));
+      if (name !== SESSION_COOKIE) continue;
+      // Malformed percent-encoding must yield a clean 401, never a 500 (L-6).
+      try {
+        return decodeURIComponent(rest.join('='));
+      } catch {
+        return undefined;
+      }
     }
   }
   return undefined;

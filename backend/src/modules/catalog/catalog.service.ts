@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from '../../common/prisma/prisma.service';
+import { CACHE_KEYS, CACHE_TTL_SECONDS, CacheService } from '../cache/cache.service';
 import { ProductQueryDto, ProductSort } from './dto/product-query.dto';
 import { AvailabilityDto, VariantAvailability } from './dto/availability.dto';
 import { searchProductIds } from './search.builder';
@@ -122,7 +123,10 @@ function mapListItem(p: Prisma.ProductGetPayload<{ select: typeof LIST_SELECT }>
  */
 @Injectable()
 export class CatalogService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly cache: CacheService,
+  ) {}
 
   async list(query: ProductQueryDto): Promise<PaginatedProducts> {
     const search = query.search?.trim();
@@ -203,6 +207,26 @@ export class CatalogService {
    * without zeroing the rest of the sidebar.
    */
   async getFacets(query: ProductQueryDto): Promise<ProductFacets> {
+    // §16.1 pins a single catalog:facets key, which is only correct when the
+    // payload is filter-independent — filtered sidebar requests bypass cache.
+    if (this.hasFilterDimensions(query)) return this.computeFacets(query);
+    return this.cache.cached(CACHE_KEYS.facets, CACHE_TTL_SECONDS.facets, () => this.computeFacets(query));
+  }
+
+  private hasFilterDimensions(q: ProductQueryDto): boolean {
+    return Boolean(
+      q.search?.trim() ||
+        q.category ||
+        q.anime ||
+        q.character ||
+        q.tag ||
+        q.featured ||
+        q.minPrice !== undefined ||
+        q.maxPrice !== undefined,
+    );
+  }
+
+  private async computeFacets(query: ProductQueryDto): Promise<ProductFacets> {
     const search = query.search?.trim();
     let scopedIds: string[] | undefined;
     if (search) {
@@ -263,7 +287,18 @@ export class CatalogService {
     };
   }
 
-  async getBySlug(slug: string) {
+  /**
+   * Read-through product detail (§16.1, 10m). The producer keeps the NotFound
+   * mapping so a cold unknown slug still answers with the stable error
+   * contract; misses are never cached.
+   */
+  getBySlug(slug: string) {
+    return this.cache.cached(CACHE_KEYS.product(slug), CACHE_TTL_SECONDS.product, () =>
+      this.loadProductDetail(slug),
+    );
+  }
+
+  private async loadProductDetail(slug: string) {
     const product = await this.prisma.product.findFirst({
       where: { slug, status: 'active' },
       include: DETAIL_INCLUDE,

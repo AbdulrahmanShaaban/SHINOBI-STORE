@@ -169,14 +169,18 @@ export default function StoreFooter() {
                   <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
                   <polyline points="22,6 12,13 2,6" />
                 </svg>
+                <label htmlFor="footer-email-mobile" className="sr-only">
+                  Email address
+                </label>
                 <input
+                  id="footer-email-mobile"
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="Email address"
                   className="flex-1 bg-transparent outline-none font-inter text-sm text-white placeholder:text-white/40"
                 />
-                <button type="submit" className="pl-4 text-white/60 group-focus-within:text-[#F97316] hover:text-[#F97316] hover:translate-x-1 transition-all">
+                <button type="submit" aria-label="Subscribe to the newsletter" className="pl-4 text-white/60 group-focus-within:text-[#F97316] hover:text-[#F97316] hover:translate-x-1 transition-all">
                   <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="square">
                     <path d="M5 12h14M12 5l7 7-7 7" />
                   </svg>
@@ -299,14 +303,18 @@ export default function StoreFooter() {
                     <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
                     <polyline points="22,6 12,13 2,6" />
                   </svg>
+                  <label htmlFor="footer-email-desktop" className="sr-only">
+                    Email address
+                  </label>
                   <input
+                    id="footer-email-desktop"
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="Email address"
                     className="flex-1 bg-transparent outline-none font-inter text-base text-white placeholder:text-white/40"
                   />
-                  <button type="submit" className="pl-4 text-white/60 group-focus-within:text-[#F97316] hover:text-[#F97316] hover:translate-x-1 transition-all">
+                  <button type="submit" aria-label="Subscribe to the newsletter" className="pl-4 text-white/60 group-focus-within:text-[#F97316] hover:text-[#F97316] hover:translate-x-1 transition-all">
                     <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="square">
                       <path d="M5 12h14M12 5l7 7-7 7" />
                     </svg>

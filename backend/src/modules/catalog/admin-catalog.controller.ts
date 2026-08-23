@@ -11,6 +11,7 @@ import {
 import { ApiBearerAuth, ApiOperation, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
 import { IsBoolean, IsIn, IsOptional, IsString, IsUUID, MaxLength, MinLength } from 'class-validator';
 import { AdminGuard } from '../../common/guards/admin.guard';
+import { RequirePermissions } from '../../common/rbac/require-permissions.decorator';
 import { AdminCatalogService } from './admin-catalog.service';
 
 class ProductBodyDto {
@@ -58,6 +59,7 @@ class ProductBodyDto {
 export class AdminCatalogController {
   constructor(private readonly adminCatalogService: AdminCatalogService) {}
 
+  @RequirePermissions('products:w')
   @Post('products')
   @ApiOperation({ summary: 'Create product (admin)' })
   createProduct(@Body() body: ProductBodyDto) {
@@ -72,18 +74,21 @@ export class AdminCatalogController {
     });
   }
 
+  @RequirePermissions('products:w')
   @Patch('products/:id')
   @ApiOperation({ summary: 'Update product (admin)' })
   updateProduct(@Param('id') id: string, @Body() body: ProductBodyDto) {
     return this.adminCatalogService.updateProduct(id, body);
   }
 
+  @RequirePermissions('products:w')
   @Delete('products/:id')
   @ApiOperation({ summary: 'Archive product (admin)' })
   archiveProduct(@Param('id') id: string) {
     return this.adminCatalogService.archiveProduct(id);
   }
 
+  @RequirePermissions('products:r')
   @Get('products/:id')
   @ApiOperation({ summary: 'Fetch product incl. drafts (admin)' })
   getProduct(@Param('id') id: string) {

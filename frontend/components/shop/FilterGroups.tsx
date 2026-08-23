@@ -75,8 +75,9 @@ export default function FilterGroups({
                     <span className={`text-sm flex-1 ${isActive ? 'text-[#FF6B00]' : 'text-[#B8B8CC]'}`}>
                       {opt.name}
                     </span>
-                    <span className="text-xs text-[#6B6B80]" aria-label={`${opt.count} products`}>
+                    <span className="text-xs text-[#6B6B80]">
                       {opt.count}
+                      <span className="sr-only"> products</span>
                     </span>
                   </label>
                 );

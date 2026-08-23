@@ -45,6 +45,7 @@ model User {
   mediaUploads        MediaEntry[]         @relation("MediaUploads")
   cart                Cart?
   orders              Order[]
+  auditLogs           AuditLog[]
 
   @@index([role])
   @@map("users")
@@ -531,6 +532,27 @@ enum inventory_tx_type {
   adjust
 }
 
+// ───────────────────────── §10.4 Admin CRM audit trail ─────────────────────
+
+/// Append-only record of every staff mutation (§11.4). Written via the global
+/// AuditService; actor link dissolves to NULL if the staff user is ever removed.
+model AuditLog {
+  id          String   @id @default(uuid()) @db.Uuid
+  actorUserId String?  @map("actor_user_id") @db.Uuid
+  action      String
+  entityType  String   @map("entity_type")
+  entityId    String?  @map("entity_id")
+  diff        Json?
+  ip          String?
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  actor User? @relation(fields: [actorUserId], references: [id], onDelete: SetNull)
+
+  @@index([entityType, entityId])
+  @@index([createdAt])
+  @@map("audit_logs")
+}
+
 // ───────────────────── Platform slice required by catalog ─────────────────────
 
 model MediaEntry {
@@ -560,4 +582,22 @@ enum media_folder {
   banners
   collections
   general
+}
+
+// ─────────────────────── §Phase 8 Content & media ───────────────────────
+
+/// Admin-curated homepage layout. One row per section key; the key set is
+/// closed by a CHECK constraint (see migration) and every `config` payload is
+/// validated by src/modules/content/section-schemas.ts before it is stored —
+/// the schema classes are the single source of truth for section config shape.
+model HomepageSection {
+  id        String   @id @default(uuid()) @db.Uuid
+  key       String   @unique
+  isVisible Boolean  @default(true) @map("is_visible")
+  sortOrder Int      @default(0) @map("sort_order")
+  config    Json
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  @@map("homepage_sections")
 }
