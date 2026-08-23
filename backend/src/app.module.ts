@@ -13,6 +13,10 @@ import { HealthModule } from './modules/health/health.module';
 import { CatalogModule } from './modules/catalog/catalog.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { CartModule } from './modules/cart/cart.module';
+import { OrdersModule } from './modules/orders/orders.module';
+import { PaymentsModule } from './modules/payments/payments.module';
+import { InventoryModule } from './modules/inventory/inventory.module';
+import { NotificationsModule } from './modules/notifications/notifications.module';
 
 @Module({
   imports: [
@@ -39,6 +43,10 @@ import { CartModule } from './modules/cart/cart.module';
     CatalogModule,
     AuthModule,
     CartModule,
+    InventoryModule,
+    NotificationsModule,
+    PaymentsModule,
+    OrdersModule,
   ],
   providers: [
     // Order matters: authentication first (attaches req.user), then

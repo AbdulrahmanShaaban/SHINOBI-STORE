@@ -44,6 +44,7 @@ model User {
   reviews             Review[]
   mediaUploads        MediaEntry[]         @relation("MediaUploads")
   cart                Cart?
+  orders              Order[]
 
   @@index([role])
   @@map("users")
@@ -250,7 +251,9 @@ model ProductVariant {
 
   product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 
-  cartItems CartItem[]
+  cartItems         CartItem[]
+  orderItems        OrderItem[]
+  inventoryTxns     InventoryTransaction[]
 
   @@index([isActive])
   @@index([productId])
@@ -301,6 +304,231 @@ enum review_status {
   pending
   approved
   rejected
+}
+
+// ───────────────────────── §10.3 Commerce slice ─────────────────────────────
+
+model Order {
+  id            String      @id @default(uuid()) @db.Uuid
+  orderNumber   String      @unique @map("order_number")
+  userId        String?     @map("user_id") @db.Uuid
+  status        order_status @default(pending_payment)
+  subtotalCents Int         @map("subtotal_cents")
+  discountCents Int         @default(0) @map("discount_cents")
+  shippingCents Int         @default(0) @map("shipping_cents")
+  taxCents      Int         @default(0) @map("tax_cents")
+  totalCents    Int         @map("total_cents")
+  currency      String      @default("USD") @db.Char(3)
+  contactEmail  String      @map("contact_email")
+  shippingAddress Json      @map("shipping_address")
+  trackingNumber String?    @map("tracking_number")
+  couponId      String?     @map("coupon_id") @db.Uuid
+  idempotencyKey String     @unique @map("idempotency_key")
+  reservationExpiresAt DateTime? @map("reservation_expires_at") @db.Timestamptz(6)
+  createdAt     DateTime    @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt     DateTime    @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  user        User?             @relation(fields: [userId], references: [id], onDelete: SetNull)
+  coupon      Coupon?           @relation(fields: [couponId], references: [id], onDelete: SetNull)
+  items       OrderItem[]
+  events      OrderEvent[]
+  payments    Payment[]
+  redemptions CouponRedemption[]
+
+  @@index([userId])
+  @@index([status, reservationExpiresAt])
+  @@map("orders")
+}
+
+model OrderItem {
+  id               String @id @default(uuid()) @db.Uuid
+  orderId          String @map("order_id") @db.Uuid
+  productVariantId String @map("product_variant_id") @db.Uuid
+  productName      String @map("product_name")
+  variantName      String @map("variant_name")
+  sku              String
+  imageUrl         String? @map("image_url")
+  unitPriceCents   Int    @map("unit_price_cents")
+  quantity         Int
+  totalCents       Int    @map("total_cents")
+
+  order   Order          @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  variant ProductVariant @relation(fields: [productVariantId], references: [id], onDelete: Restrict)
+
+  @@index([orderId])
+  @@map("order_items")
+}
+
+model OrderEvent {
+  id          String     @id @default(uuid()) @db.Uuid
+  orderId     String     @map("order_id") @db.Uuid
+  type        String
+  fromStatus  String?    @map("from_status")
+  toStatus    String?    @map("to_status")
+  actorType   event_actor @default(system)
+  actorUserId String?    @map("actor_user_id") @db.Uuid
+  message     String?
+  metadata    Json?
+  createdAt   DateTime   @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([orderId, createdAt])
+  @@map("order_events")
+}
+
+model Coupon {
+  id               String   @id @default(uuid()) @db.Uuid
+  code             String   @unique @db.Citext
+  type             coupon_type
+  value            Int
+  minSubtotalCents Int?     @map("min_subtotal_cents")
+  maxDiscountCents Int?     @map("max_discount_cents")
+  usageLimit       Int?     @map("usage_limit")
+  perUserLimit     Int?     @map("per_user_limit")
+  startsAt         DateTime? @map("starts_at") @db.Timestamptz(6)
+  endsAt           DateTime? @map("ends_at") @db.Timestamptz(6)
+  isActive         Boolean  @default(true) @map("is_active")
+  timesUsed        Int      @default(0) @map("times_used")
+  createdAt        DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  orders      Order[]
+  redemptions CouponRedemption[]
+
+  @@map("coupons")
+}
+
+model CouponRedemption {
+  id            String @id @default(uuid()) @db.Uuid
+  couponId      String @map("coupon_id") @db.Uuid
+  orderId       String @map("order_id") @db.Uuid
+  userId        String? @map("user_id") @db.Uuid
+  discountCents Int    @map("discount_cents")
+
+  coupon Coupon @relation(fields: [couponId], references: [id], onDelete: Cascade)
+  order  Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([couponId])
+  @@index([userId])
+  @@map("coupon_redemptions")
+}
+
+model Payment {
+  id             String        @id @default(uuid()) @db.Uuid
+  orderId        String        @map("order_id") @db.Uuid
+  provider       payment_provider @default(stripe)
+  providerRef    String        @unique @map("provider_ref")
+  idempotencyKey String        @unique @map("idempotency_key")
+  amountCents    Int           @map("amount_cents")
+  currency       String        @default("USD") @db.Char(3)
+  status         payment_status @default(requires_payment_method)
+  failureReason  String?       @map("failure_reason")
+  createdAt      DateTime      @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt      DateTime      @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  order   Order    @relation(fields: [orderId], references: [id], onDelete: Restrict)
+  refunds Refund[]
+
+  @@index([orderId])
+  @@index([status])
+  @@map("payments")
+}
+
+model WebhookEvent {
+  id              String   @id @default(uuid()) @db.Uuid
+  provider        String
+  eventId         String   @unique @map("event_id")
+  type            String
+  payload         Json
+  receivedAt      DateTime @default(now()) @map("received_at")
+  processedAt     DateTime? @map("processed_at") @db.Timestamptz(6)
+  processingError String?  @map("processing_error")
+
+  @@index([provider, processedAt])
+  @@map("webhook_events")
+}
+
+model Refund {
+  id           String       @id @default(uuid()) @db.Uuid
+  paymentId    String       @map("payment_id") @db.Uuid
+  providerRef  String       @unique @map("provider_ref")
+  amountCents  Int          @map("amount_cents")
+  reason       String?
+  status       refund_status @default(pending)
+  createdAt    DateTime     @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  payment Payment @relation(fields: [paymentId], references: [id], onDelete: Restrict)
+
+  @@index([paymentId])
+  @@map("refunds")
+}
+
+/// Append-only inventory audit (§15). Every reserve/commit/release/restock/adjust.
+model InventoryTransaction {
+  id         String                @id @default(uuid()) @db.Uuid
+  variantId  String                @map("variant_id") @db.Uuid
+  type       inventory_tx_type
+  quantity   Int
+  orderId    String?               @map("order_id") @db.Uuid
+  actorType  event_actor           @default(system)
+  actorUserId String?              @map("actor_user_id") @db.Uuid
+  note       String?
+  createdAt  DateTime              @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  variant ProductVariant @relation(fields: [variantId], references: [id], onDelete: Restrict)
+
+  @@index([variantId, createdAt])
+  @@index([orderId])
+  @@map("inventory_transactions")
+}
+
+enum order_status {
+  pending_payment
+  confirmed
+  processing
+  shipped
+  delivered
+  cancelled
+  refunded
+}
+
+enum event_actor {
+  system
+  customer
+  admin
+}
+
+enum coupon_type {
+  percent
+  fixed
+}
+
+enum payment_provider {
+  stripe
+}
+
+enum payment_status {
+  requires_payment_method
+  requires_action
+  processing
+  succeeded
+  failed
+  canceled
+  refunded
+}
+
+enum refund_status {
+  pending
+  succeeded
+  failed
+}
+
+enum inventory_tx_type {
+  reserve
+  sell
+  release
+  restock
+  adjust
 }
 
 // ───────────────────── Platform slice required by catalog ─────────────────────

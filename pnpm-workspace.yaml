@@ -9,6 +9,7 @@ allowBuilds:
   '@scarf/scarf': false
   core-js: true
   esbuild: true
+  msgpackr-extract: true
   prisma: true
   sharp: true
   unrs-resolver: true
@@ -16,3 +17,9 @@ allowBuilds:
 ignoredBuiltDependencies:
   - sharp
   - unrs-resolver
+
+verifyDepsBeforeRun: false
+
+onlyBuiltDependencies:
+  - msgpackr-extract
+

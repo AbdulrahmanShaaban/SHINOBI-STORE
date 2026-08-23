@@ -30,6 +30,12 @@ const LINE_SELECT = {
   },
 } satisfies Prisma.CartItemSelect;
 
+/** Raw cart lines for order placement (server-cart checkout source). */
+export interface ServerCartRawLine {
+  variantId: string;
+  quantity: number;
+}
+
 /** Purchasability clamp shared by add/update/merge — server-side quantity authority. */
 export function clampToAvailability(quantity: number, stockOnHand: number, reserved: number): number {
   return Math.max(0, Math.min(quantity, stockOnHand - reserved));
@@ -56,6 +62,21 @@ export class CartService {
       select: { items: { orderBy: { createdAt: 'asc' }, select: LINE_SELECT } },
     });
     return { items: (cart?.items ?? []).map(mapLine).filter((l): l is ServerCartLine => l !== null) };
+  }
+
+  /** Raw purchasable lines — the checkout source for authed users. */
+  async rawLines(userId: string): Promise<ServerCartRawLine[]> {
+    const cart = await this.prisma.cart.findUnique({
+      where: { userId },
+      select: {
+        items: {
+          select: { variantId: true, quantity: true, variant: { select: { isActive: true } } },
+        },
+      },
+    });
+    return (cart?.items ?? [])
+      .filter((i) => i.variant.isActive)
+      .map((i) => ({ variantId: i.variantId, quantity: i.quantity }));
   }
 
   async addItem(userId: string, variantId: string, quantity: number): Promise<ServerCartLine[]> {

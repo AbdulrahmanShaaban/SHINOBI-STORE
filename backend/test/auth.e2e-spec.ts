@@ -120,7 +120,10 @@ function prismaStub() {
 function redisStub() {
   // Every cache/throttle call fails → code paths must degrade gracefully.
   const boom = () => jest.fn().mockRejectedValue(new Error('no redis in contract tests'));
-  return { client: { get: boom(), set: boom(), del: boom(), incr: boom(), expire: boom() } };
+  return {
+    client: { get: boom(), set: boom(), del: boom(), incr: boom(), expire: boom() },
+    isHealthy: jest.fn().mockResolvedValue(false),
+  };
 }
 
 describe('Auth & cart API contracts (e2e, db-stubbed)', () => {

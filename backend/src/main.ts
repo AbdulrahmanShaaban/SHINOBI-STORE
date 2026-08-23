@@ -6,8 +6,11 @@ import { configureApp } from './app.setup';
 import { logger } from './common/logger/logger';
 
 async function bootstrap(): Promise<void> {
+  // rawBody: Stripe webhook signatures must verify against the exact bytes
+  // the provider sent — never a re-serialized JSON body (§13.2).
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
     logger: false,
+    rawBody: true,
   });
   const config = await configureApp(app);
 
