@@ -1,10 +1,12 @@
+import Link from 'next/link';
 import { formatPrice } from '@/lib/money';
 import type { ShopParams } from '@/lib/api';
 import { shopHref } from '@/lib/shop-url';
 
 /**
- * Active-filter chips — pure links (no client JS): each chip's href is the
- * current URL minus that one filter. Shareable and back-button-safe by design.
+ * Active-filter chips — links (client-side via next/link, no reload): each
+ * chip's href is the current URL minus that one filter. Shareable and
+ * back-button-safe by design.
  */
 export default function ActiveChips({ params }: { params: ShopParams }) {
   const chips: { key: keyof ShopParams; label: string }[] = [];
@@ -32,7 +34,7 @@ export default function ActiveChips({ params }: { params: ShopParams }) {
     <ul className="flex flex-wrap items-center gap-2" aria-label="Active filters">
       {chips.map((chip) => (
         <li key={chip.key}>
-          <a
+          <Link
             href={without(chip.key)}
             className="inline-flex items-center gap-1.5 rounded-full border border-[#FF6B00]/50 bg-[#FF6B00]/10 px-3 py-1 text-xs text-[#F0F0F0] hover:border-[#FF6B00] focus-visible:outline-none focus-visible:border-[#FF6B00] transition-colors"
             aria-label={`Remove filter ${chip.label}`}
@@ -41,16 +43,16 @@ export default function ActiveChips({ params }: { params: ShopParams }) {
             <span aria-hidden="true" className="text-[#FF6B00]">
               ✕
             </span>
-          </a>
+          </Link>
         </li>
       ))}
       <li>
-        <a
+        <Link
           href={clearAll}
           className="text-xs text-[#6B6B80] underline underline-offset-4 hover:text-[#B8B8CC]"
         >
           Clear all
-        </a>
+        </Link>
       </li>
     </ul>
   );

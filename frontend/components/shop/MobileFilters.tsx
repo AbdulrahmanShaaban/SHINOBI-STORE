@@ -3,6 +3,7 @@
 import { useEffect, useId, useRef, useState } from 'react';
 import FilterGroups from './FilterGroups';
 import { useShopNav } from '@/lib/use-shop-nav';
+import { acquireScrollLock, releaseLock } from '@/lib/scroll-lock';
 import type { ProductFacets } from '@/lib/api';
 
 /**
@@ -21,6 +22,7 @@ export default function MobileFilters({ facets }: { facets: ProductFacets }) {
     if (!open) return;
     const panel = panelRef.current;
     const trigger = triggerRef.current;
+    acquireScrollLock();
     panel?.querySelector<HTMLInputElement>('input[type="radio"]:checked')?.focus();
 
     const onKeyDown = (e: KeyboardEvent) => {
@@ -44,6 +46,7 @@ export default function MobileFilters({ facets }: { facets: ProductFacets }) {
     document.addEventListener('keydown', onKeyDown);
     return () => {
       document.removeEventListener('keydown', onKeyDown);
+      releaseLock();
       trigger?.focus();
     };
   }, [open]);

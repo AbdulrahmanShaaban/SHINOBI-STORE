@@ -43,11 +43,14 @@ export default function CustomCursor() {
     if (!dot || !ring) return;
 
     document.body.classList.add("custom-cursor-enabled");
+    document.documentElement.classList.add("custom-cursor-boot");
 
     const dotX = gsap.quickSetter(dot, "x", "px");
     const dotY = gsap.quickSetter(dot, "y", "px");
     const ringX = gsap.quickSetter(ring, "x", "px");
     const ringY = gsap.quickSetter(ring, "y", "px");
+    const dotOpacity = gsap.quickSetter(dot, "opacity");
+    const ringOpacity = gsap.quickSetter(ring, "opacity");
     const ringScale = gsap.quickTo(ring, "scale", {
       duration: 0.3,
       ease: "power3.out",
@@ -57,7 +60,15 @@ export default function CustomCursor() {
       ease: "power3.out",
     }) as unknown as (value: string) => void;
 
+    let shown = false;
+
     const onMove = (e: PointerEvent) => {
+      if (!shown) {
+        shown = true;
+        dotOpacity(1);
+        ringOpacity(1);
+      }
+
       dotX(e.clientX);
       dotY(e.clientY);
 
@@ -97,6 +108,7 @@ export default function CustomCursor() {
 
     return () => {
       document.body.classList.remove("custom-cursor-enabled");
+      document.documentElement.classList.remove("custom-cursor-boot");
       window.removeEventListener("pointermove", onMove);
       document.removeEventListener("mouseover", onOver);
       document.removeEventListener("mouseout", onOut);
@@ -112,7 +124,11 @@ export default function CustomCursor() {
         ref={dotRef}
         aria-hidden="true"
         className="pointer-events-none fixed left-0 top-0 z-[9999] h-1.5 w-1.5 rounded-full"
-        style={{ backgroundColor: "var(--primary)", margin: "-5px 0 0 -5px" }}
+        style={{
+          backgroundColor: "var(--primary)",
+          margin: "-5px 0 0 -5px",
+          opacity: 0,
+        }}
       />
       <div
         ref={ringRef}
@@ -122,6 +138,7 @@ export default function CustomCursor() {
           borderColor: "var(--primary)",
           backgroundColor: `rgba(${RING_RGB}, 0)`,
           margin: "-20px 0 0 -20px",
+          opacity: 0,
         }}
       />
     </>

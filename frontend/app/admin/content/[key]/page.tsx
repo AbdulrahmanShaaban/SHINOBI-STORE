@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import {
@@ -16,12 +16,16 @@ import {
   type FormValues,
   type ItemRow,
 } from '@/components/admin/content/section-schemas';
-
-const inputClass =
-  'w-full rounded-lg border border-[#2A2A3A] bg-[#12121A] px-4 py-2.5 text-sm text-[#F0F0F0] placeholder:text-[#6B6B80] focus:border-[#FF6B00] focus:outline-none disabled:opacity-50';
-
-const labelClass = 'mb-1 block text-xs font-cinzel font-bold tracking-wider text-[#B8B8CC]';
-const helpClass = 'mt-1 block text-xs text-[#6B6B80]';
+import EmptyState from '@/components/admin/EmptyState';
+import ErrorState from '@/components/admin/ErrorState';
+import SectionCard from '@/components/admin/SectionCard';
+import { SkeletonText } from '@/components/admin/Skeleton';
+import {
+  btnGhost,
+  helpClass,
+  inputClass,
+  labelClass,
+} from '@/components/admin/ui';
 
 function sectionTitle(key: string): string {
   return key.replace(/_/g, ' ').toUpperCase();
@@ -41,6 +45,7 @@ export default function AdminSectionEditPage() {
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [notFound, setNotFound] = useState(false);
+  const [retryNonce, setRetryNonce] = useState(0);
 
   const [values, setValues] = useState<FormValues>({});
   const [rawJson, setRawJson] = useState('');
@@ -86,6 +91,7 @@ export default function AdminSectionEditPage() {
         } else {
           setRawJson(JSON.stringify(section.config ?? {}, null, 2));
         }
+        setLoadError(null);
         setLoading(false);
       })
       .catch((err: unknown) => {
@@ -96,7 +102,9 @@ export default function AdminSectionEditPage() {
     return () => {
       alive = false;
     };
-  }, [key]);
+  }, [key, retryNonce]);
+
+  const retry = useCallback(() => setRetryNonce((n) => n + 1), []);
 
   /** What SAVE would send right now — powers the live JSON preview. */
   const preview = useMemo<{ json: string; error: string | null }>(() => {
@@ -204,7 +212,7 @@ export default function AdminSectionEditPage() {
             value={value}
             placeholder={field.placeholder}
             onChange={(e) => setScalar(field.name, e.target.value)}
-            className={inputClass}
+            className={`${inputClass} resize-y`}
           />
         ) : (
           <input
@@ -253,7 +261,7 @@ export default function AdminSectionEditPage() {
       <fieldset>
         <legend className={labelClass}>
           {field.label}
-          <span className="ml-2 font-normal normal-case text-[#6B6B80]">
+          <span className="ml-2 font-normal normal-case tracking-normal text-[#6B6B80]">
             {rows.length}
             {field.maxItems ? `/${field.maxItems}` : ''}
           </span>
@@ -271,7 +279,7 @@ export default function AdminSectionEditPage() {
                 <button
                   type="button"
                   onClick={() => removeItem(field, index)}
-                  className="rounded-lg border border-[#CC0000]/50 px-3 py-1 font-cinzel text-xs font-bold tracking-wider text-[#CC0000] transition-colors hover:bg-[#CC0000]/10"
+                  className="relative rounded-lg border border-[#CC0000]/50 px-3 py-1.5 font-cinzel text-xs font-bold tracking-wider text-[#FF6B6B] transition-colors after:absolute after:-inset-x-1 after:-inset-y-1.5 after:content-[''] hover:bg-[#CC0000]/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#CC0000]"
                 >
                   REMOVE
                 </button>
@@ -281,7 +289,7 @@ export default function AdminSectionEditPage() {
                   const defId = `field-${field.name}-${index}-${def.name}`;
                   return (
                     <div key={def.name}>
-                      <label htmlFor={defId} className="mb-1 block text-xs font-cinzel font-bold text-[#B8B8CC]">
+                      <label htmlFor={defId} className="mb-1 block font-cinzel text-xs font-bold text-[#B8B8CC]">
                         {def.label}
                         {def.required ? <span className="ml-1 text-[#FF6B00]">*</span> : null}
                       </label>
@@ -304,7 +312,7 @@ export default function AdminSectionEditPage() {
           type="button"
           onClick={() => addItem(field)}
           disabled={atMax}
-          className="mt-3 rounded-lg border border-[#2A2A3A] px-4 py-2 font-cinzel text-xs font-bold tracking-wider text-[#B8B8CC] transition-colors hover:border-[#FF6B00] hover:text-[#F0F0F0] disabled:opacity-40 disabled:cursor-not-allowed"
+          className="mt-3 inline-flex min-h-[44px] items-center justify-center rounded-lg border border-[#2A2A3A] px-4 font-cinzel text-xs font-bold uppercase tracking-wider text-[#B8B8CC] transition-colors hover:border-[#FF6B00] hover:text-[#F0F0F0] disabled:cursor-not-allowed disabled:opacity-40"
         >
           + ADD ENTRY
         </button>
@@ -314,21 +322,24 @@ export default function AdminSectionEditPage() {
 
   if (loading) {
     return (
-      <p className="text-[#6B6B80]" role="status" aria-live="polite">
-        Loading…
-      </p>
+      <div className="max-w-3xl space-y-6" role="status" aria-live="polite">
+        <span className="sr-only">Loading section…</span>
+        <SkeletonText lines={1} className="max-w-sm" />
+        <div className="h-96 animate-pulse rounded-xl bg-[#16161F]" />
+      </div>
     );
   }
 
   if (loadError) {
     return (
       <div>
-        <p role="alert" className="rounded-lg border border-[#CC0000]/50 bg-[#CC0000]/10 px-4 py-2 text-sm text-[#F0F0F0]">
-          {loadError}
-        </p>
-        <Link href="/admin/content" className="mt-4 inline-block font-cinzel text-sm font-bold text-[#FF6B00] hover:underline">
+        <Link
+          href="/admin/content"
+          className="mb-5 inline-flex min-h-[44px] items-center gap-2 font-cinzel text-sm font-bold text-[#FF6B00] hover:underline underline-offset-4"
+        >
           ← BACK TO CONTENT
         </Link>
+        <ErrorState message={loadError} onRetry={retry} />
       </div>
     );
   }
@@ -336,139 +347,151 @@ export default function AdminSectionEditPage() {
   if (notFound) {
     return (
       <div>
-        <h1 className="mb-4 font-bebas text-4xl tracking-wide text-[#F0F0F0]">
-          SECTION NOT FOUND
-        </h1>
-        <p className="text-sm text-[#B8B8CC]">
-          No homepage section exists with the key <code className="font-mono text-[#FF6B00]">{key}</code>.
-        </p>
-        <Link href="/admin/content" className="mt-4 inline-block font-cinzel text-sm font-bold text-[#FF6B00] hover:underline">
-          ← BACK TO CONTENT
-        </Link>
+        <h1 className="sr-only">Section not found</h1>
+        <div className="rounded-xl border border-[#2A2A3A] bg-[#16161F]">
+          <EmptyState
+            title="SECTION NOT FOUND"
+            description={`No homepage section exists with the key “${key}”.`}
+            action={
+              <Link href="/admin/content" className={btnGhost}>
+                ← BACK TO CONTENT
+              </Link>
+            }
+          />
+        </div>
       </div>
     );
   }
 
   return (
-    <div>
-      <Link href="/admin/content" className="inline-block font-cinzel text-sm font-bold text-[#FF6B00] hover:underline">
+    <div className="max-w-3xl">
+      <Link
+        href="/admin/content"
+        className="mb-5 inline-flex min-h-[44px] items-center gap-2 font-cinzel text-sm font-bold text-[#FF6B00] hover:underline underline-offset-4"
+      >
         ← CONTENT
       </Link>
-      <h1 className="mb-8 mt-4 font-bebas text-4xl tracking-wide text-[#F0F0F0] sm:text-5xl">
-        EDIT {sectionTitle(key)}
-      </h1>
+      <header className="mb-8 rounded-xl border border-[#2A2A3A] bg-[#16161F] px-5 py-4">
+        <h1 className="font-bebas text-4xl tracking-wide text-[#F0F0F0]">EDIT {sectionTitle(key)}</h1>
+      </header>
 
       {saveError ? (
-        <pre role="alert" className="mb-4 whitespace-pre-wrap rounded-lg border border-[#CC0000]/50 bg-[#CC0000]/10 px-4 py-2 text-sm text-[#F0F0F0]">
+        <pre role="alert" className="mb-4 whitespace-pre-wrap rounded-lg border border-[#CC0000]/50 bg-[#CC0000]/10 px-4 py-2.5 text-sm leading-relaxed text-[#F0F0F0]">
           {saveError}
         </pre>
       ) : null}
 
       {flash ? (
-        <p role="status" aria-live="polite" className="mb-4 rounded-lg border border-[#7CFC00]/40 bg-[#7CFC00]/10 px-4 py-2 text-sm text-[#F0F0F0]">
-          Saved.
+        <p
+          role="status"
+          aria-live="polite"
+          className="mb-4 rounded-lg border border-[#22C55E]/40 bg-[#22C55E]/10 px-4 py-2.5 text-sm text-[#4ADE80]"
+        >
+          Saved. Public pages pick it up within a minute.
         </p>
       ) : null}
 
-      {schemaDriven && fields ? (
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            void save();
-          }}
-          className="space-y-6 rounded-xl border border-[#2A2A3A] bg-[#16161F] p-5 sm:p-6"
-        >
-          {fields.map((field) => {
-            if (field.kind === 'scalar') return renderScalarField(field);
-            if (field.kind === 'slugList') return renderSlugListField(field);
-            return renderItemField(field);
-          })}
+      <SectionCard padded={false}>
+        {schemaDriven && fields ? (
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              void save();
+            }}
+            className="space-y-6 p-5 sm:p-6"
+          >
+            {fields.map((field) => {
+              if (field.kind === 'scalar') return renderScalarField(field);
+              if (field.kind === 'slugList') return renderSlugListField(field);
+              return renderItemField(field);
+            })}
 
-          <div className="flex flex-wrap items-center gap-3 pt-2">
-            <button
-              type="submit"
-              disabled={saving}
-              className="rounded-lg bg-[#CC0000] px-5 py-2.5 font-cinzel text-sm font-bold tracking-wider text-white transition-colors hover:bg-[#FF6B00] disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {saving ? 'SAVING…' : 'SAVE'}
-            </button>
-            <button
-              type="button"
-              onClick={() => setShowPreview((p) => !p)}
-              aria-expanded={showPreview}
-              className="rounded-lg border border-[#2A2A3A] px-5 py-2.5 font-cinzel text-sm font-bold tracking-wider text-[#B8B8CC] transition-colors hover:border-[#FF6B00] hover:text-[#F0F0F0]"
-            >
-              {showPreview ? 'HIDE JSON PREVIEW' : 'JSON PREVIEW'}
-            </button>
-          </div>
+            <div className="flex flex-wrap items-center gap-3 pt-2">
+              <button
+                type="submit"
+                disabled={saving}
+                className="inline-flex min-h-[44px] items-center justify-center rounded-lg bg-[#FF6B00] px-5 font-cinzel text-xs font-bold uppercase tracking-wider text-[#160B02] transition-colors hover:bg-[#FF8433] disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {saving ? 'SAVING…' : 'SAVE'}
+              </button>
+              <button
+                type="button"
+                onClick={() => setShowPreview((p) => !p)}
+                aria-expanded={showPreview}
+                className={btnGhost}
+              >
+                {showPreview ? 'HIDE JSON PREVIEW' : 'JSON PREVIEW'}
+              </button>
+            </div>
 
-          {showPreview ? (
-            <div>
-              <p className={`${helpClass} mb-2`}>Exactly what SAVE would send:</p>
-              {preview.error ? (
-                <pre aria-live="polite" className="overflow-x-auto rounded-lg border border-[#CC0000]/50 bg-[#12121A] p-4 font-mono text-xs text-[#CC0000]">
-                  {preview.error}
-                </pre>
-              ) : (
-                <pre aria-live="polite" className="max-h-96 overflow-auto rounded-lg border border-[#2A2A3A] bg-[#12121A] p-4 font-mono text-xs text-[#B8B8CC]">
-                  {preview.json}
-                </pre>
-              )}
+            {showPreview ? (
+              <div>
+                <p className={`${helpClass} mb-2`}>Exactly what SAVE would send:</p>
+                {preview.error ? (
+                  <pre aria-live="polite" className="overflow-x-auto rounded-lg border border-[#CC0000]/50 bg-[#12121A] p-4 font-mono text-xs leading-relaxed text-[#FF6B6B]">
+                    {preview.error}
+                  </pre>
+                ) : (
+                  <pre aria-live="polite" className="max-h-96 overflow-auto rounded-lg border border-[#2A2A3A] bg-[#12121A] p-4 font-mono text-xs leading-relaxed text-[#B8B8CC]">
+                    {preview.json}
+                  </pre>
+                )}
+              </div>
+            ) : null}
+          </form>
+        ) : (
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              void save();
+            }}
+            className="space-y-4 p-5 sm:p-6"
+          >
+            <p className="text-sm text-[#B8B8CC]">
+              No form schema is registered for this key — edit the raw JSON below.
+            </p>
+            <textarea
+              aria-label={`Raw JSON config for ${sectionTitle(key)}`}
+              rows={14}
+              spellCheck={false}
+              value={rawJson}
+              onChange={(e) => setRawJson(e.target.value)}
+              className={`${inputClass} font-mono`}
+            />
+            <div className="flex flex-wrap items-center gap-3">
+              <button
+                type="submit"
+                disabled={saving}
+                className="inline-flex min-h-[44px] items-center justify-center rounded-lg bg-[#FF6B00] px-5 font-cinzel text-xs font-bold uppercase tracking-wider text-[#160B02] transition-colors hover:bg-[#FF8433] disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {saving ? 'SAVING…' : 'SAVE'}
+              </button>
+              <button
+                type="button"
+                onClick={() => setShowPreview((p) => !p)}
+                aria-expanded={showPreview}
+                className={btnGhost}
+              >
+                {showPreview ? 'HIDE JSON PREVIEW' : 'JSON PREVIEW'}
+              </button>
             </div>
-          ) : null}
-        </form>
-      ) : (
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            void save();
-          }}
-          className="rounded-xl border border-[#2A2A3A] bg-[#16161F] p-5 sm:p-6"
-        >
-          <p className="mb-4 text-sm text-[#B8B8CC]">
-            No form schema is registered for this key — edit the raw JSON below.
-          </p>
-          <textarea
-            aria-label={`Raw JSON config for ${sectionTitle(key)}`}
-            rows={14}
-            spellCheck={false}
-            value={rawJson}
-            onChange={(e) => setRawJson(e.target.value)}
-            className={`${inputClass} font-mono`}
-          />
-          <div className="mt-4 flex flex-wrap items-center gap-3">
-            <button
-              type="submit"
-              disabled={saving}
-              className="rounded-lg bg-[#CC0000] px-5 py-2.5 font-cinzel text-sm font-bold tracking-wider text-white transition-colors hover:bg-[#FF6B00] disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {saving ? 'SAVING…' : 'SAVE'}
-            </button>
-            <button
-              type="button"
-              onClick={() => setShowPreview((p) => !p)}
-              aria-expanded={showPreview}
-              className="rounded-lg border border-[#2A2A3A] px-5 py-2.5 font-cinzel text-sm font-bold tracking-wider text-[#B8B8CC] transition-colors hover:border-[#FF6B00] hover:text-[#F0F0F0]"
-            >
-              {showPreview ? 'HIDE JSON PREVIEW' : 'JSON PREVIEW'}
-            </button>
-          </div>
-          {showPreview ? (
-            <div className="mt-4">
-              <p className={`${helpClass} mb-2`}>Exactly what SAVE would send:</p>
-              {preview.error ? (
-                <pre aria-live="polite" className="overflow-x-auto rounded-lg border border-[#CC0000]/50 bg-[#12121A] p-4 font-mono text-xs text-[#CC0000]">
-                  {preview.error}
-                </pre>
-              ) : (
-                <pre aria-live="polite" className="max-h-96 overflow-auto rounded-lg border border-[#2A2A3A] bg-[#12121A] p-4 font-mono text-xs text-[#B8B8CC]">
-                  {preview.json}
-                </pre>
-              )}
-            </div>
-          ) : null}
-        </form>
-      )}
+            {showPreview ? (
+              <div>
+                <p className={`${helpClass} mb-2`}>Exactly what SAVE would send:</p>
+                {preview.error ? (
+                  <pre aria-live="polite" className="overflow-x-auto rounded-lg border border-[#CC0000]/50 bg-[#12121A] p-4 font-mono text-xs leading-relaxed text-[#FF6B6B]">
+                    {preview.error}
+                  </pre>
+                ) : (
+                  <pre aria-live="polite" className="max-h-96 overflow-auto rounded-lg border border-[#2A2A3A] bg-[#12121A] p-4 font-mono text-xs leading-relaxed text-[#B8B8CC]">
+                    {preview.json}
+                  </pre>
+                )}
+              </div>
+            ) : null}
+          </form>
+        )}
+      </SectionCard>
     </div>
   );
 }

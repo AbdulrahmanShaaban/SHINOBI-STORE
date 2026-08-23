@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { selectTotalItems, useCartStore } from '@/lib/cart-store';
 import { useUser } from '@/lib/user-context';
+import { acquireScrollLock, releaseLock } from '@/lib/scroll-lock';
 
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -39,13 +40,12 @@ export default function Navbar() {
 
   // Lock body scroll when menu is open and reset overlay scroll position
   useEffect(() => {
-    if (isMenuOpen) {
-      document.body.style.overflow = 'hidden';
-      overlayRef.current?.scrollTo(0, 0);
-    } else {
-      document.body.style.overflow = '';
-    }
-    return () => { document.body.style.overflow = ''; };
+    if (!isMenuOpen) return;
+    acquireScrollLock();
+    overlayRef.current?.scrollTo(0, 0);
+    return () => {
+      releaseLock();
+    };
   }, [isMenuOpen]);
 
   const prefersReducedMotion = typeof window !== 'undefined'
@@ -72,7 +72,7 @@ export default function Navbar() {
           {/* Logo */}
           <Link href="/" className="flex items-center z-50 h-full">
             <div 
-              className={`transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] origin-top-left flex items-center ${
+              className={`pointer-events-none transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] origin-top-left flex items-center ${
                 showScrolledState 
                   ? 'w-[200px] md:w-[260px] lg:w-[320px] translate-y-[20px] lg:translate-y-[25px] translate-x-0' 
                   : 'w-[300px] md:w-[420px] lg:w-[550px] xl:w-[650px] translate-y-[20vh] md:translate-y-[25vh] lg:translate-y-[30vh] translate-x-[calc(50vw-166px)] md:translate-x-[6vw] lg:translate-x-[8vw]'
@@ -85,7 +85,7 @@ export default function Navbar() {
                 height={1024}
                 priority
                 sizes="(max-width: 767px) 300px, (max-width: 1023px) 420px, (max-width: 1279px) 550px, 650px"
-                className="w-full h-auto object-contain drop-shadow-[0_4px_15px_rgba(0,0,0,0.5)]"
+                className="w-full h-auto object-contain drop-shadow-[0_4px_15px_rgba(0,0,0,0.5)] pointer-events-auto"
               />
             </div>
           </Link>
@@ -97,13 +97,22 @@ export default function Navbar() {
                 HOME
               </Link>
               <Link href="/products" className="px-2 lg:px-4 py-2 text-[#F0F0F0] font-cinzel font-bold text-lg md:text-xl lg:text-2xl xl:text-3xl hover:text-[#FF6B00] transition-colors">
-                SHOP
+                EXPLORE
+              </Link>
+              <Link href="/products?character=naruto" className="px-2 lg:px-4 py-2 text-[#F0F0F0] font-cinzel font-bold text-lg md:text-xl lg:text-2xl xl:text-3xl hover:text-[#FF6B00] transition-colors">
+                CHARACTERS
+              </Link>
+              <Link href="/products?category=apparel" className="px-2 lg:px-4 py-2 text-[#F0F0F0] font-cinzel font-bold text-lg md:text-xl lg:text-2xl xl:text-3xl hover:text-[#FF6B00] transition-colors">
+                COLLECTIONS
+              </Link>
+              <Link href="/products?sort=newest" className="px-2 lg:px-4 py-2 text-[#F0F0F0] font-cinzel font-bold text-lg md:text-xl lg:text-2xl xl:text-3xl hover:text-[#FF6B00] transition-colors">
+                NEW ARRIVALS
               </Link>
               <Link href="/about" className="px-2 lg:px-4 py-2 text-[#F0F0F0] font-cinzel font-bold text-lg md:text-xl lg:text-2xl xl:text-3xl hover:text-[#FF6B00] transition-colors">
                 ABOUT
               </Link>
-              <Link href="/contact" className="px-2 lg:px-4 py-2 text-[#F0F0F0] font-cinzel font-bold text-lg md:text-xl lg:text-2xl xl:text-3xl hover:text-[#FF6B00] transition-colors">
-                CONTACT
+              <Link href="/products" aria-label="Search products" className="px-2 lg:px-4 py-2 text-[#F0F0F0] font-cinzel font-bold text-lg md:text-xl lg:text-2xl xl:text-3xl hover:text-[#FF6B00] transition-colors">
+                SEARCH
               </Link>
               <AccountLink />
               <button
@@ -195,13 +204,22 @@ export default function Navbar() {
             HOME
           </Link>
           <Link href="/products" onClick={closeMenu} className="font-cinzel font-bold text-3xl tracking-[0.15em] text-[#F0F0F0] hover:text-[#FF6B00] transition-colors">
-            SHOP
+            EXPLORE
+          </Link>
+          <Link href="/products?character=naruto" onClick={closeMenu} className="font-cinzel font-bold text-3xl tracking-[0.15em] text-[#F0F0F0] hover:text-[#FF6B00] transition-colors">
+            CHARACTERS
+          </Link>
+          <Link href="/products?category=apparel" onClick={closeMenu} className="font-cinzel font-bold text-3xl tracking-[0.15em] text-[#F0F0F0] hover:text-[#FF6B00] transition-colors">
+            COLLECTIONS
+          </Link>
+          <Link href="/products?sort=newest" onClick={closeMenu} className="font-cinzel font-bold text-3xl tracking-[0.15em] text-[#F0F0F0] hover:text-[#FF6B00] transition-colors">
+            NEW ARRIVALS
           </Link>
           <Link href="/about" onClick={closeMenu} className="font-cinzel font-bold text-3xl tracking-[0.15em] text-[#F0F0F0] hover:text-[#FF6B00] transition-colors">
             ABOUT
           </Link>
-          <Link href="/contact" onClick={closeMenu} className="font-cinzel font-bold text-3xl tracking-[0.15em] text-[#F0F0F0] hover:text-[#FF6B00] transition-colors">
-            CONTACT
+          <Link href="/products" onClick={closeMenu} aria-label="Search products" className="font-cinzel font-bold text-3xl tracking-[0.15em] text-[#F0F0F0] hover:text-[#FF6B00] transition-colors">
+            SEARCH
           </Link>
           {user ? (
             <Link href="/account" onClick={closeMenu} className="font-cinzel font-bold text-3xl tracking-[0.15em] text-[#F0F0F0] hover:text-[#FF6B00] transition-colors">

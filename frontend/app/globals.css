@@ -45,8 +45,12 @@ body {
 }
 
 /* Typography Classes */
+.font-belanosima {
+  font-family: var(--font-belanosima), sans-serif;
+}
+
 .font-cinzel {
-  font-family: var(--font-cinzel);
+  font-family: var(--font-belanosima), var(--font-cinzel), serif;
 }
 
 .font-inter {
@@ -134,7 +138,15 @@ body {
 
 /* ─── Custom cursor ─── */
 /* Native cursor is hidden only while the custom cursor is active
-   (fine-pointer devices), never as a permanent global rule. */
+   (fine-pointer devices), never as a permanent global rule.
+   The boot class is set by an inline <head> script before first paint
+   so the native cursor never flashes; CustomCursor keeps it in sync. */
+html.custom-cursor-boot,
+html.custom-cursor-boot body,
+html.custom-cursor-boot * {
+  cursor: none !important;
+}
+
 body.custom-cursor-enabled,
 body.custom-cursor-enabled * {
   cursor: none !important;

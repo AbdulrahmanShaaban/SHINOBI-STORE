@@ -12,6 +12,7 @@ import {
 } from '@/lib/cart-store';
 import { checkAvailability } from '@/lib/api';
 import { formatPrice } from '@/lib/money';
+import { acquireScrollLock, releaseLock } from '@/lib/scroll-lock';
 
 /**
  * Cart drawer. Lines are variant-aware and persisted in localStorage.
@@ -50,7 +51,7 @@ export default function Cart() {
     if (!isOpen) return;
     const previouslyFocused = document.activeElement as HTMLElement | null;
     closeRef.current?.focus();
-    document.body.style.overflow = 'hidden';
+    acquireScrollLock();
 
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') closeCart();
@@ -74,7 +75,7 @@ export default function Cart() {
     window.addEventListener('keydown', onKeyDown);
     return () => {
       window.removeEventListener('keydown', onKeyDown);
-      document.body.style.overflow = '';
+      releaseLock();
       previouslyFocused?.focus?.();
     };
   }, [isOpen, closeCart]);

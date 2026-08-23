@@ -4,10 +4,12 @@ import { useState } from 'react';
 import { adminApi } from '@/lib/admin-api';
 import AdminTable, { TableRow } from '@/components/admin/AdminTable';
 import AdminPagination from '@/components/admin/AdminPagination';
+import DataTableToolbar from '@/components/admin/DataTableToolbar';
+import EmptyState from '@/components/admin/EmptyState';
+import ErrorState from '@/components/admin/ErrorState';
 import { useAdminList } from '@/components/admin/use-admin-list';
 import { formatDateTime } from '@/components/admin/format';
-
-const td = 'px-4 py-3 align-middle text-[#B8B8CC]';
+import { btnGhost, tdClass } from '@/components/admin/ui';
 
 function diffToText(diff: unknown): string {
   if (diff === null || diff === undefined) return '—';
@@ -17,6 +19,14 @@ function diffToText(diff: unknown): string {
   } catch {
     return '—';
   }
+}
+
+function actionClass(action: string): string {
+  const a = action.toLowerCase();
+  if (a.includes('delete') || a.includes('ban') || a.includes('remove')) return 'text-[#FF6B6B]';
+  if (a.includes('create')) return 'text-[#4ADE80]';
+  if (a.includes('update') || a.includes('transition')) return 'text-[#C4B5FD]';
+  return 'text-[#F0F0F0]';
 }
 
 export default function AdminAuditLogPage() {
@@ -30,70 +40,93 @@ export default function AdminAuditLogPage() {
 
   return (
     <div>
-      <h1 className="mb-8 font-bebas text-5xl tracking-wide text-[#F0F0F0]">AUDIT LOG</h1>
+      <h1 className="sr-only">Audit log</h1>
 
-      <div className="mb-6">
-        <input
-          type="search"
-          placeholder="Filter by action…"
-          aria-label="Filter by action"
-          value={actionFilter}
-          onChange={(e) => setActionFilter(e.target.value)}
-          className="w-full rounded-lg border border-[#2A2A3A] bg-[#12121A] px-4 py-2.5 text-sm text-[#F0F0F0] placeholder:text-[#6B6B80] focus:border-[#FF6B00] focus:outline-none sm:max-w-sm"
-        />
-      </div>
+      <DataTableToolbar
+        searchValue={actionFilter}
+        onSearchChange={setActionFilter}
+        searchPlaceholder="Filter by action…"
+        searchLabel="Filter by action"
+        actions={
+          list.data ? (
+            <span className="hidden text-xs uppercase tracking-wider text-[#6B6B80] lg:block">
+              {items.length} of {list.data.meta.total}
+            </span>
+          ) : null
+        }
+      />
 
-      {list.error ? (
-        <p role="alert" className="mb-4 rounded-lg border border-[#CC0000]/50 bg-[#CC0000]/10 px-4 py-2 text-sm text-[#F0F0F0]">
-          {list.error}
-        </p>
-      ) : null}
+      {list.error ? <ErrorState message={list.error} onRetry={list.reload} /> : null}
 
-      {list.loading && !list.data ? (
-        <p className="text-[#6B6B80]" role="status" aria-live="polite">
-          Loading…
-        </p>
-      ) : !list.loading && items.length === 0 ? (
-        <p className="text-sm text-[#6B6B80]">No audit entries match the current filter.</p>
-      ) : items.length > 0 ? (
-        <>
-          <AdminTable headers={['TIME', 'ACTION', 'ENTITY', 'ACTOR', 'IP', 'DIFF']}>
-            {items.map((entry) => {
-              const diffText = diffToText(entry.diff);
-              return (
-                <TableRow key={entry.id}>
-                  <td className={`${td} whitespace-nowrap`}>{formatDateTime(entry.createdAt)}</td>
-                  <td className={`${td} font-cinzel font-bold uppercase tracking-wider text-[#F0F0F0]`}>
-                    {entry.action.replace(/_/g, ' ')}
-                  </td>
-                  <td className={td}>
-                    {entry.entityType.replace(/_/g, ' ')}
-                    <span className="block max-w-[160px] truncate font-mono text-xs text-[#6B6B80]" title={entry.entityId}>
-                      {entry.entityId}
-                    </span>
-                  </td>
-                  <td className={`${td} max-w-[140px] truncate font-mono text-xs`} title={entry.actorUserId}>
-                    {entry.actorUserId}
-                  </td>
-                  <td className={`${td} font-mono text-xs`}>{entry.ip ?? '—'}</td>
-                  <td className={td}>
-                    <pre
-                      title={diffText}
-                      className="max-w-[240px] truncate whitespace-nowrap font-mono text-xs text-[#6B6B80]"
-                    >
-                      {diffText}
-                    </pre>
-                  </td>
-                </TableRow>
-              );
-            })}
+      {!list.error ? (
+        list.loading && !list.data ? (
+          <AdminTable headers={['TIME', 'ACTION', 'ENTITY', 'ACTOR', 'IP', 'DIFF']} isLoading skeletonRows={8}>
+            <></>
           </AdminTable>
-          <AdminPagination
-            page={page}
-            totalPages={list.data?.meta?.totalPages ?? 1}
-            onPageChange={setPage}
-          />
-        </>
+        ) : !list.loading && items.length === 0 ? (
+          <div className="rounded-xl border border-[#2A2A3A] bg-[#16161F]">
+            {actionFilter.trim() !== '' ? (
+              <EmptyState
+                title="NO MATCHING ENTRIES"
+                description={`No audit actions contain “${actionFilter.trim()}”.`}
+                action={
+                  <button type="button" onClick={() => setActionFilter('')} className={btnGhost}>
+                    CLEAR FILTER
+                  </button>
+                }
+              />
+            ) : (
+              <EmptyState
+                title="NO AUDIT ENTRIES"
+                description="Staff actions on orders, products and customers are recorded here."
+              />
+            )}
+          </div>
+        ) : items.length > 0 ? (
+          <>
+            <AdminTable headers={['TIME', 'ACTION', 'ENTITY', 'ACTOR', 'IP', 'DIFF']} caption="Audit trail" zebra>
+              {items.map((entry) => {
+                const diffText = diffToText(entry.diff);
+                return (
+                  <TableRow key={entry.id}>
+                    <td className={`${tdClass} whitespace-nowrap`}>{formatDateTime(entry.createdAt)}</td>
+                    <td
+                      className={`${tdClass} whitespace-nowrap font-cinzel text-xs font-bold uppercase tracking-wider ${actionClass(entry.action)}`}
+                    >
+                      {entry.action.replace(/_/g, ' ')}
+                    </td>
+                    <td className={tdClass}>
+                      {entry.entityType.replace(/_/g, ' ')}
+                      <span
+                        className="block max-w-[160px] truncate font-mono text-xs text-[#6B6B80]"
+                        title={entry.entityId}
+                      >
+                        {entry.entityId}
+                      </span>
+                    </td>
+                    <td className={`${tdClass} max-w-[140px] truncate font-mono text-xs`} title={entry.actorUserId}>
+                      {entry.actorUserId}
+                    </td>
+                    <td className={`${tdClass} font-mono text-xs`}>{entry.ip ?? '—'}</td>
+                    <td className={tdClass}>
+                      <pre
+                        title={diffText}
+                        className="max-w-[240px] truncate whitespace-nowrap rounded-md bg-[#12121A] px-2 py-1 font-mono text-xs text-[#9B9BB0]"
+                      >
+                        {diffText}
+                      </pre>
+                    </td>
+                  </TableRow>
+                );
+              })}
+            </AdminTable>
+            <AdminPagination
+              page={page}
+              totalPages={list.data?.meta?.totalPages ?? 1}
+              onPageChange={setPage}
+            />
+          </>
+        ) : null
       ) : null}
     </div>
   );

@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { shopHref } from '@/lib/shop-url';
 import type { ShopParams } from '@/lib/api';
 
@@ -6,8 +7,9 @@ function pageHref(params: ShopParams, page: number): string {
 }
 
 /**
- * Link-based pagination — crawlable, works without JS, preserves every
- * other §18 param. Windowed to ±2 around the current page.
+ * Link-based pagination — crawlable, client-side navigated via next/link
+ * (no document reload), preserves every other §18 param.
+ * Windowed to ±2 around the current page.
  */
 export default function Pagination({
   params,
@@ -34,10 +36,10 @@ export default function Pagination({
       <ul className="flex items-center gap-2 flex-wrap justify-center">
         <li>
           {current > 1 ? (
-            <a href={pageHref(params, current - 1)} rel="prev" className={linkClass}>
+            <Link href={pageHref(params, current - 1)} rel="prev" className={linkClass}>
               ←
               <span className="sr-only">Previous page</span>
-            </a>
+            </Link>
           ) : (
             <span className={`${linkClass} opacity-30`} aria-disabled="true">
               ←<span className="sr-only">No previous page</span>
@@ -46,21 +48,21 @@ export default function Pagination({
         </li>
         {pages.map((p) => (
           <li key={p}>
-            <a
+            <Link
               href={pageHref(params, p)}
               aria-current={p === current ? 'page' : undefined}
               aria-label={`Page ${p}`}
               className={`${linkClass} ${p === current ? activeClass : ''}`}
             >
               {p}
-            </a>
+            </Link>
           </li>
         ))}
         <li>
           {current < totalPages ? (
-            <a href={pageHref(params, current + 1)} rel="next" className={linkClass}>
+            <Link href={pageHref(params, current + 1)} rel="next" className={linkClass}>
               →<span className="sr-only">Next page</span>
-            </a>
+            </Link>
           ) : (
             <span className={`${linkClass} opacity-30`} aria-disabled="true">
               →<span className="sr-only">No next page</span>

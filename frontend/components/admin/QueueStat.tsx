@@ -28,7 +28,7 @@ export default function QueueStat({ queue, selected, onSelect }: QueueStatProps)
       aria-pressed={selected}
       className={`w-full rounded-xl border p-4 text-left transition-colors sm:p-5 ${
         selected
-          ? 'border-[#FF6B00] bg-[#FF6B00]/5'
+          ? 'border-[#FF6B00] bg-[#FF6B00]/[0.04] shadow-[0_0_28px_rgba(255,107,0,0.08)]'
           : 'border-[#2A2A3A] bg-[#16161F] hover:border-[#6B6B80]'
       }`}
     >
@@ -37,7 +37,7 @@ export default function QueueStat({ queue, selected, onSelect }: QueueStatProps)
           {queue.name}
         </span>
         {queue.counts.failed > 0 ? (
-          <span className="inline-flex shrink-0 items-center whitespace-nowrap rounded-full border border-[#CC0000]/40 bg-[#CC0000]/10 px-2.5 py-0.5 font-cinzel text-[11px] font-bold uppercase tracking-wider text-[#CC0000]">
+          <span className="inline-flex shrink-0 items-center whitespace-nowrap rounded-full border border-[#CC0000]/40 bg-[#CC0000]/10 px-2.5 py-0.5 font-cinzel text-[11px] font-bold uppercase tracking-wider text-[#FF6B6B]">
             DLQ {queue.dlqCount}
           </span>
         ) : null}

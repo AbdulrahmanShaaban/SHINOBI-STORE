@@ -104,6 +104,10 @@ export default function MadaraSpecialCard({
   ];
   const sandOrbitRef = useRef<HTMLDivElement>(null);
 
+  // Hover tweens are created in event handlers (outside any GSAP context), so
+  // they are tracked here and killed on unmount instead of leaking.
+  const hoverTweensRef = useRef<gsap.core.Tween[]>([]);
+
   useGSAP(
     () => {
       const section = sectionRef.current;
@@ -125,6 +129,25 @@ export default function MadaraSpecialCard({
       }
 
       const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+      // Looping animations are paused while the section is off-screen and
+      // resumed on re-entry; they are never recreated, so their phase and
+      // progress (and therefore the visuals) stay identical.
+      const loopingAnims: Array<gsap.core.Animation> = [];
+      // The pulse loops start only via the reveal timeline's call; track that
+      // so visibility toggling never starts them earlier than before.
+      const pulseState: {
+        started: boolean;
+        pulse: gsap.core.Tween | null;
+        corePulse: gsap.core.Tween | null;
+      } = { started: false, pulse: null, corePulse: null };
+      // Non-GSAP resources needing explicit disposal (useGSAP reverts the rest).
+      const cleanups: Array<() => void> = [];
+
+      cleanups.push(() => {
+        hoverTweensRef.current.forEach((tween) => tween.kill());
+        hoverTweensRef.current = [];
+      });
 
       gsap.fromTo(
         titleRef.current,
@@ -246,6 +269,7 @@ export default function MadaraSpecialCard({
               scaleY: 1,
               duration: config.duration * 0.24,
             });
+          loopingAnims.push(cycle);
         });
 
         // The broad aura breathes on a long, non-synchronized cycle so it feels
@@ -255,6 +279,7 @@ export default function MadaraSpecialCard({
           .to(chakraAura, { yPercent: -1.6, xPercent: 0.8, scale: 1.018, duration: 2.8 })
           .to(chakraAura, { yPercent: 0.9, xPercent: -0.7, scale: 0.992, duration: 3.2 })
           .to(chakraAura, { yPercent: 0, xPercent: 0, scale: 1, duration: 2.2 });
+        loopingAnims.push(auraDrift);
 
         const chakraPulse = gsap.to(chakraAura, {
           opacity: 0.88,
@@ -278,8 +303,32 @@ export default function MadaraSpecialCard({
 
         // Keep everything alive continuously; visibility is still controlled by
         // the reveal timeline, so hidden states do not require restarting loops.
+        pulseState.pulse = chakraPulse;
+        pulseState.corePulse = chakraCorePulse;
         chakraPulse.pause();
         chakraCorePulse.pause();
+        // Per-particle disturbance bursts are created upfront as PAUSED tweens
+        // (instead of ad-hoc inside a scrub .call), so they stay recorded by
+        // this GSAP context and are reverted on unmount. Start values resolve
+        // on first play exactly like the previous create-on-crossing behavior.
+        const dustParticles = dust?.querySelectorAll<HTMLSpanElement>("span");
+        const burstTweens = dustParticles
+          ? Array.from(dustParticles).map((el, i) => {
+              const p = DUST_PARTICLES[i];
+              const burstX = Math.cos(p.angle) * p.distance * 32;
+              const burstY = Math.sin(p.angle) * p.distance * 14 + p.y * 22;
+              return gsap.to(el, {
+                x: burstX,
+                y: burstY,
+                rotation: `+=${p.rotate * 0.4}`,
+                duration: 0.26,
+                delay: p.delay,
+                ease: "power3.out",
+                paused: true,
+              });
+            })
+          : [];
+
         const reveal = gsap.timeline({
           defaults: { overwrite: "auto" },
           scrollTrigger: {
@@ -289,7 +338,9 @@ export default function MadaraSpecialCard({
             // normally before this point.
             start: "top 18%",
             // Give the user a generous amount of scroll to play the resurrection.
-            end: () => `+=${window.innerWidth < 768 ? 1700 : 2500}`,
+            // Viewport-relative so refreshes/resizes keep the pin distance in
+            // sync with the visible scroll length (~2500px at ~1000px tall).
+            end: () => "+=" + window.innerHeight * (window.innerWidth < 768 ? 2 : 2.5),
             scrub: 0.65,
             pin: stage,
             pinSpacing: true,
@@ -312,21 +363,7 @@ export default function MadaraSpecialCard({
           // angle by a small offset, so the disturbance reads as scattered
           // debris rather than a single scaling blob.
           .call(() => {
-            const particles = dust?.querySelectorAll<HTMLSpanElement>("span");
-            if (!particles) return;
-            particles.forEach((el, i) => {
-              const p = DUST_PARTICLES[i];
-              const burstX = Math.cos(p.angle) * p.distance * 32;
-              const burstY = Math.sin(p.angle) * p.distance * 14 + p.y * 22;
-              gsap.to(el, {
-                x: burstX,
-                y: burstY,
-                rotation: `+=${p.rotate * 0.4}`,
-                duration: 0.26,
-                delay: p.delay,
-                ease: "power3.out",
-              });
-            });
+            burstTweens.forEach((tween) => tween.play());
           }, [], "disturbance+=0.02")
           .addLabel("emerge")
           .to(coffin, { yPercent: -4, scale: 1.01, duration: 0.48, ease: "power4.out" }, "emerge")
@@ -382,8 +419,9 @@ export default function MadaraSpecialCard({
           .to(chakraRings, { opacity: 1, scale: 1, duration: 0.42, stagger: 0.055, ease: "power3.out" }, "reveal+=0.24")
           .to(chakraCore, { opacity: 0.58, scale: 1.06, duration: 0.22, repeat: 3, yoyo: true, ease: "sine.inOut" }, "reveal+=0.55")
           .call(() => {
-            chakraPulse.play();
-            chakraCorePulse.play();
+            pulseState.started = true;
+            pulseState.pulse?.play();
+            pulseState.corePulse?.play();
           }, [], "reveal+=0.60");
       }
 
@@ -400,6 +438,11 @@ export default function MadaraSpecialCard({
         const setScaleX = sandImgs.map((img) => gsap.quickSetter(img, "scaleX"));
         const setScaleY = sandImgs.map((img) => gsap.quickSetter(img, "scaleY"));
         const setOpacity = sandImgs.map((img) => gsap.quickSetter(img, "opacity"));
+
+        // Snap translated positions to a 0.5px grid. On particles blurred
+        // between 0.15px and 2.25px this is far below perception threshold and
+        // avoids subpixel rasterization churn; rotation/scale stay continuous.
+        const snapHalf = (value: number) => Math.round(value * 2) / 2;
 
         const geometry = {
           centerX: 0,
@@ -487,15 +530,19 @@ export default function MadaraSpecialCard({
                   (180 / Math.PI);
 
                 setX[i](
-                  geometry.centerX +
-                  Math.cos(angle) * rx +
-                  gustX +
-                  windBias
+                  snapHalf(
+                    geometry.centerX +
+                    Math.cos(angle) * rx +
+                    gustX +
+                    windBias
+                  )
                 );
                 setY[i](
-                  geometry.centerY +
-                  Math.sin(angle) * ry +
-                  gustY
+                  snapHalf(
+                    geometry.centerY +
+                    Math.sin(angle) * ry +
+                    gustY
+                  )
                 );
                 setRotation[i](
                   tangentRotation * (0.42 + config.spinFactor * 0.5) +
@@ -521,104 +568,175 @@ export default function MadaraSpecialCard({
             },
           });
 
+          loopingAnims.push(orbitTween);
+
           const resizeObserver = new ResizeObserver(updateOrbitGeometry);
           resizeObserver.observe(card);
 
-          return () => {
+          cleanups.push(() => {
             resizeObserver.disconnect();
             orbitTween.kill();
-          };
+          });
         }
 
       }
+
+      // Pause every looping timeline/tween while the section is off-screen and
+      // resume it on re-entry. Animations are only paused/resumed — never
+      // recreated — so progress, phase and the on-screen play state stay
+      // identical to the always-running behavior.
+      if (!reducedMotion && loopingAnims.length > 0) {
+        const setLoopsActive = (active: boolean) => {
+          loopingAnims.forEach((anim) => {
+            if (active) anim.play();
+            else anim.pause();
+          });
+          if (!pulseState.pulse || !pulseState.corePulse) return;
+          if (!active) {
+            pulseState.pulse.pause();
+            pulseState.corePulse.pause();
+          } else if (pulseState.started) {
+            // Never start the pulses before the reveal call does.
+            pulseState.pulse.play();
+            pulseState.corePulse.play();
+          }
+        };
+
+        const visibilityTrigger = ScrollTrigger.create({
+          trigger: section,
+          start: "top bottom",
+          end: "bottom top",
+          // Refresh after the pinned reveal trigger so measurements account for
+          // the final pin spacing.
+          refreshPriority: -2,
+          onToggle: (self) => setLoopsActive(self.isActive),
+        });
+        // Sync immediately: a section that mounts out of view starts paused.
+        setLoopsActive(visibilityTrigger.isActive);
+      }
+
+      return () => {
+        cleanups.forEach((cleanup) => cleanup());
+      };
     },
     { scope: sectionRef, dependencies: [defaultImg, jutsuImg, sixPathsImg, sandImg] }
   );
 
+  // contextSafe would read refs during render (react-hooks/refs), so plain
+  // handlers are kept and their tweens registered for unmount cleanup.
+  const trackHoverTween = (tween: gsap.core.Tween) => {
+    hoverTweensRef.current.push(tween);
+    return tween;
+  };
+
   const handleMouseEnter = () => {
-    gsap.to(defaultImgRef.current, {
-      opacity: 0,
-      duration: 0.4,
-      ease: "power2.out",
-      overwrite: "auto",
-    });
-    gsap.to(jutsuImgRef.current, {
-      opacity: 0,
-      scale: 1,
-      duration: 0.22,
-      ease: "power2.out",
-      overwrite: "auto",
-    });
-    gsap.to(sixPathsImgRef.current, {
-      opacity: 1,
-      scale: 1.045,
-      duration: 0.45,
-      ease: "power3.out",
-      overwrite: "auto",
-    });
-    gsap.to(chakraAuraRef.current, {
-      opacity: 1,
-      scale: 1.06,
-      duration: 0.38,
-      ease: "power2.out",
-      overwrite: "auto",
-    });
-    gsap.to(chakraCoreRef.current, {
-      opacity: 1,
-      scale: 1.1,
-      duration: 0.28,
-      ease: "power2.out",
-      overwrite: "auto",
-    });
-    gsap.to(chakraRingRefs.map((ref) => ref.current), {
-      opacity: 1,
-      scale: 1.035,
-      duration: 0.28,
-      stagger: 0.04,
-      overwrite: "auto",
-    });
+    trackHoverTween(
+      gsap.to(defaultImgRef.current, {
+        opacity: 0,
+        duration: 0.4,
+        ease: "power2.out",
+        overwrite: "auto",
+      })
+    );
+    trackHoverTween(
+      gsap.to(jutsuImgRef.current, {
+        opacity: 0,
+        scale: 1,
+        duration: 0.22,
+        ease: "power2.out",
+        overwrite: "auto",
+      })
+    );
+    trackHoverTween(
+      gsap.to(sixPathsImgRef.current, {
+        opacity: 1,
+        scale: 1.045,
+        duration: 0.45,
+        ease: "power3.out",
+        overwrite: "auto",
+      })
+    );
+    trackHoverTween(
+      gsap.to(chakraAuraRef.current, {
+        opacity: 1,
+        scale: 1.06,
+        duration: 0.38,
+        ease: "power2.out",
+        overwrite: "auto",
+      })
+    );
+    trackHoverTween(
+      gsap.to(chakraCoreRef.current, {
+        opacity: 1,
+        scale: 1.1,
+        duration: 0.28,
+        ease: "power2.out",
+        overwrite: "auto",
+      })
+    );
+    trackHoverTween(
+      gsap.to(chakraRingRefs.map((ref) => ref.current), {
+        opacity: 1,
+        scale: 1.035,
+        duration: 0.28,
+        stagger: 0.04,
+        overwrite: "auto",
+      })
+    );
   };
 
   const handleMouseLeave = () => {
-    gsap.to(defaultImgRef.current, {
-      opacity: 1,
-      duration: 0.4,
-      ease: "power2.out",
-      overwrite: "auto",
-    });
-    gsap.to(jutsuImgRef.current, {
-      opacity: 0,
-      scale: 1,
-      duration: 0.22,
-      ease: "power2.out",
-      overwrite: "auto",
-    });
-    gsap.to(sixPathsImgRef.current, {
-      opacity: 0,
-      scale: 1,
-      duration: 0.28,
-      ease: "power2.out",
-      overwrite: "auto",
-    });
-    gsap.to(chakraAuraRef.current, {
-      opacity: 0,
-      scale: 0.98,
-      duration: 0.32,
-      ease: "power2.out",
-      overwrite: "auto",
-    });
-    gsap.to(chakraCoreRef.current, {
-      opacity: 0,
-      scale: 0.96,
-      duration: 0.26,
-      ease: "power2.out",
-      overwrite: "auto",
-    });
-    gsap.to(chakraRingRefs.map((ref) => ref.current), {
-      opacity: 0,
-      duration: 0.24,
-      overwrite: "auto",
-    });
+    trackHoverTween(
+      gsap.to(defaultImgRef.current, {
+        opacity: 1,
+        duration: 0.4,
+        ease: "power2.out",
+        overwrite: "auto",
+      })
+    );
+    trackHoverTween(
+      gsap.to(jutsuImgRef.current, {
+        opacity: 0,
+        scale: 1,
+        duration: 0.22,
+        ease: "power2.out",
+        overwrite: "auto",
+      })
+    );
+    trackHoverTween(
+      gsap.to(sixPathsImgRef.current, {
+        opacity: 0,
+        scale: 1,
+        duration: 0.28,
+        ease: "power2.out",
+        overwrite: "auto",
+      })
+    );
+    trackHoverTween(
+      gsap.to(chakraAuraRef.current, {
+        opacity: 0,
+        scale: 0.98,
+        duration: 0.32,
+        ease: "power2.out",
+        overwrite: "auto",
+      })
+    );
+    trackHoverTween(
+      gsap.to(chakraCoreRef.current, {
+        opacity: 0,
+        scale: 0.96,
+        duration: 0.26,
+        ease: "power2.out",
+        overwrite: "auto",
+      })
+    );
+    trackHoverTween(
+      gsap.to(chakraRingRefs.map((ref) => ref.current), {
+        opacity: 0,
+        duration: 0.24,
+        overwrite: "auto",
+      })
+    );
   };
 
   return (
@@ -873,6 +991,7 @@ export default function MadaraSpecialCard({
                     src={defaultImg}
                     alt="Madara Uchiha"
                     className="absolute inset-0 z-[20] w-full h-full object-contain"
+                    decoding="async"
                   />
                   <img
                     ref={jutsuImgRef}
@@ -880,6 +999,7 @@ export default function MadaraSpecialCard({
                     alt="Madara Susanoo"
                     className="absolute inset-0 z-[20] w-full h-full object-contain"
                     style={{ opacity: 0 }}
+                    decoding="async"
                   />
                   <img
                     ref={sixPathsImgRef}
@@ -887,6 +1007,7 @@ export default function MadaraSpecialCard({
                     alt="Madara Six Paths"
                     className="absolute inset-0 z-[20] w-full h-full object-contain"
                     style={{ opacity: 0 }}
+                    decoding="async"
                   />
                 </div>
               </div>
@@ -1058,6 +1179,10 @@ export default function MadaraSpecialCard({
                 key={i}
                 src={sandImg}
                 alt=""
+                loading="lazy"
+                decoding="async"
+                width={Math.round(config.size)}
+                height={Math.round(config.size * (0.48 + config.stretchY * 0.42))}
                 className="absolute left-0 top-0 object-contain"
                 style={{
                   width: `${config.size}px`,

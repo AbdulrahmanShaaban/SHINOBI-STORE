@@ -1,5 +1,11 @@
 import type { Metadata } from "next";
-import { Anton, Bebas_Neue, Cinzel, Inter } from "next/font/google";
+import {
+  Anton,
+  Bebas_Neue,
+  Belanosima,
+  Cinzel,
+  Inter,
+} from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/shared/Navbar";
 import Cart from "@/components/shared/Cart";
@@ -20,6 +26,12 @@ const bebasNeue = Bebas_Neue({
   subsets: ["latin"],
   weight: "400",
   variable: "--font-bebas",
+});
+
+const belanosima = Belanosima({
+  subsets: ["latin", "latin-ext"],
+  weight: ["400", "600", "700"],
+  variable: "--font-belanosima",
 });
 
 const cinzel = Cinzel({
@@ -49,8 +61,16 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${anton.variable} ${bebasNeue.variable} ${cinzel.variable} ${inter.variable} h-full antialiased`}
+      className={`${anton.variable} ${bebasNeue.variable} ${belanosima.variable} ${cinzel.variable} ${inter.variable} h-full antialiased`}
     >
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              "try{if(window.matchMedia&&window.matchMedia('(pointer: fine)').matches)document.documentElement.classList.add('custom-cursor-boot')}catch(e){}",
+          }}
+        />
+      </head>
       <body className="min-h-full flex flex-col">
         <UserProvider>
           <SmoothScroll />
