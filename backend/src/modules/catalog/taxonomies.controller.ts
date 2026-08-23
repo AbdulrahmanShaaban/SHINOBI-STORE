@@ -1,8 +1,10 @@
 import { Controller, Get } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { TaxonomiesService } from './taxonomies.service';
+import { Public } from '../../common/guards/public.decorator';
 
 @ApiTags('taxonomies')
+@Public()
 @Controller('taxonomies')
 export class TaxonomiesController {
   constructor(private readonly taxonomiesService: TaxonomiesService) {}

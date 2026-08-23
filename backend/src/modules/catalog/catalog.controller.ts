@@ -1,9 +1,12 @@
-import { Controller, Get, Param, Query } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Param, Post, Query } from '@nestjs/common';
 import { ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { CatalogService } from './catalog.service';
 import { ProductQueryDto } from './dto/product-query.dto';
+import { AvailabilityDto } from './dto/availability.dto';
+import { Public } from '../../common/guards/public.decorator';
 
 @ApiTags('catalog')
+@Public()
 @Controller('products')
 export class CatalogController {
   constructor(private readonly catalogService: CatalogService) {}
@@ -21,6 +24,14 @@ export class CatalogController {
   @ApiOkResponse({ description: 'Counts per category/anime/character/tag; own dimension excluded per bucket' })
   facets(@Query() query: ProductQueryDto) {
     return this.catalogService.getFacets(query);
+  }
+
+  @Post('availability')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Batch live availability for variants (cart revalidation)' })
+  @ApiOkResponse({ description: 'Only purchasable variants of active products are returned' })
+  availability(@Body() body: AvailabilityDto) {
+    return this.catalogService.getAvailability(body);
   }
 
   @Get(':slug')

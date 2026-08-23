@@ -80,6 +80,19 @@ function stubPrisma() {
     character: { findMany: jest.fn().mockResolvedValue([]) },
     tag: { findMany: jest.fn().mockResolvedValue([]) },
     category: { findMany: categoryFindMany },
+    productVariant: {
+      findMany: jest.fn().mockResolvedValue([
+        {
+          id: '11111111-1111-4111-8111-111111111111',
+          isActive: true,
+          priceCents: 6900,
+          compareAtPriceCents: 8900,
+          stockOnHand: 40,
+          reserved: 5,
+          product: { slug: 'naruto-rasengan-hoodie' },
+        },
+      ]),
+    },
   };
 }
 
@@ -163,6 +176,56 @@ describe('Catalog API contracts (e2e, db-stubbed)', () => {
     });
   });
 
+  describe('POST /api/v1/products/availability', () => {
+    it('returns computed availability without leaking stock internals', async () => {
+      const prisma = app.get(PrismaService) as unknown as {
+        productVariant: { findMany: jest.Mock };
+      };
+      prisma.productVariant.findMany.mockResolvedValue([
+        {
+          id: '11111111-1111-4111-8111-111111111111',
+          isActive: true,
+          priceCents: 6900,
+          compareAtPriceCents: 8900,
+          stockOnHand: 40,
+          reserved: 5,
+          product: { slug: 'naruto-rasengan-hoodie' },
+        },
+      ]);
+
+      const res = await request(app.getHttpServer())
+        .post('/api/v1/products/availability')
+        .send({ variantIds: ['11111111-1111-4111-8111-111111111111'] })
+        .expect(200);
+
+      expect(res.body).toHaveLength(1);
+      expect(res.body[0]).toMatchObject({
+        variantId: '11111111-1111-4111-8111-111111111111',
+        available: 35,
+        priceCents: 6900,
+        productSlug: 'naruto-rasengan-hoodie',
+      });
+      expect(res.body[0]).not.toHaveProperty('stockOnHand');
+      expect(res.body[0]).not.toHaveProperty('reserved');
+    });
+
+    it('validates batch shape and uuid format', async () => {
+      await request(app.getHttpServer())
+        .post('/api/v1/products/availability')
+        .send({ variantIds: [] })
+        .expect(400);
+      await request(app.getHttpServer())
+        .post('/api/v1/products/availability')
+        .send({ variantIds: ['not-a-uuid'] })
+        .expect(400);
+      const ids = Array.from({ length: 51 }, () => '11111111-1111-4111-8111-111111111111');
+      await request(app.getHttpServer())
+        .post('/api/v1/products/availability')
+        .send({ variantIds: ids })
+        .expect(400);
+    });
+  });
+
   describe('GET /api/v1/products/:slug', () => {
     it('serves active products with computed availability only', async () => {
       const res = await request(app.getHttpServer())
@@ -199,13 +262,13 @@ describe('Catalog API contracts (e2e, db-stubbed)', () => {
   });
 
   describe('Admin surface', () => {
-    it('rejects admin mutations while sessions are unimplemented', async () => {
+    it('rejects unauthenticated admin mutations with the stable auth code', async () => {
       const res = await request(app.getHttpServer())
         .post('/api/v1/admin/products')
         .send({ name: 'x' })
         .expect(401);
 
-      expect(res.body.code).toBe('SESSIONS_NOT_IMPLEMENTED');
+      expect(res.body.code).toBe('UNAUTHENTICATED');
     });
   });
 });

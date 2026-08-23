@@ -1,11 +1,13 @@
 /**
- * Server-side typed client for the Shinobi Store API.
- * Used from RSC/server code only — never ship API calls to the browser
- * that the server can make (keeps latency on the server, no CORS concerns).
+ * Typed client for the Shinobi Store API.
+ * - Server components use API_URL (private network, cached via next.revalidate).
+ * - Browser code (cart revalidation) uses NEXT_PUBLIC_API_URL; backend CORS
+ *   must list the storefront origin.
  */
-
-const API_URL = process.env.API_URL ?? 'http://localhost:5000';
-const BASE = `${API_URL}/api/v1`;
+const SERVER_BASE = `${process.env.API_URL ?? 'http://localhost:5000'}/api/v1`;
+const BROWSER_BASE = `${
+  process.env.NEXT_PUBLIC_API_URL ?? process.env.API_URL ?? 'http://localhost:5000'
+}/api/v1`;
 
 /** Shop URL params (§18) plus server-side paging knobs. minRating/inStock arrive with reviews later. */
 export interface ShopParams {
@@ -105,12 +107,29 @@ export interface ProductDetail {
   images: ProductImage[];
 }
 
-async function request<T>(path: string, revalidate: number): Promise<T> {
+async function request<T>(
+  path: string,
+  revalidate: number,
+  init?: { method?: string; body?: unknown },
+): Promise<T> {
+  return rawRequest<T>(SERVER_BASE, path, { ...init, revalidate });
+}
+
+async function rawRequest<T>(
+  base: string,
+  path: string,
+  opts: { method?: string; body?: unknown; revalidate: number },
+): Promise<T> {
   let res: Response;
   try {
-    res = await fetch(`${BASE}${path}`, {
-      headers: { accept: 'application/json' },
-      next: { revalidate },
+    res = await fetch(`${base}${path}`, {
+      headers: {
+        accept: 'application/json',
+        ...(opts.body ? { 'content-type': 'application/json' } : {}),
+      },
+      method: opts.method ?? 'GET',
+      body: opts.body ? JSON.stringify(opts.body) : undefined,
+      next: { revalidate: opts.revalidate },
       signal: AbortSignal.timeout(10_000),
     });
   } catch (cause) {
@@ -151,6 +170,25 @@ export function getFacets(params: ShopParams): Promise<ProductFacets> {
   if (params.tag) search.set('tag', params.tag);
   if (params.search) search.set('search', params.search);
   return request<ProductFacets>(`/products/facets?${search.toString()}`, 60);
+}
+
+/** Live purchasability per variant. Absent ids mean "gone" — quarantine those lines. */
+export interface VariantAvailability {
+  variantId: string;
+  isActive: boolean;
+  priceCents: number;
+  compareAtPriceCents: number | null;
+  available: number;
+  productSlug: string;
+}
+
+/** Browser-facing (no HTTP cache); used by cart drawer revalidation. */
+export async function checkAvailability(variantIds: string[]): Promise<VariantAvailability[]> {
+  return rawRequest<VariantAvailability[]>(BROWSER_BASE, '/products/availability', {
+    revalidate: 0,
+    method: 'POST',
+    body: { variantIds },
+  });
 }
 
 export function getProduct(slug: string): Promise<ProductDetail> {

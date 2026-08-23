@@ -1,5 +1,9 @@
 import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
+import { Reflector } from '@nestjs/core';
 import { Request } from 'express';
+import { IS_PUBLIC_KEY } from './public.decorator';
+import { SessionsService } from '../../modules/auth/sessions.service';
+import type { AuthenticatedUser } from '../rbac/require-permissions.decorator';
 
 export const SESSION_COOKIE = 'shinobi_session';
 
@@ -17,21 +21,62 @@ export function extractToken(req: Request): string | undefined {
   return undefined;
 }
 
+const CSRF_HEADER = 'x-csrf-token';
+
 /**
- * SKELETON (Phase 0): authenticates requests via opaque session token
- * (httpOnly cookie for web, Bearer header for future clients) per plan §11.1.
+ * Real session authentication (§11.1): opaque token → SHA-256 → Redis-cached
+ * lookup with DB fallback → attaches req.user. Rejects expired/revoked
+ * sessions and inactive users.
  *
- * The session store does not exist yet — until Phase 5 implements
- * sessions this guard rejects every request. Do not attach it to routes
- * before then; it exists so the auth surface and its tests are shaped now.
+ * CSRF defense-in-depth for cookie-authenticated browsers: non-GET requests
+ * must carry a custom header, which cross-site classic forms cannot set.
+ * SameSite=Lax is the primary control; this is the belt to its braces.
  */
 @Injectable()
 export class SessionGuard implements CanActivate {
-  async canActivate(_context: ExecutionContext): Promise<boolean> {
-    // Phase 5: extractToken → sha256 → Redis-cached session lookup → attach req.user.
-    throw new UnauthorizedException({
-      code: 'SESSIONS_NOT_IMPLEMENTED',
-      message: 'Authentication is not available yet',
-    });
+  constructor(
+    private readonly sessions: SessionsService,
+    private readonly reflector: Reflector,
+  ) {}
+
+  async canActivate(context: ExecutionContext): Promise<boolean> {
+    const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
+      context.getHandler(),
+      context.getClass(),
+    ]);
+    if (isPublic) return true;
+
+    const req = context.switchToHttp().getRequest<Request & { user?: AuthenticatedUser; sessionId?: string }>();
+    const token = extractToken(req);
+    if (!token) {
+      throw unauthorized();
+    }
+
+    const session = await this.sessions.validate(token);
+    if (!session) {
+      throw unauthorized();
+    }
+
+    const method = req.method.toUpperCase();
+    const usesCookie = !req.headers.authorization;
+    if (method !== 'GET' && method !== 'HEAD' && method !== 'OPTIONS' && usesCookie) {
+      if (!req.headers[CSRF_HEADER]) {
+        throw new UnauthorizedException({
+          code: 'CSRF_TOKEN_MISSING',
+          message: 'Missing CSRF header',
+        });
+      }
+    }
+
+    req.user = session.user;
+    req.sessionId = session.sessionId;
+    return true;
   }
+}
+
+function unauthorized(): UnauthorizedException {
+  return new UnauthorizedException({
+    code: 'UNAUTHENTICATED',
+    message: 'Authentication required',
+  });
 }

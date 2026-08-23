@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { selectTotalItems, useCartStore } from '@/lib/cart-store';
+import { useUser } from '@/lib/user-context';
 
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -12,6 +13,7 @@ export default function Navbar() {
   const pathname = usePathname();
   const openCart = useCartStore((s) => s.openCart);
   const cartCount = useCartStore(selectTotalItems);
+  const { user } = useUser();
   const isHomePage = pathname === '/';
   const showScrolledState = isScrolled || !isHomePage;
 
@@ -98,6 +100,7 @@ export default function Navbar() {
               <Link href="/contact" className="px-2 lg:px-4 py-2 text-[#F0F0F0] font-cinzel font-bold text-lg md:text-xl lg:text-2xl xl:text-3xl hover:text-[#FF6B00] transition-colors">
                 CONTACT
               </Link>
+              <AccountLink />
               <button
                 onClick={openCart}
                 aria-label={`Open cart, ${cartCount} ${cartCount === 1 ? 'item' : 'items'}`}
@@ -193,11 +196,34 @@ export default function Navbar() {
           <Link href="/contact" onClick={closeMenu} className="font-cinzel font-bold text-3xl tracking-[0.15em] text-[#F0F0F0] hover:text-[#FF6B00] transition-colors">
             CONTACT
           </Link>
+          {user ? (
+            <Link href="/account" onClick={closeMenu} className="font-cinzel font-bold text-3xl tracking-[0.15em] text-[#F0F0F0] hover:text-[#FF6B00] transition-colors">
+              MY ACCOUNT
+            </Link>
+          ) : (
+            <Link href="/account/login" onClick={closeMenu} className="font-cinzel font-bold text-3xl tracking-[0.15em] text-[#F0F0F0] hover:text-[#FF6B00] transition-colors">
+              SIGN IN
+            </Link>
+          )}
           <Link href="/cart" onClick={closeMenu} className="font-cinzel font-bold text-3xl tracking-[0.15em] text-[#F0F0F0] hover:text-[#FF6B00] transition-colors">
             CART
           </Link>
         </nav>
       </div>
     </>
+  );
+}
+
+/** Desktop account entry — adapts to session state once the /auth/me probe lands. */
+function AccountLink() {
+  const { user, loading } = useUser();
+  return (
+    <Link
+      href={user ? '/account' : '/account/login'}
+      aria-label={user ? `Account: ${user.fullName}` : 'Sign in'}
+      className="px-2 lg:px-4 py-2 text-[#F0F0F0] font-cinzel font-bold text-lg md:text-xl lg:text-2xl xl:text-3xl hover:text-[#FF6B00] transition-colors"
+    >
+      {loading ? '' : user ? 'ACCOUNT' : 'SIGN IN'}
+    </Link>
   );
 }

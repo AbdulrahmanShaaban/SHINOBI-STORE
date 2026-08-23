@@ -8,6 +8,7 @@ import LoadingScreen from "@/components/LoadingScreen";
 import SmoothScroll from "@/components/shared/SmoothScroll";
 import CustomCursor from "@/components/shared/CustomCursor";
 import ScrollRefresh from "@/components/shared/ScrollRefresh";
+import { UserProvider } from "@/lib/user-context";
 
 const anton = Anton({
   subsets: ["latin"],
@@ -51,14 +52,16 @@ export default function RootLayout({
       className={`${anton.variable} ${bebasNeue.variable} ${cinzel.variable} ${inter.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        <SmoothScroll />
-        <ScrollRefresh />
-        <CustomCursor />
-        <LoadingScreen />
-        <Navbar />
-        {children}
-        <Cart />
-        <CartHydration />
+        <UserProvider>
+          <SmoothScroll />
+          <ScrollRefresh />
+          <CustomCursor />
+          <LoadingScreen />
+          <Navbar />
+          {children}
+          <Cart />
+          <CartHydration />
+        </UserProvider>
       </body>
     </html>
   );

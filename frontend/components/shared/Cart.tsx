@@ -5,22 +5,45 @@ import Link from 'next/link';
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
 import {
+  selectHasUnavailable,
   selectSubtotalCents,
   selectTotalItems,
   useCartStore,
 } from '@/lib/cart-store';
+import { checkAvailability } from '@/lib/api';
 import { formatPrice } from '@/lib/money';
 
 /**
- * Cart drawer. Lines are variant-aware and persisted in localStorage;
- * quantity is clamped by the availability snapshot taken at add-time.
+ * Cart drawer. Lines are variant-aware and persisted in localStorage.
+ * Opening the drawer revalidates every line against live availability:
+ * stale quantities are clamped, changed prices are refreshed, and lines
+ * whose variant is gone/sold out are visibly quarantined and block checkout.
  */
 export default function Cart() {
-  const { isOpen, closeCart, lines, setQuantity, removeLine } = useCartStore();
+  const { isOpen, closeCart, lines, setQuantity, removeLine, revalidate } =
+    useCartStore();
   const subtotalCents = useCartStore(selectSubtotalCents);
   const totalItems = useCartStore(selectTotalItems);
+  const hasUnavailable = useCartStore(selectHasUnavailable);
   const closeRef = useRef<HTMLButtonElement>(null);
   const drawerRef = useRef<HTMLDivElement>(null);
+
+  // Revalidate once per drawer open; failure keeps the drawer usable with
+  // snapshot data (availability is enforced server-side at order time anyway).
+  useEffect(() => {
+    if (!isOpen || lines.length === 0) return;
+    let cancelled = false;
+    const ids = [...new Set(lines.map((l) => l.variantId))];
+    checkAvailability(ids)
+      .then((statuses) => {
+        if (!cancelled) revalidate(statuses);
+      })
+      .catch(() => undefined);
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen]);
 
   // Focus management: focus the close button on open, restore later.
   useEffect(() => {
@@ -120,7 +143,17 @@ export default function Cart() {
           ) : (
             <ul className="space-y-4" aria-label="Cart items">
               {lines.map((line) => (
-                <li key={line.variantId} className="flex gap-4 bg-[#16161F] p-4 rounded-lg">
+                <li
+                  key={line.variantId}
+                  className={`flex gap-4 bg-[#16161F] p-4 rounded-lg ${
+                    line.unavailable ? 'opacity-70' : ''
+                  }`}
+                  aria-label={
+                    line.unavailable
+                      ? `${line.name}, ${line.variantLabel} — no longer available`
+                      : undefined
+                  }
+                >
                   <Link href={`/products/${line.slug}`} onClick={closeCart} className="shrink-0">
                     <div className="w-20 h-20 bg-[#0A0A0F] rounded flex items-center justify-center overflow-hidden">
                       {line.imageUrl ? (
@@ -135,47 +168,75 @@ export default function Cart() {
                     <Link
                       href={`/products/${line.slug}`}
                       onClick={closeCart}
-                      className="font-cinzel font-bold mb-0.5 block truncate hover:text-[#FF6B00] transition-colors"
+                      className={`font-cinzel font-bold mb-0.5 block truncate hover:text-[#FF6B00] transition-colors ${
+                        line.unavailable ? 'line-through text-[#6B6B80]' : ''
+                      }`}
                     >
                       {line.name}
                     </Link>
                     <p className="text-[#6B6B80] font-inter text-sm mb-1">{line.variantLabel}</p>
-                    <p className="text-[#FFB800] font-bebas text-xl mb-2">
-                      {formatPrice(line.priceCents)}
-                    </p>
+                    {line.unavailable ? (
+                      <p className="text-[#CC0000] font-cinzel text-xs font-bold mb-2 uppercase tracking-wide">
+                        No longer available
+                      </p>
+                    ) : (
+                      <>
+                        <p className="text-[#FFB800] font-bebas text-xl mb-2">
+                          {formatPrice(line.priceCents)}
+                        </p>
+                        {line.notice === 'price-changed' ? (
+                          <p className="text-[#FFB800] text-xs mb-2">Price updated</p>
+                        ) : null}
+                        {line.notice === 'quantity-reduced' ? (
+                          <p className="text-[#FFB800] text-xs mb-2">
+                            Quantity reduced to stock on hand
+                          </p>
+                        ) : null}
+                      </>
+                    )}
                     <div className="flex items-center gap-2">
-                      <div role="group" aria-label={`Quantity for ${line.name}, ${line.variantLabel}`}>
-                        <button
-                          onClick={() => setQuantity(line.variantId, line.quantity - 1)}
-                          aria-label="Decrease quantity"
-                          disabled={line.quantity <= 1}
-                          className="w-8 h-8 bg-[#2A2A3A] text-[#F0F0F0] rounded hover:bg-[#FF6B00] transition-colors disabled:opacity-40"
-                        >
-                          −
-                        </button>
-                        <span className="text-[#F0F0F0] font-inter w-8 inline-block text-center" aria-live="polite">
-                          {line.quantity}
-                        </span>
-                        <button
-                          onClick={() => setQuantity(line.variantId, line.quantity + 1)}
-                          aria-label="Increase quantity"
-                          disabled={line.quantity >= line.maxQuantity}
-                          title={
-                            line.quantity >= line.maxQuantity ? 'No more stock available' : undefined
-                          }
-                          className="w-8 h-8 bg-[#2A2A3A] text-[#F0F0F0] rounded hover:bg-[#FF6B00] transition-colors disabled:opacity-40"
-                        >
-                          +
-                        </button>
-                      </div>
+                      {!line.unavailable && (
+                        <div role="group" aria-label={`Quantity for ${line.name}, ${line.variantLabel}`}>
+                          <button
+                            onClick={() => setQuantity(line.variantId, line.quantity - 1)}
+                            aria-label="Decrease quantity"
+                            disabled={line.quantity <= 1}
+                            className="w-8 h-8 bg-[#2A2A3A] text-[#F0F0F0] rounded hover:bg-[#FF6B00] transition-colors disabled:opacity-40"
+                          >
+                            −
+                          </button>
+                          <span className="text-[#F0F0F0] font-inter w-8 inline-block text-center" aria-live="polite">
+                            {line.quantity}
+                          </span>
+                          <button
+                            onClick={() => setQuantity(line.variantId, line.quantity + 1)}
+                            aria-label="Increase quantity"
+                            disabled={line.quantity >= line.maxQuantity}
+                            title={
+                              line.quantity >= line.maxQuantity ? 'No more stock available' : undefined
+                            }
+                            className="w-8 h-8 bg-[#2A2A3A] text-[#F0F0F0] rounded hover:bg-[#FF6B00] transition-colors disabled:opacity-40"
+                          >
+                            +
+                          </button>
+                        </div>
+                      )}
                       <button
                         onClick={() => removeLine(line.variantId)}
                         aria-label={`Remove ${line.name}, ${line.variantLabel} from cart`}
-                        className="ml-auto text-[#CC0000] hover:text-[#FF6B00] transition-colors p-1"
+                        className={`transition-colors p-1 ${
+                          line.unavailable
+                            ? 'text-[#CC0000] underline underline-offset-4 text-xs font-cinzel font-bold uppercase ml-auto'
+                            : 'ml-auto text-[#CC0000] hover:text-[#FF6B00]'
+                        }`}
                       >
-                        <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                          <path d="M6 18 L18 6 M6 6 L18 18" strokeLinecap="round" strokeLinejoin="round" />
-                        </svg>
+                        {line.unavailable ? (
+                          'Remove'
+                        ) : (
+                          <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <path d="M6 18 L18 6 M6 6 L18 18" strokeLinecap="round" strokeLinejoin="round" />
+                          </svg>
+                        )}
                       </button>
                     </div>
                   </div>
@@ -194,14 +255,24 @@ export default function Cart() {
                 {formatPrice(subtotalCents)}
               </span>
             </div>
-            <button
-              disabled
-              aria-disabled="true"
-              title="Checkout arrives with Phase 6"
-              className="w-full py-4 bg-[#16161F] text-[#6B6B80] font-cinzel font-bold cursor-not-allowed rounded-lg border border-[#2A2A3A]"
-            >
-              CHECKOUT — COMING SOON
-            </button>
+            {hasUnavailable ? (
+              <button
+                disabled
+                aria-disabled="true"
+                className="w-full py-4 bg-[#16161F] text-[#6B6B80] font-cinzel font-bold cursor-not-allowed rounded-lg border border-[#CC0000]/40"
+              >
+                REMOVE UNAVAILABLE ITEMS TO CHECKOUT
+              </button>
+            ) : (
+              <button
+                disabled
+                aria-disabled="true"
+                title="Checkout arrives with Phase 6"
+                className="w-full py-4 bg-[#16161F] text-[#6B6B80] font-cinzel font-bold cursor-not-allowed rounded-lg border border-[#2A2A3A]"
+              >
+                CHECKOUT — COMING SOON
+              </button>
+            )}
             <p className="text-center text-[#6B6B80] text-sm font-inter mt-4">
               Free shipping on orders over $50
             </p>

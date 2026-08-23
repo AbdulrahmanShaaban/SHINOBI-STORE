@@ -7,8 +7,12 @@ import { AppConfigModule } from './common/config/app-config.module';
 import { validateEnv } from './common/config/env.validation';
 import { PrismaModule } from './common/prisma/prisma.module';
 import { RedisModule } from './common/redis/redis.module';
+import { SessionGuard } from './common/guards/session.guard';
+import { PermissionsGuard } from './common/rbac/permissions.guard';
 import { HealthModule } from './modules/health/health.module';
 import { CatalogModule } from './modules/catalog/catalog.module';
+import { AuthModule } from './modules/auth/auth.module';
+import { CartModule } from './modules/cart/cart.module';
 
 @Module({
   imports: [
@@ -33,7 +37,15 @@ import { CatalogModule } from './modules/catalog/catalog.module';
     RedisModule,
     HealthModule,
     CatalogModule,
+    AuthModule,
+    CartModule,
   ],
-  providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }],
+  providers: [
+    // Order matters: authentication first (attaches req.user), then
+    // authorization (@RequirePermissions metadata). @Public() routes skip auth.
+    { provide: APP_GUARD, useClass: ThrottlerGuard },
+    { provide: APP_GUARD, useClass: SessionGuard },
+    { provide: APP_GUARD, useClass: PermissionsGuard },
+  ],
 })
 export class AppModule {}

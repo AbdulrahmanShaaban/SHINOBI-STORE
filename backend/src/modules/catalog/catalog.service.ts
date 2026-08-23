@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from '../../common/prisma/prisma.service';
 import { ProductQueryDto, ProductSort } from './dto/product-query.dto';
+import { AvailabilityDto, VariantAvailability } from './dto/availability.dto';
 import { searchProductIds } from './search.builder';
 
 export interface ProductListItem {
@@ -166,6 +167,34 @@ export class CatalogService {
       items: rows.map(mapListItem),
       meta: { page: query.page, limit: query.limit, total, totalPages: Math.max(1, Math.ceil(total / query.limit)) },
     };
+  }
+
+  /**
+   * Live purchasability per variant. Only variants of ACTIVE products are
+   * returned — absent ids mean "gone" (deleted, draft or archived) and
+   * clients must quarantine those cart lines.
+   */
+  async getAvailability({ variantIds }: AvailabilityDto): Promise<VariantAvailability[]> {
+    const rows = await this.prisma.productVariant.findMany({
+      where: { id: { in: variantIds }, product: { status: 'active' } },
+      select: {
+        id: true,
+        isActive: true,
+        priceCents: true,
+        compareAtPriceCents: true,
+        stockOnHand: true,
+        reserved: true,
+        product: { select: { slug: true } },
+      },
+    });
+    return rows.map((v) => ({
+      variantId: v.id,
+      isActive: v.isActive,
+      priceCents: v.priceCents,
+      compareAtPriceCents: v.compareAtPriceCents,
+      available: Math.max(0, v.stockOnHand - v.reserved),
+      productSlug: v.product.slug,
+    }));
   }
 
   /**

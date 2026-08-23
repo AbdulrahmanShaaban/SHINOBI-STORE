@@ -3,7 +3,9 @@ import { ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { SkipThrottle } from '@nestjs/throttler';
 import { Response } from 'express';
 import { HealthService } from './health.service';
+import { Public } from '../../common/guards/public.decorator';
 
+@Public()
 @Controller('health')
 @SkipThrottle()
 export class HealthController {

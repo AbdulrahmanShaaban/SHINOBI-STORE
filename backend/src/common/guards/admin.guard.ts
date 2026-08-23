@@ -1,22 +1,25 @@
-import { ExecutionContext, Injectable } from '@nestjs/common';
-import { SessionGuard } from './session.guard';
+import { CanActivate, ExecutionContext, ForbiddenException, Injectable, UnauthorizedException } from '@nestjs/common';
+import type { Role } from '../rbac/permissions';
 
-export const ADMIN_ROLES = new Set(['content_manager', 'admin', 'super_admin']);
+export const ADMIN_ROLES: readonly Role[] = ['content_manager', 'order_manager', 'admin', 'super_admin'];
 
 /**
- * Phase 1 scaffolding for admin routes: extends the (not yet functional)
- * SessionGuard with a role gate. Until Phase 5 ships real sessions this
- * rejects every request — which is exactly the safe default.
- *
- * When sessions land: SessionGuard attaches `req.user`; AdminGuard then
- * verifies the role. The role check below is written now so flipping auth on
- * cannot accidentally leave admin routes role-unprotected.
+ * Staff-role gate. Runs AFTER the global SessionGuard has attached req.user.
+ * When used standalone (harnesses without the global chain) an absent user is
+ * still a 401 — authentication state must never masquerade as authorization
+ * failure. Routes needing finer control use @RequirePermissions.
  */
 @Injectable()
-export class AdminGuard extends SessionGuard {
-  override async canActivate(context: ExecutionContext): Promise<boolean> {
-    await super.canActivate(context); // throws 401 until Phase 5
+export class AdminGuard implements CanActivate {
+  canActivate(context: ExecutionContext): boolean {
     const req = context.switchToHttp().getRequest<{ user?: { role?: string } }>();
-    return ADMIN_ROLES.has(req.user?.role ?? '');
+    const role = req.user?.role as Role | undefined;
+    if (!req.user) {
+      throw new UnauthorizedException({ code: 'UNAUTHENTICATED', message: 'Authentication required' });
+    }
+    if (!role || !ADMIN_ROLES.includes(role)) {
+      throw new ForbiddenException({ code: 'FORBIDDEN', message: 'Staff access required' });
+    }
+    return true;
   }
 }
