@@ -60,3 +60,6 @@ legacy/*/node_modules/
 
 # Zombie-handle leftovers from legacy deletion (delete after reboot)
 _legacy-cleanup-pending/
+
+# Documentation 
+docs/
