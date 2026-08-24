@@ -97,7 +97,7 @@ export default function ProductDetailView({ product, related }: ProductDetailVie
         </ol>
       </nav>
 
-      <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 xl:gap-16 mt-6 lg:mt-10">
+        <div className="grid lg:grid-cols-[1.15fr_1fr] gap-8 lg:gap-14 xl:gap-20 mt-6 lg:mt-10">
         <div data-animate="gallery" className="min-w-0">
           <ProductGallery images={product.images} productName={product.name} />
         </div>

@@ -109,7 +109,7 @@ export default async function ProductPage({ params }: PageProps) {
           __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c'),
         }}
       />
-      <main className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-10 pt-28 lg:pt-32 pb-24">
+      <main className="mx-auto w-full max-w-[1700px] px-4 sm:px-6 lg:px-10 pt-36 lg:pt-40 pb-24">
         <ProductDetailView product={product} related={related} />
       </main>
     </>

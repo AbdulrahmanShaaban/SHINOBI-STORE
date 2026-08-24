@@ -36,7 +36,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: Sea
         }`;
 
   return (
-    <main id="main" className="mx-auto w-full max-w-7xl px-4 sm:px-6 py-10">
+    <main id="main" className="mx-auto w-full max-w-[1700px] px-4 sm:px-6 py-10">
       <header className="mb-6">
         <h1 className="font-bebas text-5xl sm:text-6xl tracking-wide text-[#F0F0F0]">THE ARMORY</h1>
         <p className="mt-2 text-sm text-[#B8B8CC]" role="status" aria-live="polite">

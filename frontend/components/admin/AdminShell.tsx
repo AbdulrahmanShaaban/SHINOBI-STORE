@@ -253,7 +253,7 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
   );
 
   return (
-    <div ref={rootRef} className="min-h-screen bg-[#0A0A0F] text-[#F0F0F0]">
+    <div ref={rootRef} className="admin-shell-root min-h-screen bg-[#0A0A0F] text-[#F0F0F0]">
       {/* Admin owns the full viewport canvas on /admin routes. */}
       <div aria-hidden="true" className="pointer-events-none fixed inset-0 z-[45] bg-[#0A0A0F]" />
 
@@ -348,11 +348,11 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
       ) : null}
 
       {/* Main column */}
-      <div
-        className={`flex min-h-screen flex-col transition-[padding] duration-200 motion-reduce:transition-none ${
-          collapsed ? 'lg:pl-[76px]' : 'lg:pl-64'
-        }`}
-      >
+        <div
+          className={`relative z-[46] flex min-h-screen flex-col transition-[padding] duration-200 motion-reduce:transition-none ${
+            collapsed ? 'lg:pl-[76px]' : 'lg:pl-64'
+          }`}
+        >
         <header className="sticky top-0 z-50 flex h-16 shrink-0 items-center gap-2 border-b border-[#2A2A3A] bg-[#0C0C13]/95 px-3 backdrop-blur sm:px-5">
           <button
             type="button"

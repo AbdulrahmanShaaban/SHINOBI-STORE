@@ -127,6 +127,53 @@ export class AdminCatalogService {
     return product;
   }
 
+  /** Admin list with optional q (name/slug contains) + status filter, paginated. */
+  async listProducts(opts: { q?: string; status?: string; page: number; limit: number }) {
+    const where: Prisma.ProductWhereInput = {};
+    if (opts.q) {
+      where.OR = [
+        { name: { contains: opts.q, mode: 'insensitive' } },
+        { slug: { contains: opts.q, mode: 'insensitive' } },
+      ];
+    }
+    if (
+      opts.status &&
+      ['draft', 'active', 'archived'].includes(opts.status)
+    ) {
+      where.status = opts.status as 'draft' | 'active' | 'archived';
+    }
+
+    const [rows, total] = await this.prisma.$transaction([
+      this.prisma.product.findMany({
+        where,
+        orderBy: { createdAt: 'desc' },
+        select: {
+          id: true,
+          slug: true,
+          name: true,
+          status: true,
+          featured: true,
+          priceFromCents: true,
+          createdAt: true,
+        },
+        skip: (opts.page - 1) * opts.limit,
+        take: opts.limit,
+      }),
+      this.prisma.product.count({ where }),
+    ]);
+
+    return {
+      items: rows,
+      meta: {
+        page: opts.page,
+        limit: opts.limit,
+        total,
+        totalPages: Math.max(1, Math.ceil(total / opts.limit)),
+      },
+    };
+  }
+
+
   private async assertProductExists(id: string): Promise<{ slug: string }> {
     const product = await this.prisma.product.findUnique({ where: { id }, select: { slug: true } });
     if (!product) {

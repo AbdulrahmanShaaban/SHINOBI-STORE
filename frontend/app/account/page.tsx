@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
@@ -6,8 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useUser } from '@/lib/user-context';
 
 /**
- * Account home (Phase 5): profile + sign-out. Orders arrive in Phase 6 —
- * the placeholder keeps the IA stable from day one.
+ * Account home: centered profile hub. Orders live at /account/orders.
  */
 export default function AccountPage() {
   const router = useRouter();
@@ -21,22 +20,12 @@ export default function AccountPage() {
     }
   }, [loading, user, router]);
 
-  if (loading || !user) {
-    return (
-      <main className="flex items-center justify-center min-h-[60vh]">
-        <p className="text-[#6B6B80] font-cinzel" role="status" aria-live="polite">
-          Checking credentials…
-        </p>
-      </main>
-    );
-  }
-
   const signOut = async () => {
     setSigningOut(true);
     try {
       await fetch(
         `${
-          process.env.NEXT_PUBLIC_API_URL ?? process.env.API_URL ?? 'http://localhost:5000'
+          process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:5000'
         }/api/v1/auth/logout`,
         {
           method: 'POST',
@@ -51,45 +40,74 @@ export default function AccountPage() {
     }
   };
 
-  return (
-    <main className="mx-auto w-full max-w-3xl px-4 py-12">
-      <header className="mb-10">
-        <h1 className="font-bebas text-5xl tracking-wide text-[#F0F0F0]">MY ACCOUNT</h1>
-        <p className="mt-2 text-sm text-[#B8B8CC]">Signed in as {user.email}</p>
-      </header>
-
-      <section aria-labelledby="profile-heading" className="rounded-xl border border-[#2A2A3A] bg-[#16161F] p-6 mb-6">
-        <h2 id="profile-heading" className="font-cinzel text-lg font-bold text-[#F0F0F0] mb-4">
-          Profile
-        </h2>
-        <dl className="grid grid-cols-[auto_1fr] gap-x-6 gap-y-2 text-sm">
-          <dt className="text-[#6B6B80]">Name</dt>
-          <dd className="text-[#F0F0F0]">{user.fullName}</dd>
-          <dt className="text-[#6B6B80]">Email</dt>
-          <dd className="text-[#F0F0F0]">{user.email}</dd>
-        </dl>
-      </section>
-
-      <section aria-labelledby="orders-heading" className="rounded-xl border border-dashed border-[#2A2A3A] bg-[#12121A] p-6 mb-8">
-        <h2 id="orders-heading" className="font-cinzel text-lg font-bold text-[#B8B8CC] mb-2">
-          Orders
-        </h2>
-        <p className="text-sm text-[#6B6B80]">
-          Order history unlocks with checkout.{' '}
-          <Link href="/products" className="text-[#FF6B00] underline underline-offset-4">
-            Keep browsing
-          </Link>{' '}
-          in the meantime.
+  if (loading || !user) {
+    return (
+      <main className="flex items-center justify-center min-h-[60vh]">
+        <p className="text-[#6B6B80] font-cinzel" role="status" aria-live="polite">
+          Checking credentials…
         </p>
+      </main>
+    );
+  }
+
+  const initials = user.fullName
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((p) => p[0]?.toUpperCase())
+    .join('');
+
+  return (
+    <main className="mx-auto w-full max-w-2xl px-4 py-16">
+      {/* Profile header */}
+      <section
+        aria-labelledby="profile-heading"
+        className="rounded-2xl border border-[#2A2A3A] bg-[#16161F] p-8 text-center"
+      >
+        <span
+          aria-hidden="true"
+          className="mx-auto grid h-20 w-20 place-items-center rounded-full border border-[#FF6B00]/40 bg-[#FF6B00]/15 font-cinzel text-2xl font-bold text-[#FF6B00]"
+        >
+          {initials}
+        </span>
+        <h1 id="profile-heading" className="mt-4 text-2xl font-semibold text-[#F0F0F0]">
+          {user.fullName}
+        </h1>
+        <p className="mt-1 text-sm text-[#6B6B80]">{user.email}</p>
+        <span className="mt-3 inline-block rounded-full border border-[#FF6B00]/40 bg-[#FF6B00]/10 px-3 py-1 text-xs uppercase tracking-wider text-[#FF6B00]">
+          {(user.role ?? 'customer').replace(/_/g, ' ')}
+        </span>
       </section>
 
-      <div className="flex gap-3">
+      {/* Quick links */}
+      <section aria-label="Account shortcuts" className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <Link
+          href="/account/orders"
+          className="group rounded-xl border border-[#2A2A3A] bg-[#16161F] p-5 text-center transition-colors hover:border-[#FF6B00]/60 focus-visible:outline-none focus-visible:border-[#FF6B00]"
+        >
+          <p className="font-semibold text-[#F0F0F0] group-hover:text-[#FF6B00] transition-colors">
+            My Orders
+          </p>
+          <p className="mt-1 text-xs text-[#6B6B80]">Track purchases</p>
+        </Link>
+        <div className="rounded-xl border border-[#2A2A3A] bg-[#16161F] p-5 text-center opacity-60">
+          <p className="font-semibold text-[#B8B8CC]">Addresses</p>
+          <p className="mt-1 text-xs text-[#6B6B80]">Coming soon</p>
+        </div>
+        <div className="rounded-xl border border-[#2A2A3A] bg-[#16161F] p-5 text-center opacity-60">
+          <p className="font-semibold text-[#B8B8CC]">Settings</p>
+          <p className="mt-1 text-xs text-[#6B6B80]">Coming soon</p>
+        </div>
+      </section>
+
+      {/* Sign out */}
+      <div className="mt-10 text-center">
         <button
           onClick={signOut}
           disabled={signingOut}
-          className="rounded-lg border border-[#CC0000]/50 px-6 py-2.5 font-cinzel text-sm font-bold text-[#F0F0F0] hover:border-[#CC0000] focus-visible:outline-none transition-colors disabled:opacity-50"
+          className="text-sm text-[#CC0000] underline underline-offset-4 hover:text-[#FF6B00] transition-colors disabled:opacity-50"
         >
-          {signingOut ? 'SIGNING OUT…' : 'SIGN OUT'}
+          {signingOut ? 'Signing out...' : 'Sign out'}
         </button>
       </div>
     </main>

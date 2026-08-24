@@ -38,7 +38,7 @@ html {
 body {
   background: var(--bg);
   color: var(--text);
-  font-family: var(--font-inter);
+  font-family: var(--font-belanosima), sans-serif;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -54,15 +54,16 @@ body {
 }
 
 .font-inter {
-  font-family: var(--font-inter);
+  font-family: var(--font-belanosima), sans-serif;
 }
 
 .font-bebas {
-  font-family: var(--font-bebas);
+  font-family: var(--font-belanosima), sans-serif;
+  letter-spacing: 0.02em;
 }
 
 .font-anton {
-  font-family: var(--font-anton);
+  font-family: var(--font-belanosima), sans-serif;
 }
 
 /* Scrollbar Styling */
@@ -101,7 +102,7 @@ body {
 }
 
 .choose-your-heading {
-  font-family: var(--font-anton);
+  font-family: var(--font-belanosima), sans-serif;
   font-weight: 900;
   color: #f5e6c8;
   font-size: clamp(2rem, 5vw, 4.5rem);
@@ -124,9 +125,9 @@ body {
 }
 
 .shinobi-outline-letter {
-  font-family: var(--font-anton);
+  font-family: var(--font-belanosima), sans-serif;
   font-weight: 900;
-  font-size: 30vw;
+  font-size: 17vw;
   color: transparent;
   -webkit-text-stroke: 2px #f5e6c8;
   text-stroke: 2px #f5e6c8;
@@ -192,6 +193,13 @@ body.custom-cursor-enabled * {
   }
 
   .shinobi-outline-letter {
-    font-size: 22vw;
+    font-size: 13vw;
   }
+}
+
+
+/* Full-bleed home hero sits under the transparent navbar; admin owns its chrome. */
+.public-shell:has(.home-hero-full),
+.public-shell:has(.admin-shell-root) {
+  padding-top: 0;
 }

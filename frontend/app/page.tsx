@@ -108,7 +108,7 @@ export default async function Home() {
   const testimonialsConfig = byKey.get('testimonials')?.config;
 
   return (
-    <main className="min-h-screen bg-[#0A0A0F]">
+    <main className="home-hero-full min-h-screen bg-[#0A0A0F]">
       <HeroSection
         title={str(heroConfig?.title) || FALLBACKS.hero.title}
         subtitle={str(heroConfig?.subtitle) || FALLBACKS.hero.subtitle}

@@ -61,6 +61,9 @@ export default function RootLayout({
   return (
     <html
       lang="en"
+      // suppressHydrationWarning: the cursor boot script legitimately adds
+      // custom-cursor-boot to documentElement before React hydrates.
+      suppressHydrationWarning
       className={`${anton.variable} ${bebasNeue.variable} ${belanosima.variable} ${cinzel.variable} ${inter.variable} h-full antialiased`}
     >
       <head>
@@ -71,18 +74,26 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className="min-h-full flex flex-col">
+      <body className="min-h-full flex flex-col bg-[#0A0A0F] text-[#F0F0F0] [font-family:var(--font-belanosima),sans-serif]">
         <UserProvider>
           <SmoothScroll />
           <ScrollRefresh />
           <CustomCursor />
           <LoadingScreen />
           <Navbar />
-          {children}
+          <PublicShell>{children}</PublicShell>
           <Cart />
           <CartHydration />
         </UserProvider>
       </body>
     </html>
   );
+}
+
+/**
+ * Clears the fixed navbar (h-16) on every public route. The home hero is
+ * intentionally full-bleed UNDER the transparent navbar, so it opts out.
+ */
+function PublicShell({ children }: { children: React.ReactNode }) {
+  return <div className="public-shell pt-16">{children}</div>;
 }

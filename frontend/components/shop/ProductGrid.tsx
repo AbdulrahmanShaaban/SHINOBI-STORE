@@ -35,7 +35,7 @@ export default function ProductGrid({ items }: { items: ProductListItem[] }) {
   );
 
   return (
-    <ul ref={grid} className="grid grid-cols-1 min-[480px]:grid-cols-2 md:grid-cols-3 2xl:grid-cols-4 gap-4">
+    <ul ref={grid} className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
       {items.map((item) => (
         <li key={item.id} data-card>
           <ProductCard product={item} className="h-full" />

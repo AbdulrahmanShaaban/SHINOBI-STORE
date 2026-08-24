@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
+import { PiHandbagSimpleBold, PiMagnifyingGlassBold, PiUserCircle, PiUserCircleBold } from 'react-icons/pi';
 import { selectTotalItems, useCartStore } from '@/lib/cart-store';
 import { useUser } from '@/lib/user-context';
 import { acquireScrollLock, releaseLock } from '@/lib/scroll-lock';
@@ -92,43 +93,45 @@ export default function Navbar() {
 
           <div className="flex items-center justify-end h-full">
             {/* Desktop Navigation */}
-            <div className="hidden lg:flex items-center gap-4 lg:gap-6 xl:gap-8">
-              <Link href="/" className="px-2 lg:px-4 py-2 text-[#F0F0F0] font-cinzel font-bold text-lg md:text-xl lg:text-2xl xl:text-3xl hover:text-[#FF6B00] transition-colors">
-                HOME
+            <div className="hidden lg:flex items-center gap-3 lg:gap-5">
+              <Link href="/" className="px-2 py-2 text-[#F0F0F0] font-semibold text-lg hover:text-[#FF6B00] transition-colors">
+                Home
               </Link>
-              <Link href="/products" className="px-2 lg:px-4 py-2 text-[#F0F0F0] font-cinzel font-bold text-lg md:text-xl lg:text-2xl xl:text-3xl hover:text-[#FF6B00] transition-colors">
-                EXPLORE
+              <Link href="/products" className="px-2 py-2 text-[#F0F0F0] font-semibold text-lg hover:text-[#FF6B00] transition-colors">
+                Shop
               </Link>
-              <Link href="/products?character=naruto" className="px-2 lg:px-4 py-2 text-[#F0F0F0] font-cinzel font-bold text-lg md:text-xl lg:text-2xl xl:text-3xl hover:text-[#FF6B00] transition-colors">
-                CHARACTERS
+              <Link href="/products?character=naruto" className="px-2 py-2 text-[#F0F0F0] font-semibold text-lg hover:text-[#FF6B00] transition-colors">
+                Characters
               </Link>
-              <Link href="/products?category=apparel" className="px-2 lg:px-4 py-2 text-[#F0F0F0] font-cinzel font-bold text-lg md:text-xl lg:text-2xl xl:text-3xl hover:text-[#FF6B00] transition-colors">
-                COLLECTIONS
+              <Link href="/products?category=apparel" className="px-2 py-2 text-[#F0F0F0] font-semibold text-lg hover:text-[#FF6B00] transition-colors">
+                Collections
               </Link>
-              <Link href="/products?sort=newest" className="px-2 lg:px-4 py-2 text-[#F0F0F0] font-cinzel font-bold text-lg md:text-xl lg:text-2xl xl:text-3xl hover:text-[#FF6B00] transition-colors">
-                NEW ARRIVALS
+              <Link href="/products?sort=newest" className="px-2 py-2 text-[#F0F0F0] font-semibold text-lg hover:text-[#FF6B00] transition-colors">
+                New Arrivals
               </Link>
-              <Link href="/about" className="px-2 lg:px-4 py-2 text-[#F0F0F0] font-cinzel font-bold text-lg md:text-xl lg:text-2xl xl:text-3xl hover:text-[#FF6B00] transition-colors">
-                ABOUT
+              <Link href="/about" className="px-2 py-2 text-[#F0F0F0] font-semibold text-lg hover:text-[#FF6B00] transition-colors">
+                About
               </Link>
-              <Link href="/products" aria-label="Search products" className="px-2 lg:px-4 py-2 text-[#F0F0F0] font-cinzel font-bold text-lg md:text-xl lg:text-2xl xl:text-3xl hover:text-[#FF6B00] transition-colors">
-                SEARCH
+              <Link
+                href="/products"
+                aria-label="Search products"
+                title="Search"
+                className="p-2 text-[#F0F0F0] hover:text-[#FF6B00] transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
+              >
+                <PiMagnifyingGlassBold className="w-6 h-6" />
               </Link>
               <AccountLink />
               <button
                 onClick={openCart}
                 aria-label={`Open cart, ${cartCount} ${cartCount === 1 ? 'item' : 'items'}`}
+                title="Cart"
                 className="relative p-2 text-[#F0F0F0] hover:text-[#FF6B00] transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
               >
-                <svg className="w-[clamp(24px,3vh,28px)] h-[clamp(24px,3vh,28px)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M6 2 L3 6 L3 20 L21 20 L21 6 L18 2 Z" strokeLinecap="round" strokeLinejoin="round" />
-                  <circle cx="9" cy="10" r="1" fill="currentColor" />
-                  <circle cx="15" cy="10" r="1" fill="currentColor" />
-                </svg>
+                <PiHandbagSimpleBold className="w-6 h-6" />
                 {cartCount > 0 && (
                   <span
                     aria-hidden="true"
-                    className="absolute top-0 right-0 bg-[#CC0000] text-[#F0F0F0] text-xs min-w-[clamp(18px,2.5vh,22px)] h-[clamp(18px,2.5vh,22px)] px-1 rounded-full flex items-center justify-center font-bebas"
+                    className="absolute top-0 right-0 bg-[#CC0000] text-[#F0F0F0] text-xs min-w-[clamp(18px,2.5vh,22px)] h-[clamp(18px,2.5vh,22px)] px-1 rounded-full flex items-center justify-center font-semibold"
                   >
                     {cartCount > 99 ? '99+' : cartCount}
                   </span>
@@ -138,20 +141,26 @@ export default function Navbar() {
 
             {/* Mobile/Tablet Controls */}
             <div className="flex items-center gap-2 lg:hidden">
+              <Link
+                href="/products"
+                aria-label="Search products"
+                title="Search"
+                className="p-2 text-[#F0F0F0] hover:text-[#FF6B00] transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
+              >
+                <PiMagnifyingGlassBold className="w-6 h-6" />
+              </Link>
+              <AccountLink iconOnly />
               <button
                 onClick={openCart}
                 aria-label={`Open cart, ${cartCount} ${cartCount === 1 ? 'item' : 'items'}`}
+                title="Cart"
                 className="relative p-2 text-[#F0F0F0] hover:text-[#FF6B00] transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
               >
-                <svg className="w-[clamp(24px,4vh,32px)] h-[clamp(24px,4vh,32px)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M6 2 L3 6 L3 20 L21 20 L21 6 L18 2 Z" strokeLinecap="round" strokeLinejoin="round" />
-                  <circle cx="9" cy="10" r="1" fill="currentColor" />
-                  <circle cx="15" cy="10" r="1" fill="currentColor" />
-                </svg>
+                <PiHandbagSimpleBold className="w-6 h-6" />
                 {cartCount > 0 && (
                   <span
                     aria-hidden="true"
-                    className="absolute top-0 right-0 bg-[#CC0000] text-[#F0F0F0] text-xs min-w-[clamp(18px,2.5vh,22px)] h-[clamp(18px,2.5vh,22px)] px-1 rounded-full flex items-center justify-center font-bebas"
+                    className="absolute top-0 right-0 bg-[#CC0000] text-[#F0F0F0] text-xs min-w-[clamp(18px,2.5vh,22px)] h-[clamp(18px,2.5vh,22px)] px-1 rounded-full flex items-center justify-center font-semibold"
                   >
                     {cartCount > 99 ? '99+' : cartCount}
                   </span>
@@ -197,58 +206,73 @@ export default function Navbar() {
         </button>
 
         {/* Nav links */}
-        <nav className={`flex flex-col items-center gap-8 ${contentTransition} ${
+        <nav className={`flex flex-col items-center gap-7 ${contentTransition} ${
           isMenuOpen ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
         }`}>
-          <Link href="/" onClick={closeMenu} className="font-cinzel font-bold text-3xl tracking-[0.15em] text-[#F0F0F0] hover:text-[#FF6B00] transition-colors">
-            HOME
+          <Link href="/" onClick={closeMenu} className="font-semibold text-2xl text-[#F0F0F0] hover:text-[#FF6B00] transition-colors">
+            Home
           </Link>
-          <Link href="/products" onClick={closeMenu} className="font-cinzel font-bold text-3xl tracking-[0.15em] text-[#F0F0F0] hover:text-[#FF6B00] transition-colors">
-            EXPLORE
+          <Link href="/products" onClick={closeMenu} className="font-semibold text-2xl text-[#F0F0F0] hover:text-[#FF6B00] transition-colors">
+            Shop
           </Link>
-          <Link href="/products?character=naruto" onClick={closeMenu} className="font-cinzel font-bold text-3xl tracking-[0.15em] text-[#F0F0F0] hover:text-[#FF6B00] transition-colors">
-            CHARACTERS
+          <Link href="/products?character=naruto" onClick={closeMenu} className="font-semibold text-2xl text-[#F0F0F0] hover:text-[#FF6B00] transition-colors">
+            Characters
           </Link>
-          <Link href="/products?category=apparel" onClick={closeMenu} className="font-cinzel font-bold text-3xl tracking-[0.15em] text-[#F0F0F0] hover:text-[#FF6B00] transition-colors">
-            COLLECTIONS
+          <Link href="/products?category=apparel" onClick={closeMenu} className="font-semibold text-2xl text-[#F0F0F0] hover:text-[#FF6B00] transition-colors">
+            Collections
           </Link>
-          <Link href="/products?sort=newest" onClick={closeMenu} className="font-cinzel font-bold text-3xl tracking-[0.15em] text-[#F0F0F0] hover:text-[#FF6B00] transition-colors">
-            NEW ARRIVALS
+          <Link href="/products?sort=newest" onClick={closeMenu} className="font-semibold text-2xl text-[#F0F0F0] hover:text-[#FF6B00] transition-colors">
+            New Arrivals
           </Link>
-          <Link href="/about" onClick={closeMenu} className="font-cinzel font-bold text-3xl tracking-[0.15em] text-[#F0F0F0] hover:text-[#FF6B00] transition-colors">
-            ABOUT
-          </Link>
-          <Link href="/products" onClick={closeMenu} aria-label="Search products" className="font-cinzel font-bold text-3xl tracking-[0.15em] text-[#F0F0F0] hover:text-[#FF6B00] transition-colors">
-            SEARCH
+          <Link href="/about" onClick={closeMenu} className="font-semibold text-2xl text-[#F0F0F0] hover:text-[#FF6B00] transition-colors">
+            About
           </Link>
           {user ? (
-            <Link href="/account" onClick={closeMenu} className="font-cinzel font-bold text-3xl tracking-[0.15em] text-[#F0F0F0] hover:text-[#FF6B00] transition-colors">
-              MY ACCOUNT
+            <Link href="/account" onClick={closeMenu} className="font-semibold text-2xl text-[#F0F0F0] hover:text-[#FF6B00] transition-colors">
+              My Account
             </Link>
           ) : (
-            <Link href="/account/login" onClick={closeMenu} className="font-cinzel font-bold text-3xl tracking-[0.15em] text-[#F0F0F0] hover:text-[#FF6B00] transition-colors">
-              SIGN IN
+            <Link href="/account/login" onClick={closeMenu} className="font-semibold text-2xl text-[#F0F0F0] hover:text-[#FF6B00] transition-colors">
+              Sign In
             </Link>
           )}
-          <Link href="/cart" onClick={closeMenu} className="font-cinzel font-bold text-3xl tracking-[0.15em] text-[#F0F0F0] hover:text-[#FF6B00] transition-colors">
-            CART
-          </Link>
         </nav>
       </div>
     </>
   );
 }
 
-/** Desktop account entry — adapts to session state once the /auth/me probe lands. */
-function AccountLink() {
+/** Account entry — expressive user icon that adapts to session state. */
+function AccountLink({ iconOnly = false }: { iconOnly?: boolean }) {
   const { user, loading } = useUser();
+  const href = user ? '/account' : '/account/login';
+  const label = user ? `Account: ${user.fullName}` : 'Sign in';
+
+  if (iconOnly) {
+    return (
+      <Link
+        href={href}
+        aria-label={label}
+        title={user ? 'My Account' : 'Sign in'}
+        className="p-2 text-[#F0F0F0] hover:text-[#FF6B00] transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
+      >
+        {user ? (
+          <PiUserCircleBold className="w-7 h-7" />
+        ) : (
+          <PiUserCircle className="w-7 h-7" />
+        )}
+      </Link>
+    );
+  }
+
   return (
     <Link
-      href={user ? '/account' : '/account/login'}
-      aria-label={user ? `Account: ${user.fullName}` : 'Sign in'}
-      className="px-2 lg:px-4 py-2 text-[#F0F0F0] font-cinzel font-bold text-lg md:text-xl lg:text-2xl xl:text-3xl hover:text-[#FF6B00] transition-colors"
+      href={href}
+      aria-label={label}
+      title={user ? 'My Account' : 'Sign in'}
+      className="p-2 text-[#F0F0F0] hover:text-[#FF6B00] transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
     >
-      {loading ? '' : user ? 'ACCOUNT' : 'SIGN IN'}
+      <PiUserCircleBold className="w-6 h-6" />
     </Link>
   );
 }
