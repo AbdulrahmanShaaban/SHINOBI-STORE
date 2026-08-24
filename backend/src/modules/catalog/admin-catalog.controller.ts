@@ -1,11 +1,14 @@
 import {
   Body,
   Controller,
+  DefaultValuePipe,
   Delete,
   Get,
   Param,
+  ParseIntPipe,
   Patch,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
@@ -60,6 +63,23 @@ export class AdminCatalogController {
   constructor(private readonly adminCatalogService: AdminCatalogService) {}
 
   @RequirePermissions('products:w')
+
+  @Get('products')
+  @RequirePermissions('products:r')
+  @ApiOperation({ summary: 'List products with search/status filter (admin)' })
+  listProducts(
+    @Query('q') q: string | undefined,
+    @Query('status') status: string | undefined,
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
+    @Query('limit', new DefaultValuePipe(20), ParseIntPipe) limit: number,
+  ) {
+    return this.adminCatalogService.listProducts({
+      q: q?.trim() || undefined,
+      status: status?.trim() || undefined,
+      page: Math.min(Math.max(page, 1), 500),
+      limit: Math.min(Math.max(limit, 1), 50),
+    });
+  }
   @Post('products')
   @ApiOperation({ summary: 'Create product (admin)' })
   createProduct(@Body() body: ProductBodyDto) {

@@ -94,22 +94,22 @@ export default function Navbar() {
           <div className="flex items-center justify-end h-full">
             {/* Desktop Navigation */}
             <div className="hidden lg:flex items-center gap-3 lg:gap-5">
-              <Link href="/" className="px-2 py-2 text-[#F0F0F0] font-semibold text-lg hover:text-[#FF6B00] transition-colors">
+              <Link href="/" className="px-2 py-2 text-[#F0F0F0] font-semibold text-lg xl:text-xl hover:text-[#FF6B00] transition-colors">
                 Home
               </Link>
-              <Link href="/products" className="px-2 py-2 text-[#F0F0F0] font-semibold text-lg hover:text-[#FF6B00] transition-colors">
+              <Link href="/products" className="px-2 py-2 text-[#F0F0F0] font-semibold text-lg xl:text-xl hover:text-[#FF6B00] transition-colors">
                 Shop
               </Link>
-              <Link href="/products?character=naruto" className="px-2 py-2 text-[#F0F0F0] font-semibold text-lg hover:text-[#FF6B00] transition-colors">
+              <Link href="/products?character=naruto" className="px-2 py-2 text-[#F0F0F0] font-semibold text-lg xl:text-xl hover:text-[#FF6B00] transition-colors">
                 Characters
               </Link>
-              <Link href="/products?category=apparel" className="px-2 py-2 text-[#F0F0F0] font-semibold text-lg hover:text-[#FF6B00] transition-colors">
+              <Link href="/products?category=apparel" className="px-2 py-2 text-[#F0F0F0] font-semibold text-lg xl:text-xl hover:text-[#FF6B00] transition-colors">
                 Collections
               </Link>
-              <Link href="/products?sort=newest" className="px-2 py-2 text-[#F0F0F0] font-semibold text-lg hover:text-[#FF6B00] transition-colors">
+              <Link href="/products?sort=newest" className="px-2 py-2 text-[#F0F0F0] font-semibold text-lg xl:text-xl hover:text-[#FF6B00] transition-colors">
                 New Arrivals
               </Link>
-              <Link href="/about" className="px-2 py-2 text-[#F0F0F0] font-semibold text-lg hover:text-[#FF6B00] transition-colors">
+              <Link href="/about" className="px-2 py-2 text-[#F0F0F0] font-semibold text-lg xl:text-xl hover:text-[#FF6B00] transition-colors">
                 About
               </Link>
               <Link
