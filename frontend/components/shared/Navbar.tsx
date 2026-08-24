@@ -62,7 +62,7 @@ export default function Navbar() {
   return (
     <>
       <nav
-        className={`fixed top-0 left-0 right-0 z-40 h-16 transition-all duration-300 ${
+        className={`fixed top-0 left-0 right-0 z-40 h-20 transition-all duration-300 ${
         showScrolledState
           ? 'bg-[#0A0A0F]/90 backdrop-blur-md border-b border-[#FF6B00]/20'
           : 'bg-transparent'
@@ -71,9 +71,11 @@ export default function Navbar() {
       <div className="w-full h-full pr-3 md:pr-6 lg:pr-10 pl-4 lg:pl-8">
         <div className="flex items-center justify-between h-full">
           {/* Logo */}
-          <Link href="/" className="flex items-center z-50 h-full">
-            <div 
-              className={`pointer-events-none transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] origin-top-left flex items-center ${
+          {/* Logo — min-w-0 + max-w-full let it shrink on narrow viewports so
+              the action controls always stay inside the viewport. */}
+          <Link href="/" className="flex items-center z-50 h-full min-w-0">
+            <div
+              className={`pointer-events-none transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] origin-top-left flex items-center max-w-full ${
                 showScrolledState 
                   ? 'w-[200px] md:w-[260px] lg:w-[320px] translate-y-[20px] lg:translate-y-[25px] translate-x-0' 
                   : 'w-[300px] md:w-[420px] lg:w-[550px] xl:w-[650px] translate-y-[20vh] md:translate-y-[25vh] lg:translate-y-[30vh] translate-x-[calc(50vw-166px)] md:translate-x-[6vw] lg:translate-x-[8vw]'
@@ -93,24 +95,15 @@ export default function Navbar() {
 
           <div className="flex items-center justify-end h-full">
             {/* Desktop Navigation */}
-            <div className="hidden lg:flex items-center gap-3 lg:gap-5">
-              <Link href="/" className="px-2 py-2 text-[#F0F0F0] font-semibold text-lg xl:text-xl hover:text-[#FF6B00] transition-colors">
+            <div className="hidden lg:flex items-center gap-3 lg:gap-5 shrink-0">
+              <Link href="/" className="px-2 py-2 text-[#F0F0F0] font-semibold text-xl xl:text-2xl hover:text-[#FF6B00] transition-colors">
                 Home
               </Link>
-              <Link href="/products" className="px-2 py-2 text-[#F0F0F0] font-semibold text-lg xl:text-xl hover:text-[#FF6B00] transition-colors">
+              <Link href="/products" className="px-2 py-2 text-[#F0F0F0] font-semibold text-xl xl:text-2xl hover:text-[#FF6B00] transition-colors">
                 Shop
               </Link>
-              <Link href="/products?character=naruto" className="px-2 py-2 text-[#F0F0F0] font-semibold text-lg xl:text-xl hover:text-[#FF6B00] transition-colors">
-                Characters
-              </Link>
-              <Link href="/products?category=apparel" className="px-2 py-2 text-[#F0F0F0] font-semibold text-lg xl:text-xl hover:text-[#FF6B00] transition-colors">
-                Collections
-              </Link>
-              <Link href="/products?sort=newest" className="px-2 py-2 text-[#F0F0F0] font-semibold text-lg xl:text-xl hover:text-[#FF6B00] transition-colors">
+              <Link href="/products?sort=newest" className="px-2 py-2 text-[#F0F0F0] font-semibold text-xl xl:text-2xl hover:text-[#FF6B00] transition-colors">
                 New Arrivals
-              </Link>
-              <Link href="/about" className="px-2 py-2 text-[#F0F0F0] font-semibold text-lg xl:text-xl hover:text-[#FF6B00] transition-colors">
-                About
               </Link>
               <Link
                 href="/products"
@@ -140,7 +133,7 @@ export default function Navbar() {
             </div>
 
             {/* Mobile/Tablet Controls */}
-            <div className="flex items-center gap-2 lg:hidden">
+            <div className="flex items-center gap-2 lg:hidden shrink-0">
               <Link
                 href="/products"
                 aria-label="Search products"
@@ -215,17 +208,8 @@ export default function Navbar() {
           <Link href="/products" onClick={closeMenu} className="font-semibold text-2xl text-[#F0F0F0] hover:text-[#FF6B00] transition-colors">
             Shop
           </Link>
-          <Link href="/products?character=naruto" onClick={closeMenu} className="font-semibold text-2xl text-[#F0F0F0] hover:text-[#FF6B00] transition-colors">
-            Characters
-          </Link>
-          <Link href="/products?category=apparel" onClick={closeMenu} className="font-semibold text-2xl text-[#F0F0F0] hover:text-[#FF6B00] transition-colors">
-            Collections
-          </Link>
           <Link href="/products?sort=newest" onClick={closeMenu} className="font-semibold text-2xl text-[#F0F0F0] hover:text-[#FF6B00] transition-colors">
             New Arrivals
-          </Link>
-          <Link href="/about" onClick={closeMenu} className="font-semibold text-2xl text-[#F0F0F0] hover:text-[#FF6B00] transition-colors">
-            About
           </Link>
           {user ? (
             <Link href="/account" onClick={closeMenu} className="font-semibold text-2xl text-[#F0F0F0] hover:text-[#FF6B00] transition-colors">

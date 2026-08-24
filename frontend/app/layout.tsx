@@ -95,5 +95,5 @@ export default function RootLayout({
  * intentionally full-bleed UNDER the transparent navbar, so it opts out.
  */
 function PublicShell({ children }: { children: React.ReactNode }) {
-  return <div className="public-shell pt-16">{children}</div>;
+  return <div className="public-shell pt-24">{children}</div>;
 }

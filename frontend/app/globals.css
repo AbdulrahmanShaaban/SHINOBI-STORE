@@ -24,11 +24,12 @@
   --font-anton: 'Anton', sans-serif;
 }
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+/* NOTE: no global "*" margin/padding reset here. It would sit OUTSIDE any
+   cascade layer, and unlayered author CSS beats Tailwind v4's @layer
+   utilities — silently killing every padding, margin and space utility
+   app-wide (navbar covering page titles, admin sidebar covering its
+   header, etc.). Tailwind's preflight already resets margin, padding and
+   box-sizing in @layer base. */
 
 html {
   scroll-behavior: smooth;
