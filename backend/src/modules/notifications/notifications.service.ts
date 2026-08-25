@@ -1,4 +1,4 @@
-import {
+﻿import {
   Inject,
   Injectable,
   Logger,
@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common';
 import { Queue, Worker, type Job } from 'bullmq';
 import { RedisService } from '../../common/redis/redis.service';
-import { AppConfig } from '../../common/config/configuration';
+import type { AppConfig } from '../../common/config/configuration';
 import { APP_CONFIG } from '../../common/config/app-config.token';
 import { logger } from '../../common/logger/logger';
 import {
@@ -18,12 +18,12 @@ import {
 } from '../queue/queue.constants';
 
 /**
- * §13.3 queued email introduction. The queue and its minimal worker are
- * created lazily and only when Redis answers — without Redis the service
- * degrades to log-only so email outages never block checkout (§13.3/§16.4).
+ * Â§13.3 queued email introduction. The queue and its minimal worker are
+ * created lazily and only when Redis answers â€” without Redis the service
+ * degrades to log-only so email outages never block checkout (Â§13.3/Â§16.4).
  * SMTP adapter lands later; until then the worker simulates the send.
  *
- * §17 conventions: job payloads carry ids (never blobs) and handlers log
+ * Â§17 conventions: job payloads carry ids (never blobs) and handlers log
  * start/end/error. After EMAIL_MAX_ATTEMPTS exhausted attempts BullMQ parks
  * the job in the failed set (the DLQ surfaced under admin/queues).
  */
@@ -45,7 +45,7 @@ export class NotificationsService implements OnModuleInit, OnModuleDestroy {
 
   async onModuleInit(): Promise<void> {
     if (!(await this.redis.isHealthy())) {
-      this.nestLogger.warn('notifications: redis unavailable — running in log-only mode');
+      this.nestLogger.warn('notifications: redis unavailable â€” running in log-only mode');
       return;
     }
     try {
@@ -85,7 +85,7 @@ export class NotificationsService implements OnModuleInit, OnModuleDestroy {
   }): Promise<void> {
     if (!this.queue || !this.worker) {
       // Degraded mode: no Redis. Log enough context to trace the order, then
-      // move on — email must never block checkout.
+      // move on â€” email must never block checkout.
       logger.info(
         {
           type: 'order-confirmation',
@@ -97,7 +97,7 @@ export class NotificationsService implements OnModuleInit, OnModuleDestroy {
       );
       return;
     }
-    // Ids only — the handler re-fetches fresh state when a real adapter lands.
+    // Ids only â€” the handler re-fetches fresh state when a real adapter lands.
     const payload: EmailJobPayload = {
       type: 'order-confirmation',
       ids: { orderNumber: input.orderNumber },
@@ -109,12 +109,12 @@ export class NotificationsService implements OnModuleInit, OnModuleDestroy {
     });
   }
 
-  /** Send simulation with structured start/end/error logs (§17). */
+  /** Send simulation with structured start/end/error logs (Â§17). */
   private async processSendJob(job: Job<EmailJobPayload>): Promise<void> {
     const log = { queue: EMAIL_QUEUE, jobId: job.id, type: job.data.type };
     logger.info(log, 'email send start');
     try {
-      // SMTP adapter lands later (§13.3): nothing to deliver yet, so the
+      // SMTP adapter lands later (Â§13.3): nothing to deliver yet, so the
       // simulation always succeeds and the job completes.
       logger.info({ ...log, attempt: (job.attemptsMade ?? 0) + 1 }, 'email send end');
     } catch (err) {
@@ -122,7 +122,7 @@ export class NotificationsService implements OnModuleInit, OnModuleDestroy {
         { ...log, err: (err as Error).message },
         'email send error',
       );
-      throw err; // surface to BullMQ → retry policy → DLQ
+      throw err; // surface to BullMQ â†’ retry policy â†’ DLQ
     }
   }
 

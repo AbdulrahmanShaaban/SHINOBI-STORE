@@ -1,11 +1,11 @@
-import { Inject, Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
+﻿import { Inject, Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import Redis from 'ioredis';
-import { AppConfig } from '../config/configuration';
+import type { AppConfig } from '../config/configuration';
 import { APP_CONFIG } from '../config/app-config.token';
 import { logger } from '../logger/logger';
 
 /**
- * Redis connection for cache / rate limiting / BullMQ (plan §16).
+ * Redis connection for cache / rate limiting / BullMQ (plan Â§16).
  * Deliberately resilient to absence: lazy connect, bounded retries, and a
  * `ping()` probe with timeout so an unreachable Redis degrades health/readiness
  * instead of hanging requests or crash-looping the API.
@@ -24,7 +24,7 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
     });
 
     // ioredis emits 'error' on every failed reconnect; without a listener it
-    // becomes an unhandled exception. We log at debug level only — readiness
+    // becomes an unhandled exception. We log at debug level only â€” readiness
     // reporting owns surfacing the outage.
     this.client.on('error', (err: Error) => {
       logger.debug({ err: err.message }, 'redis connection error');
@@ -35,7 +35,7 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
     try {
       await this.client.connect();
     } catch {
-      logger.warn('redis not reachable at boot — readiness will report it down');
+      logger.warn('redis not reachable at boot â€” readiness will report it down');
     }
   }
 

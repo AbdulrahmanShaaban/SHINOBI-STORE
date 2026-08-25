@@ -1,4 +1,5 @@
-import { Body, Controller, Get, Headers, HttpCode, HttpStatus, Param, Post, Req, RawBodyRequest } from '@nestjs/common';
+﻿import { Body, Controller, Get, Headers, HttpCode, HttpStatus, Param, Post, Req } from '@nestjs/common';
+import type { RawBodyRequest } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
 import type { Request } from 'express';
 import { OrdersService } from './orders.service';
@@ -8,7 +9,7 @@ import { Public } from '../../common/guards/public.decorator';
 import { PlaceOrderDto } from './dto/place-order.dto';
 
 /**
- * §14.2 flow. POST /orders is guest-capable (§10.3 userId?): auth is soft —
+ * Â§14.2 flow. POST /orders is guest-capable (Â§10.3 userId?): auth is soft â€”
  * server-side pricing, the idempotency key and inventory reservation are the
  * real gates. Everything else about the request is validated by DTOs.
  */
@@ -48,7 +49,7 @@ export class OrdersController {
     return userId ? this.orders.listForUser(userId) : Promise.resolve([]);
   }
 
-  /** Lightweight polling endpoint for /checkout/return (§14.2). */
+  /** Lightweight polling endpoint for /checkout/return (Â§14.2). */
   @Public()
   @Get('status/:orderNumber')
   @HttpCode(HttpStatus.OK)

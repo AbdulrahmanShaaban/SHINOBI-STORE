@@ -1,7 +1,7 @@
-import { Inject, Injectable, NotFoundException, OnModuleDestroy } from '@nestjs/common';
+﻿import { Inject, Injectable, NotFoundException, OnModuleDestroy } from '@nestjs/common';
 import { Queue } from 'bullmq';
 import { RedisService } from '../../common/redis/redis.service';
-import { AppConfig } from '../../common/config/configuration';
+import type { AppConfig } from '../../common/config/configuration';
 import { APP_CONFIG } from '../../common/config/app-config.token';
 import { logger } from '../../common/logger/logger';
 import { ADMIN_QUEUE_NAMES } from './queue.constants';
@@ -41,9 +41,9 @@ const FAILED_PAGE_SIZE = 25;
 const DLQ_SCAN_CAP = 500;
 
 /**
- * Admin-facing queue introspection (§17 DLQ surface). Every Redis touch is
+ * Admin-facing queue introspection (Â§17 DLQ surface). Every Redis touch is
  * individually guarded: when Redis is unreachable the API answers zeroed
- * envelopes instead of failing — queues pause, nothing is lost (§16.4).
+ * envelopes instead of failing â€” queues pause, nothing is lost (Â§16.4).
  *
  * A dead-lettered job is a failed job that exhausted its attempts (BullMQ
  * moves those to the failed set automatically once retries are spent);

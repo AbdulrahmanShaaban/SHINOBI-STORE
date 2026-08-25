@@ -1,7 +1,7 @@
-import { Controller, Get, HttpStatus, Res } from '@nestjs/common';
+﻿import { Controller, Get, HttpStatus, Res } from '@nestjs/common';
 import { ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { SkipThrottle } from '@nestjs/throttler';
-import { Response } from 'express';
+import type { Response } from 'express';
 import { HealthService } from './health.service';
 import { Public } from '../../common/guards/public.decorator';
 
@@ -11,7 +11,7 @@ import { Public } from '../../common/guards/public.decorator';
 export class HealthController {
   constructor(private readonly healthService: HealthService) {}
 
-  /** Liveness — process is up. No dependency checks. */
+  /** Liveness â€” process is up. No dependency checks. */
   @Get()
   @ApiOperation({ summary: 'Liveness probe' })
   @ApiResponse({ status: 200, description: 'Process alive' })
@@ -19,7 +19,7 @@ export class HealthController {
     return { status: 'ok' as const, uptimeSec: Math.floor(process.uptime()) };
   }
 
-  /** Readiness — all critical dependencies reachable. */
+  /** Readiness â€” all critical dependencies reachable. */
   @Get('ready')
   @ApiOperation({ summary: 'Readiness probe (checks PostgreSQL and Redis)' })
   @ApiResponse({ status: 200, description: 'All dependencies up' })

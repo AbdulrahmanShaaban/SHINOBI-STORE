@@ -1,7 +1,7 @@
-import { Inject, Injectable, Logger, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
+﻿import { Inject, Injectable, Logger, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import { Queue, Worker, type Job } from 'bullmq';
 import { RedisService } from '../../common/redis/redis.service';
-import { AppConfig } from '../../common/config/configuration';
+import type { AppConfig } from '../../common/config/configuration';
 import { APP_CONFIG } from '../../common/config/app-config.token';
 import { logger } from '../../common/logger/logger';
 import { PaymentReconService } from './payment-recon.service';
@@ -17,11 +17,11 @@ import {
 const REPEAT_HISTORY_LIMIT = 100;
 
 /**
- * §17 scheduler: registers the repeatable jobs on the `jobs-scheduler` queue
+ * Â§17 scheduler: registers the repeatable jobs on the `jobs-scheduler` queue
  * and runs their handlers inline in this process. Everything is created ONLY
- * when Redis answers at boot — without Redis the service degrades to
+ * when Redis answers at boot â€” without Redis the service degrades to
  * log-only mode exactly like notifications, because queues pause but nothing
- * is lost (§16.4).
+ * is lost (Â§16.4).
  *
  * Handlers dispatch by job name to PaymentReconService / MaintenanceService,
  * which are idempotent, so overlapping or repeated runs are safe. A later
@@ -42,7 +42,7 @@ export class QueueSchedulerService implements OnModuleInit, OnModuleDestroy {
 
   async onModuleInit(): Promise<void> {
     if (!(await this.redis.isHealthy())) {
-      this.nestLogger.warn('queue-scheduler: redis unavailable — running in log-only mode');
+      this.nestLogger.warn('queue-scheduler: redis unavailable â€” running in log-only mode');
       return;
     }
     try {
@@ -79,7 +79,7 @@ export class QueueSchedulerService implements OnModuleInit, OnModuleDestroy {
     } catch (err) {
       this.nestLogger.warn(
         { err: (err as Error).message },
-        'queue-scheduler: registration failed — running in log-only mode',
+        'queue-scheduler: registration failed â€” running in log-only mode',
       );
       await this.closeAll();
     }

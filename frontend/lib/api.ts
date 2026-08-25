@@ -249,7 +249,7 @@ export async function submitReview(
   if (!res.ok || !data?.id) {
     throw new ApiError(res.status, data?.code ?? `HTTP_${res.status}`, data?.message ?? 'Could not submit the review.');
   }
-  return { id: data.id, status: data.status };
+  return { id: data.id, status: data.status ?? 'pending' };
 }
 
 export function getProduct(slug: string): Promise<ProductDetail> {

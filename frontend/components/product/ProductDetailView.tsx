@@ -4,11 +4,12 @@ import Link from 'next/link';
 import { useRef } from 'react';
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
-import type { ProductDetail } from '@/lib/api';
+import type { ProductDetail, ProductReviewsPayload } from '@/lib/api';
 import { splitChars } from '@/lib/split-chars';
 import ProductGallery from './ProductGallery';
 import AddToCartPanel from './AddToCartPanel';
 import RelatedProducts from './RelatedProducts';
+import ReviewsSection from './ReviewsSection';
 
 export interface RelatedProductsData {
   items: {
@@ -24,6 +25,7 @@ export interface RelatedProductsData {
 interface ProductDetailViewProps {
   product: ProductDetail;
   related: RelatedProductsData;
+  reviews: ProductReviewsPayload;
 }
 
 /**
@@ -34,7 +36,7 @@ interface ProductDetailViewProps {
  * Content is never hidden in CSS: GSAP sets initial states at mount
  * (pre-paint), so without JS or with reduced motion everything is visible.
  */
-export default function ProductDetailView({ product, related }: ProductDetailViewProps) {
+export default function ProductDetailView({ product, related, reviews }: ProductDetailViewProps) {
   const root = useRef<HTMLDivElement>(null);
 
   useGSAP(
@@ -159,6 +161,8 @@ export default function ProductDetailView({ product, related }: ProductDetailVie
           <RelatedProducts items={related.items} />
         </section>
       )}
+
+      <ReviewsSection slug={product.slug} productName={product.name} initial={reviews} />
     </div>
   );
 }

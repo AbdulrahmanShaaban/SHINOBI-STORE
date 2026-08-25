@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { ApiError, getProduct, listProducts } from '@/lib/api';
+import { ApiError, getProduct, getProductReviews, listProducts, type ProductReviewsPayload } from '@/lib/api';
 import ProductDetailView, {
   type RelatedProductsData,
 } from '@/components/product/ProductDetailView';
@@ -63,12 +63,17 @@ async function loadRelated(slug: string): Promise<RelatedProductsData> {
 export default async function ProductPage({ params }: PageProps) {
   const { slug } = await params;
 
-  const [product, related] = await Promise.all([
+  const [product, related, reviews] = await Promise.all([
     getProduct(slug).catch((error: unknown) => {
       if (error instanceof ApiError && error.status === 404) notFound();
       throw error;
     }),
     loadRelated(slug),
+    // Reviews are a nice-to-have beside the buy flow — a reviews API hiccup
+    // must never take the product page down.
+    getProductReviews(slug).catch(
+      (): ProductReviewsPayload => ({ items: [], average: null, total: 0 }),
+    ),
   ]);
 
   const inStockVariant = product.variants.find((v) => v.available > 0);
@@ -110,7 +115,7 @@ export default async function ProductPage({ params }: PageProps) {
         }}
       />
       <main className="mx-auto w-full max-w-[1700px] px-4 sm:px-6 lg:px-10 pt-12 lg:pt-16 pb-24">
-        <ProductDetailView product={product} related={related} />
+        <ProductDetailView product={product} related={related} reviews={reviews} />
       </main>
     </>
   );
