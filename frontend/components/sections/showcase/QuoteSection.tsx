@@ -98,16 +98,12 @@ function MarqueeRow({ row }: { row: (typeof MARQUEE_ROWS)[number] }) {
   );
 }
 
-const QUOTE_LINES_DESKTOP = [
-  ["THOSE", "WHO", "CANNOT", "ACKNOWLEDGE"],
-  ["THEMSELVES"],
-  ["WILL", "EVENTUALLY", "FAIL."],
-];
-
-const QUOTE_LINES_MOBILE = [
+// Deliberate 3-line grouping (user-specified) — identical on desktop and mobile
+// so the two pinned panels never drift:
+//   THOSE WHO CANNOT / ACKNOWLEDGE THEMSELVES / WILL EVENTUALLY FAIL.
+const QUOTE_LINES = [
   ["THOSE", "WHO", "CANNOT"],
-  ["ACKNOWLEDGE"],
-  ["THEMSELVES"],
+  ["ACKNOWLEDGE", "THEMSELVES"],
   ["WILL", "EVENTUALLY", "FAIL."],
 ];
 
@@ -326,7 +322,7 @@ export default function QuoteSection() {
               className="font-anton text-[clamp(34px,10vw,68px)] uppercase leading-[0.88] tracking-[0.02em] md:text-[clamp(40px,calc(100cqw/14.2),96px)]"
               style={{ color: "#F5E6C8" }}
             >
-              <QuoteLines lines={QUOTE_LINES_DESKTOP} />
+              <QuoteLines lines={QUOTE_LINES} />
             </h2>
 
             <div ref={attributionRef} className="mt-9 flex flex-col items-center md:mt-12">
@@ -354,7 +350,7 @@ export default function QuoteSection() {
               className="font-anton text-[clamp(30px,8vw,56px)] uppercase leading-[0.88] tracking-[0.02em]"
               style={{ color: "#F5E6C8" }}
             >
-              <QuoteLines lines={QUOTE_LINES_MOBILE} />
+              <QuoteLines lines={QUOTE_LINES} />
             </h2>
 
             <div ref={mobileAttributionRef} className="mt-9 flex flex-col items-center">
