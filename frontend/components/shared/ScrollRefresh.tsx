@@ -1,15 +1,22 @@
 "use client";
 
 import { useEffect } from "react";
+import { usePathname } from "next/navigation";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 /**
- * Waits for fonts and the window load event, then refreshes every
- * ScrollTrigger once — so all pinned distances and trigger positions
- * are calculated against the final, settled layout rather than a
- * mid-font-swap snapshot.
+ * Keeps GSAP ScrollTrigger measurements honest:
+ * - once after fonts settle and on window load (first paint accuracy), and
+ * - after every client-side route change. Root-layout components never remount
+ *   on App Router navigation, so without the pathname trigger the refresh
+ *   would run exactly once per full page load — leaving pinned/pin-spacer
+ *   sections measured against the PREVIOUS page's layout (stale spacer
+ *   heights are a prime suspect for "scroll sometimes freezes until
+ *   refresh").
  */
 export default function ScrollRefresh() {
+  const pathname = usePathname();
+
   useEffect(() => {
     const refresh = () => ScrollTrigger.refresh();
 
@@ -20,6 +27,16 @@ export default function ScrollRefresh() {
       window.removeEventListener("load", refresh);
     };
   }, []);
+
+  useEffect(() => {
+    if (pathname === null) return;
+    // Two frames: let the new route's DOM commit and layout settle, then
+    // re-measure every trigger (pin distances, start/end positions).
+    const raf = requestAnimationFrame(() =>
+      requestAnimationFrame(() => ScrollTrigger.refresh())
+    );
+    return () => cancelAnimationFrame(raf);
+  }, [pathname]);
 
   return null;
 }
