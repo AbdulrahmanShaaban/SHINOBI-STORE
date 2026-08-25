@@ -1206,37 +1206,9 @@ export default function MadaraSpecialCard({
                 </span>
               </div>
 
-              {/* Door: physically opens downward. */}
-              <div
-                ref={coffinDoorRef}
-                className="absolute inset-[7%] z-[50] rounded-[8px]"
-                style={{
-                  transformOrigin: "50% 100%",
-                  transformStyle: "preserve-3d",
-                  background:
-                    "linear-gradient(90deg, #382318, #81552e 9%, #a97943 20%, #5e3a20 33%, #9b6e3e 48%, #633f21 62%, #a1723e 78%, #54331c 91%, #322015), repeating-linear-gradient(90deg, rgba(35,20,12,.35) 0 3px, transparent 3px 31px)",
-                  border: "5px solid #2b1a10",
-                  boxShadow:
-                    "inset 0 0 35px rgba(0,0,0,.42), 0 8px 18px rgba(0,0,0,.42)",
-                  backfaceVisibility: "hidden",
-                }}
-              >
-                <div
-                  className="absolute inset-[12px] rounded-[4px]"
-                  style={{
-                    border: "2px solid rgba(33,20,12,.55)",
-                    background:
-                      "repeating-linear-gradient(90deg, transparent 0 23px, rgba(42,24,13,.32) 24px 26px, transparent 27px 56px)",
-                  }}
-                />
-                <div
-                  className="absolute left-1/2 top-1/2 h-[74%] w-[72%] -translate-x-1/2 -translate-y-1/2 rounded-[3px]"
-                  style={{
-                    border: "1px solid rgba(24,14,9,.38)",
-                    boxShadow: "inset 0 0 35px rgba(0,0,0,.25)",
-                  }}
-                />
-              </div>
+              {/* The door lives in its own stacking layer ABOVE the card —
+                  children cannot escape the shell's z-30 context, so it is
+                  rendered as a sibling wrapper with identical geometry. */}
 
               {/* Heavy lower hinge / threshold */}
               <div
@@ -1244,6 +1216,47 @@ export default function MadaraSpecialCard({
                 style={{
                   background: "linear-gradient(#6d4828, #2d1b11)",
                   borderTop: "2px solid rgba(224,181,111,.25)",
+                }}
+              />
+            </div>
+          </div>
+
+          {/* Door layer: physically opens downward. Sits ABOVE the card
+              (z-57 > card z-35) so the closed door hides the resurrection,
+              while the shell frame itself stays behind the card. Same
+              positioning as the shell so inset-[7%] lands identically. */}
+          <div
+            className="pointer-events-none absolute left-1/2 top-[-40px] md:top-[-90px] z-[57] h-[calc(100%+80px)] md:h-[calc(100%+180px)] w-[calc(100%+80px)] md:w-[calc(100%+140px)] max-w-[840px] -translate-x-1/2"
+            style={{ perspective: "1400px" }}
+            aria-hidden="true"
+          >
+            <div
+              ref={coffinDoorRef}
+              className="absolute inset-[7%] rounded-[8px]"
+              style={{
+                transformOrigin: "50% 100%",
+                transformStyle: "preserve-3d",
+                background:
+                  "linear-gradient(90deg, #382318, #81552e 9%, #a97943 20%, #5e3a20 33%, #9b6e3e 48%, #633f21 62%, #a1723e 78%, #54331c 91%, #322015), repeating-linear-gradient(90deg, rgba(35,20,12,.35) 0 3px, transparent 3px 31px)",
+                border: "5px solid #2b1a10",
+                boxShadow:
+                  "inset 0 0 35px rgba(0,0,0,.42), 0 8px 18px rgba(0,0,0,.42)",
+                backfaceVisibility: "hidden",
+              }}
+            >
+              <div
+                className="absolute inset-[12px] rounded-[4px]"
+                style={{
+                  border: "2px solid rgba(33,20,12,.55)",
+                  background:
+                    "repeating-linear-gradient(90deg, transparent 0 23px, rgba(42,24,13,.32) 24px 26px, transparent 27px 56px)",
+                }}
+              />
+              <div
+                className="absolute left-1/2 top-1/2 h-[74%] w-[72%] -translate-x-1/2 -translate-y-1/2 rounded-[3px]"
+                style={{
+                  border: "1px solid rgba(24,14,9,.38)",
+                  boxShadow: "inset 0 0 35px rgba(0,0,0,.25)",
                 }}
               />
             </div>
