@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+﻿import { Module } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
 import { ConfigModule } from '@nestjs/config';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
@@ -22,10 +22,11 @@ import { AuditModule } from './modules/audit/audit.module';
 import { AdminModule } from './modules/admin/admin.module';
 import { MediaModule } from './modules/media/media.module';
 import { ContentModule } from './modules/content/content.module';
+import { ReviewsModule } from './modules/reviews/reviews.module';
 
 @Module({
   imports: [
-    // Fail-fast environment contract — invalid/malformed env aborts boot.
+    // Fail-fast environment contract â€” invalid/malformed env aborts boot.
     ConfigModule.forRoot({
       isGlobal: true,
       cache: true,
@@ -44,7 +45,7 @@ import { ContentModule } from './modules/content/content.module';
     ]),
     PrismaModule,
     RedisModule,
-    // Global audit trail — every admin mutation records through it.
+    // Global audit trail â€” every admin mutation records through it.
     AuditModule,
     HealthModule,
     CatalogModule,
@@ -58,6 +59,7 @@ import { ContentModule } from './modules/content/content.module';
     AdminModule,
     MediaModule,
     ContentModule,
+    ReviewsModule,
   ],
   providers: [
     // Order matters: authentication first (attaches req.user), then

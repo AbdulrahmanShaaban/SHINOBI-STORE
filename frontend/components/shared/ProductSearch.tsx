@@ -156,7 +156,7 @@ export default function ProductSearchOverlay({
     if (!open) return;
     const previouslyFocused = document.activeElement as HTMLElement | null;
     inputRef.current?.focus();
-    acquireScrollLock();
+    acquireScrollLock('search-overlay');
 
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') requestClose();
@@ -164,7 +164,7 @@ export default function ProductSearchOverlay({
     window.addEventListener('keydown', onKeyDown);
     return () => {
       window.removeEventListener('keydown', onKeyDown);
-      releaseLock();
+      releaseLock('search-overlay');
       previouslyFocused?.focus?.();
     };
   }, [open, requestClose]);

@@ -55,7 +55,7 @@ export default function ProductGallery({ images, productName }: ProductGalleryPr
     if (!lightboxOpen) return;
     const previouslyFocused = document.activeElement as HTMLElement | null;
     closeRef.current?.focus();
-    acquireScrollLock();
+    acquireScrollLock('gallery-zoom');
 
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') setLightboxOpen(false);
@@ -78,7 +78,7 @@ export default function ProductGallery({ images, productName }: ProductGalleryPr
     window.addEventListener('keydown', onKeyDown);
     return () => {
       window.removeEventListener('keydown', onKeyDown);
-      releaseLock();
+      releaseLock('gallery-zoom');
       previouslyFocused?.focus?.();
     };
   }, [lightboxOpen]);

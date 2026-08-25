@@ -45,10 +45,10 @@ export default function Navbar() {
   // Lock body scroll when menu is open and reset overlay scroll position
   useEffect(() => {
     if (!isMenuOpen) return;
-    acquireScrollLock();
+    acquireScrollLock('nav-menu');
     overlayRef.current?.scrollTo(0, 0);
     return () => {
-      releaseLock();
+      releaseLock('nav-menu');
     };
   }, [isMenuOpen]);
 

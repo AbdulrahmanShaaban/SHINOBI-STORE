@@ -205,6 +205,53 @@ export function searchProductsBrowser(query: string, limit = 6): Promise<Paginat
   });
 }
 
+// ── Reviews (§10.3) ───────────────────────────────────────────────────────────
+
+export interface ProductReview {
+  id: string;
+  rating: number;
+  title: string | null;
+  body: string;
+  status: string;
+  createdAt: string;
+  author: string;
+}
+
+export interface ProductReviewsPayload {
+  items: ProductReview[];
+  /** Average of APPROVED reviews; null when there are none. */
+  average: number | null;
+  total: number;
+}
+
+/** Server-facing (cached briefly); used by the product page. */
+export function getProductReviews(slug: string): Promise<ProductReviewsPayload> {
+  return request<ProductReviewsPayload>(
+    `/products/${encodeURIComponent(slug)}/reviews`,
+    30,
+  );
+}
+
+/** Browser-facing submission (session cookie). New reviews enter `pending` moderation. */
+export async function submitReview(
+  slug: string,
+  payload: { rating: number; title?: string; body: string },
+): Promise<{ id: string; status: string }> {
+  const res = await fetch(`${BROWSER_BASE}/products/${encodeURIComponent(slug)}/reviews`, {
+    method: 'POST',
+    credentials: 'include',
+    headers: { 'content-type': 'application/json', 'x-csrf-token': '1' },
+    body: JSON.stringify(payload),
+  });
+  const data = (await res.json().catch(() => null)) as
+    | { id?: string; status?: string; message?: string; code?: string }
+    | null;
+  if (!res.ok || !data?.id) {
+    throw new ApiError(res.status, data?.code ?? `HTTP_${res.status}`, data?.message ?? 'Could not submit the review.');
+  }
+  return { id: data.id, status: data.status };
+}
+
 export function getProduct(slug: string): Promise<ProductDetail> {
   return request<ProductDetail>(
     `/products/${encodeURIComponent(slug)}`,

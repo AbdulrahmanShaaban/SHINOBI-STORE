@@ -22,7 +22,7 @@ export default function MobileFilters({ facets }: { facets: ProductFacets }) {
     if (!open) return;
     const panel = panelRef.current;
     const trigger = triggerRef.current;
-    acquireScrollLock();
+    acquireScrollLock('mobile-filters');
     panel?.querySelector<HTMLInputElement>('input[type="radio"]:checked')?.focus();
 
     const onKeyDown = (e: KeyboardEvent) => {
@@ -46,7 +46,7 @@ export default function MobileFilters({ facets }: { facets: ProductFacets }) {
     document.addEventListener('keydown', onKeyDown);
     return () => {
       document.removeEventListener('keydown', onKeyDown);
-      releaseLock();
+      releaseLock('mobile-filters');
       trigger?.focus();
     };
   }, [open]);

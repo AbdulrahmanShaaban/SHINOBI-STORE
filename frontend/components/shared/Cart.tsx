@@ -51,7 +51,7 @@ export default function Cart() {
     if (!isOpen) return;
     const previouslyFocused = document.activeElement as HTMLElement | null;
     closeRef.current?.focus();
-    acquireScrollLock();
+    acquireScrollLock('cart-drawer');
 
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') closeCart();
@@ -75,7 +75,7 @@ export default function Cart() {
     window.addEventListener('keydown', onKeyDown);
     return () => {
       window.removeEventListener('keydown', onKeyDown);
-      releaseLock();
+      releaseLock('cart-drawer');
       previouslyFocused?.focus?.();
     };
   }, [isOpen, closeCart]);
@@ -265,14 +265,13 @@ export default function Cart() {
                 REMOVE UNAVAILABLE ITEMS TO CHECKOUT
               </button>
             ) : (
-              <button
-                disabled
-                aria-disabled="true"
-                title="Checkout arrives with Phase 6"
-                className="w-full py-4 bg-[#16161F] text-[#6B6B80] font-cinzel font-bold cursor-not-allowed rounded-lg border border-[#2A2A3A]"
+              <Link
+                href="/checkout"
+                onClick={closeCart}
+                className="block w-full py-4 text-center bg-[#CC0000] hover:bg-[#FF6B00] transition-colors font-cinzel font-bold tracking-wider text-white rounded-lg"
               >
-                CHECKOUT — COMING SOON
-              </button>
+                CHECKOUT
+              </Link>
             )}
             <p className="text-center text-[#6B6B80] text-sm font-inter mt-4">
               Free shipping on orders over $50
