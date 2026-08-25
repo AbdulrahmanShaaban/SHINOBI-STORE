@@ -150,7 +150,7 @@ export default function ShinobiCharacterCards() {
                 style={{ backgroundColor: "#F4E9D3", color: "#1A1A1A" }}
               >
                 <span>BUY NOW</span>
-                <span className="font-inter text-[12px] sm:text-[13px] md:text-[14px] font-semibold">$29.99</span>
+                <span className="font-bebas text-2xl sm:text-3xl leading-none">$29.99</span>
               </Link>
               <Link
                 href="/products/naruto-rasengan-hoodie"
@@ -193,7 +193,7 @@ export default function ShinobiCharacterCards() {
                 style={{ backgroundColor: "#F4E9D3", color: "#1A1A1A" }}
               >
                 <span>BUY NOW</span>
-                <span className="font-inter text-[12px] sm:text-[13px] md:text-[14px] font-semibold">$34.99</span>
+                <span className="font-bebas text-2xl sm:text-3xl leading-none">$34.99</span>
               </Link>
               <Link
                 href="/products/itachi-akatsuki-hoodie"
@@ -236,7 +236,7 @@ export default function ShinobiCharacterCards() {
                 style={{ backgroundColor: "#F4E9D3", color: "#1A1A1A" }}
               >
                 <span>BUY NOW</span>
-                <span className="font-inter text-[12px] sm:text-[13px] md:text-[14px] font-semibold">$31.99</span>
+                <span className="font-bebas text-2xl sm:text-3xl leading-none">$31.99</span>
               </Link>
               <Link
                 href="/products/sasuke-chidori-hoodie"

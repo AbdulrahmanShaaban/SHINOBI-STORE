@@ -9,6 +9,7 @@ export type Role = (typeof ROLES)[number];
 export const PERMISSIONS: Record<Role, readonly string[]> = {
   super_admin: ['*'],
   admin: [
+    'products:r',
     'products:w',
     'orders:*',
     'customers:r',

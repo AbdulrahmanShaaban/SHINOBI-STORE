@@ -188,8 +188,25 @@ export interface AdminProductRow {
   [key: string]: unknown;
 }
 
+export interface ProductImageInput {
+  url: string;
+  mediaId?: string;
+  altText?: string;
+  isPrimary?: boolean;
+}
+
+export interface ProductImageRow {
+  id: string;
+  url: string;
+  mediaId: string | null;
+  altText: string | null;
+  sortOrder: number;
+  isPrimary: boolean;
+}
+
 export interface AdminProductDetail extends AdminProductRow {
   description?: string | null;
+  images?: ProductImageRow[];
 }
 
 export interface ProductUpdateInput {
@@ -265,6 +282,12 @@ export const adminApi = {
       method: 'PATCH',
       body: JSON.stringify(body),
     }),
+
+  setProductImages: (id: string, images: ProductImageInput[]) =>
+    request<{ images: ProductImageRow[] }>(
+      `/admin/products/${encodeURIComponent(id)}/images`,
+      { method: 'PUT', body: JSON.stringify({ images }) },
+    ),
 
   listQueues: () => request<QueueInfo[]>('/admin/queues'),
 

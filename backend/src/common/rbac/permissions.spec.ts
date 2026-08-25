@@ -32,6 +32,7 @@ describe('hasPermission — matrix (role × representative permission)', () => {
 
   describe('admin', () => {
     it('grants staff domains incl. the orders:* wildcard family', () => {
+      expect(hasPermission('admin', 'products:r')).toBe(true);
       expect(hasPermission('admin', 'products:w')).toBe(true);
       expect(hasPermission('admin', 'orders:r')).toBe(true);
       expect(hasPermission('admin', 'orders:transition')).toBe(true);
@@ -39,6 +40,13 @@ describe('hasPermission — matrix (role × representative permission)', () => {
       expect(hasPermission('admin', 'inventory:w')).toBe(true);
       expect(hasPermission('admin', 'coupons:w')).toBe(true);
       expect(hasPermission('admin', 'admins:r')).toBe(true);
+    });
+
+    it('reads AND writes products (explicit grants, no products:* wildcard)', () => {
+      // Regression pin: the admin edit form loads via GET /admin/products/:id,
+      // which requires products:r. A write-only admin role bricks every edit.
+      expect(hasPermission('admin', 'products:r')).toBe(true);
+      expect(PERMISSIONS.admin).not.toContain('products:*');
     });
 
     it('does not hold inventory:adjust (matrix gap: only order_manager does)', () => {
@@ -154,6 +162,7 @@ describe('PermissionsGuard', () => {
   it('mirrors the matrix through the guard for each role', () => {
     const cases: Array<[string, string[], boolean]> = [
       ['super_admin', ['admins:r'], true],
+      ['admin', ['products:r'], true],
       ['admin', ['coupons:w'], true],
       ['order_manager', ['inventory:adjust'], true],
       ['content_manager', ['content:w'], true],

@@ -44,7 +44,7 @@ export default function ProductCard({
           {product.name}
         </h3>
         <p className="mt-1 flex items-baseline gap-2">
-          <span className="font-bebas text-xl text-[#FFB800]">
+          <span className="font-bebas text-2xl text-[#FFB800]">
             {formatPrice(product.priceFromCents)}
           </span>
         {(() => {

@@ -108,6 +108,35 @@ export default function MadaraSpecialCard({
   // they are tracked here and killed on unmount instead of leaking.
   const hoverTweensRef = useRef<gsap.core.Tween[]>([]);
 
+  // Per-particle dust bursts live in the particle-scoped GSAP context (they
+  // target the gated dust spans); the pinned reveal timeline reads this ref at
+  // scrub time, so it never depends on a context rebuild.
+  const burstTweensRef = useRef<gsap.core.Tween[]>([]);
+
+  // The 42 blurred sand sprites + 56 dust particles are pure GPU cost, so they
+  // only enter the DOM once the section approaches the viewport (generous
+  // margin => no pop-in) and stay mounted afterwards to avoid churn.
+  // fxActive mirrors proximity so per-image will-change hints can be released
+  // while the section is far off-screen. Scheduling state only: nothing
+  // visual depends on it.
+  const [fxMounted, setFxMounted] = useState(false);
+  const [fxActive, setFxActive] = useState(false);
+
+  useEffect(() => {
+    const section = sectionRef.current;
+    if (!section) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry) return;
+        setFxActive(entry.isIntersecting);
+        if (entry.isIntersecting) setFxMounted(true);
+      },
+      { rootMargin: "600px 0px" }
+    );
+    observer.observe(section);
+    return () => observer.disconnect();
+  }, []);
+
   useGSAP(
     () => {
       const section = sectionRef.current;
@@ -307,28 +336,13 @@ export default function MadaraSpecialCard({
         pulseState.corePulse = chakraCorePulse;
         chakraPulse.pause();
         chakraCorePulse.pause();
-        // Per-particle disturbance bursts are created upfront as PAUSED tweens
-        // (instead of ad-hoc inside a scrub .call), so they stay recorded by
-        // this GSAP context and are reverted on unmount. Start values resolve
-        // on first play exactly like the previous create-on-crossing behavior.
-        const dustParticles = dust?.querySelectorAll<HTMLSpanElement>("span");
-        const burstTweens = dustParticles
-          ? Array.from(dustParticles).map((el, i) => {
-              const p = DUST_PARTICLES[i];
-              const burstX = Math.cos(p.angle) * p.distance * 32;
-              const burstY = Math.sin(p.angle) * p.distance * 14 + p.y * 22;
-              return gsap.to(el, {
-                x: burstX,
-                y: burstY,
-                rotation: `+=${p.rotate * 0.4}`,
-                duration: 0.26,
-                delay: p.delay,
-                ease: "power3.out",
-                paused: true,
-              });
-            })
-          : [];
+        // NOTE: per-particle dust bursts are created in the particle-scoped
+        // context below (they target the gated dust spans) and played from
+        // burstTweensRef — the pinned timeline must never depend on a rebuild.
 
+        // Card reveal: scrubbed wipe (original design). The parked mid-wipe
+        // state is fine — the header occlusion was a coffin z-order bug
+        // (shell covered the card), fixed at the layer level below.
         const reveal = gsap.timeline({
           defaults: { overwrite: "auto" },
           scrollTrigger: {
@@ -361,9 +375,11 @@ export default function MadaraSpecialCard({
           .to(crater, { scale: 1.15, opacity: 1, duration: 0.38, ease: "power3.out" }, "disturbance")
           // Per-particle burst: each dust speck kicks outward from its initial
           // angle by a small offset, so the disturbance reads as scattered
-          // debris rather than a single scaling blob.
+          // debris rather than a single scaling blob. The bursts are owned by
+          // the particle context; reading the ref keeps this scrub timeline
+          // independent of when (or whether) those spans have mounted.
           .call(() => {
-            burstTweens.forEach((tween) => tween.play());
+            burstTweensRef.current.forEach((tween) => tween.play());
           }, [], "disturbance+=0.02")
           .addLabel("emerge")
           .to(coffin, { yPercent: -4, scale: 1.01, duration: 0.48, ease: "power4.out" }, "emerge")
@@ -425,161 +441,12 @@ export default function MadaraSpecialCard({
           }, [], "reveal+=0.60");
       }
 
-      if (sandOrbitRef.current) {
-        const orbit = sandOrbitRef.current;
-        const sandImgs = Array.from(orbit.querySelectorAll<HTMLImageElement>("img"));
-
-        // Keep the orbit on a single GSAP ticker instead of running one tween
-        // and multiple layout reads per particle. Geometry is cached and only
-        // recalculated when the card changes size.
-        const setX = sandImgs.map((img) => gsap.quickSetter(img, "x", "px"));
-        const setY = sandImgs.map((img) => gsap.quickSetter(img, "y", "px"));
-        const setRotation = sandImgs.map((img) => gsap.quickSetter(img, "rotation", "deg"));
-        const setScaleX = sandImgs.map((img) => gsap.quickSetter(img, "scaleX"));
-        const setScaleY = sandImgs.map((img) => gsap.quickSetter(img, "scaleY"));
-        const setOpacity = sandImgs.map((img) => gsap.quickSetter(img, "opacity"));
-
-        // Snap translated positions to a 0.5px grid. On particles blurred
-        // between 0.15px and 2.25px this is far below perception threshold and
-        // avoids subpixel rasterization churn; rotation/scale stay continuous.
-        const snapHalf = (value: number) => Math.round(value * 2) / 2;
-
-        const geometry = {
-          centerX: 0,
-          centerY: 0,
-          baseRadius: 0,
-        };
-
-        const updateOrbitGeometry = () => {
-          const cardRect = card.getBoundingClientRect();
-          const orbitRect = orbit.getBoundingClientRect();
-          const base = Math.min(cardRect.width, cardRect.height) * 0.5;
-
-          geometry.centerX = cardRect.left - orbitRect.left + cardRect.width * 0.5;
-          geometry.centerY = cardRect.top - orbitRect.top + cardRect.height * 0.5;
-          geometry.baseRadius = base;
-        };
-
-        updateOrbitGeometry();
-
-        if (reducedMotion) {
-          sandImgs.forEach((img, i) => {
-            const config = ORBIT_CONFIGS[i];
-            const angle = config.phase;
-            const rx = geometry.baseRadius * (0.82 + config.radiusFactor * 0.58);
-            const ry = geometry.baseRadius * config.yScale * (0.82 + config.radiusFactor * 0.26);
-            const tangentRotation = Math.atan2(Math.cos(angle) * ry, -Math.sin(angle) * rx) * (180 / Math.PI);
-
-            setX[i](geometry.centerX + Math.cos(angle) * rx);
-            setY[i](geometry.centerY + Math.sin(angle) * ry);
-            setRotation[i](tangentRotation * config.spinFactor);
-            setScaleX[i](config.stretchX * 0.9);
-            setScaleY[i](config.stretchY * 0.9);
-            setOpacity[i](Math.max(0.06, config.opacity * (0.72 + config.depth * 0.2)));
-          });
-        } else {
-          const orbitProgress = { value: 0 };
-
-          const orbitTween = gsap.to(orbitProgress, {
-            value: Math.PI * 2,
-            duration: 12,
-            repeat: -1,
-            ease: "none",
-            onUpdate: () => {
-              const rotation = orbitProgress.value;
-
-              sandImgs.forEach((_, i) => {
-                const config = ORBIT_CONFIGS[i];
-
-                // Slightly chaotic, wind-driven orbit: the path remains centered on
-                // the coffin, but the radius and vertical flow breathe continuously.
-                const angle = config.phase + rotation * config.speed / 12;
-                const turbulence =
-                  Math.sin(angle * 1.35 + config.phase * 0.8) * 0.055 +
-                  Math.sin(angle * 2.7 + config.phase * 1.7) * 0.025;
-                const radialBreath = 1 + turbulence;
-                const rx = geometry.baseRadius * (0.98 + config.radiusFactor * 0.58) * radialBreath;
-                const ry =
-                  geometry.baseRadius *
-                  config.yScale *
-                  (0.96 + config.radiusFactor * 0.32) *
-                  (1 + Math.cos(angle * 1.1 + config.phase) * 0.045);
-
-                const gustX =
-                  Math.sin(angle * 1.9 + config.phase) *
-                  geometry.baseRadius *
-                  0.055 *
-                  config.drift;
-                const gustY =
-                  Math.cos(angle * 1.45 + config.phase * 0.7) *
-                  geometry.baseRadius *
-                  0.035 *
-                  config.gust;
-
-                const windBias =
-                  Math.sin(rotation * 0.55 + config.phase * 2) *
-                  geometry.baseRadius *
-                  0.018;
-
-                // Near particles are larger/sharper; far particles become softer
-                // and lighter, creating fake depth without extra 3D rendering.
-                const depthWave = 0.68 + 0.32 * (0.5 + 0.5 * Math.sin(angle + config.phase));
-                const depthScale = 0.82 + depthWave * 0.36;
-                const tangentRotation =
-                  Math.atan2(Math.cos(angle) * ry, -Math.sin(angle) * rx) *
-                  (180 / Math.PI);
-
-                setX[i](
-                  snapHalf(
-                    geometry.centerX +
-                    Math.cos(angle) * rx +
-                    gustX +
-                    windBias
-                  )
-                );
-                setY[i](
-                  snapHalf(
-                    geometry.centerY +
-                    Math.sin(angle) * ry +
-                    gustY
-                  )
-                );
-                setRotation[i](
-                  tangentRotation * (0.42 + config.spinFactor * 0.5) +
-                  Math.sin(angle * 1.6 + config.phase) * 7
-                );
-                setScaleX[i](
-                  config.stretchX *
-                  depthScale *
-                  (1 + Math.sin(angle * 1.8 + config.phase) * 0.08)
-                );
-                setScaleY[i](
-                  config.stretchY *
-                  depthScale *
-                  (1 + Math.cos(angle * 1.35 + config.phase) * 0.08)
-                );
-                setOpacity[i](
-                  Math.max(
-                    0.045,
-                    config.opacity * (0.52 + depthWave * 0.62)
-                  )
-                );
-              });
-            },
-          });
-
-          loopingAnims.push(orbitTween);
-
-          const resizeObserver = new ResizeObserver(updateOrbitGeometry);
-          resizeObserver.observe(card);
-
-          cleanups.push(() => {
-            resizeObserver.disconnect();
-            orbitTween.kill();
-          });
-        }
-
-      }
+      // NOTE: the sand-orbit loop and the per-particle dust bursts are created
+      // in the particle-scoped useGSAP below — they target the sand/dust spans
+      // that only exist once fxMounted flips. Keeping them OUT of this context
+      // means the pinned reveal timeline is built exactly once and is never
+      // rebuilt (a rebuild mid-scroll resets the scrub and visibly breaks the
+      // pinning).
 
       // Pause every looping timeline/tween while the section is off-screen and
       // resume it on re-entry. Animations are only paused/resumed — never
@@ -620,6 +487,225 @@ export default function MadaraSpecialCard({
       };
     },
     { scope: sectionRef, dependencies: [defaultImg, jutsuImg, sixPathsImg, sandImg] }
+  );
+
+  // Particle-scoped context: the 42 sand sprites and 56 dust spans only enter
+  // the DOM once fxMounted flips (IntersectionObserver, 600px before the
+  // section), so the loops that drive them are built here, exactly once, and
+  // NEVER together with the pinned reveal timeline — rebuilding the pin
+  // mid-scroll resets the scrub and visibly breaks the animation.
+  useGSAP(
+    () => {
+      if (!fxMounted) return;
+      const section = sectionRef.current;
+      const card = cardRef.current;
+      const dust = dustRef.current;
+      const orbit = sandOrbitRef.current;
+      if (!section || !card || !dust || !orbit) return;
+
+      const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      const cleanups: Array<() => void> = [];
+      const loopingAnims: Array<gsap.core.Animation> = [];
+
+      // Per-particle disturbance bursts, created upfront as PAUSED tweens and
+      // played by the reveal timeline's scrub .call via burstTweensRef.
+      const dustParticles = dust.querySelectorAll<HTMLSpanElement>("span");
+      burstTweensRef.current = Array.from(dustParticles).map((el, i) => {
+        const p = DUST_PARTICLES[i];
+        const burstX = Math.cos(p.angle) * p.distance * 32;
+        const burstY = Math.sin(p.angle) * p.distance * 14 + p.y * 22;
+        return gsap.to(el, {
+          x: burstX,
+          y: burstY,
+          rotation: `+=${p.rotate * 0.4}`,
+          duration: 0.26,
+          delay: p.delay,
+          ease: "power3.out",
+          paused: true,
+        });
+      });
+
+      const sandImgs = Array.from(orbit.querySelectorAll<HTMLImageElement>("img"));
+
+      // Keep the orbit on a single GSAP ticker instead of running one tween
+      // and multiple layout reads per particle. Geometry is cached and only
+      // recalculated when the card changes size.
+      const setX = sandImgs.map((img) => gsap.quickSetter(img, "x", "px"));
+      const setY = sandImgs.map((img) => gsap.quickSetter(img, "y", "px"));
+      const setRotation = sandImgs.map((img) => gsap.quickSetter(img, "rotation", "deg"));
+      const setScaleX = sandImgs.map((img) => gsap.quickSetter(img, "scaleX"));
+      const setScaleY = sandImgs.map((img) => gsap.quickSetter(img, "scaleY"));
+      const setOpacity = sandImgs.map((img) => gsap.quickSetter(img, "opacity"));
+
+      // Snap translated positions to a 0.5px grid. On particles blurred
+      // between 0.15px and 2.25px this is far below perception threshold and
+      // avoids subpixel rasterization churn; rotation/scale stay continuous.
+      const snapHalf = (value: number) => Math.round(value * 2) / 2;
+
+      const geometry = {
+        centerX: 0,
+        centerY: 0,
+        baseRadius: 0,
+      };
+
+      const updateOrbitGeometry = () => {
+        const cardRect = card.getBoundingClientRect();
+        const orbitRect = orbit.getBoundingClientRect();
+        const base = Math.min(cardRect.width, cardRect.height) * 0.5;
+
+        geometry.centerX = cardRect.left - orbitRect.left + cardRect.width * 0.5;
+        geometry.centerY = cardRect.top - orbitRect.top + cardRect.height * 0.5;
+        geometry.baseRadius = base;
+      };
+
+      updateOrbitGeometry();
+
+      if (reducedMotion) {
+        sandImgs.forEach((img, i) => {
+          const config = ORBIT_CONFIGS[i];
+          const angle = config.phase;
+          const rx = geometry.baseRadius * (0.82 + config.radiusFactor * 0.58);
+          const ry = geometry.baseRadius * config.yScale * (0.82 + config.radiusFactor * 0.26);
+          const tangentRotation = Math.atan2(Math.cos(angle) * ry, -Math.sin(angle) * rx) * (180 / Math.PI);
+
+          setX[i](geometry.centerX + Math.cos(angle) * rx);
+          setY[i](geometry.centerY + Math.sin(angle) * ry);
+          setRotation[i](tangentRotation * config.spinFactor);
+          setScaleX[i](config.stretchX * 0.9);
+          setScaleY[i](config.stretchY * 0.9);
+          setOpacity[i](Math.max(0.06, config.opacity * (0.72 + config.depth * 0.2)));
+        });
+      } else {
+        const orbitProgress = { value: 0 };
+
+        const orbitTween = gsap.to(orbitProgress, {
+          value: Math.PI * 2,
+          duration: 12,
+          repeat: -1,
+          ease: "none",
+          onUpdate: () => {
+            const rotation = orbitProgress.value;
+
+            sandImgs.forEach((_, i) => {
+              const config = ORBIT_CONFIGS[i];
+
+              // Slightly chaotic, wind-driven orbit: the path remains centered on
+              // the coffin, but the radius and vertical flow breathe continuously.
+              const angle = config.phase + rotation * config.speed / 12;
+              const turbulence =
+                Math.sin(angle * 1.35 + config.phase * 0.8) * 0.055 +
+                Math.sin(angle * 2.7 + config.phase * 1.7) * 0.025;
+              const radialBreath = 1 + turbulence;
+              const rx = geometry.baseRadius * (0.98 + config.radiusFactor * 0.58) * radialBreath;
+              const ry =
+                geometry.baseRadius *
+                config.yScale *
+                (0.96 + config.radiusFactor * 0.32) *
+                (1 + Math.cos(angle * 1.1 + config.phase) * 0.045);
+
+              const gustX =
+                Math.sin(angle * 1.9 + config.phase) *
+                geometry.baseRadius *
+                0.055 *
+                config.drift;
+              const gustY =
+                Math.cos(angle * 1.45 + config.phase * 0.7) *
+                geometry.baseRadius *
+                0.035 *
+                config.gust;
+
+              const windBias =
+                Math.sin(rotation * 0.55 + config.phase * 2) *
+                geometry.baseRadius *
+                0.018;
+
+              // Near particles are larger/sharper; far particles become softer
+              // and lighter, creating fake depth without extra 3D rendering.
+              const depthWave = 0.68 + 0.32 * (0.5 + 0.5 * Math.sin(angle + config.phase));
+              const depthScale = 0.82 + depthWave * 0.36;
+              const tangentRotation =
+                Math.atan2(Math.cos(angle) * ry, -Math.sin(angle) * rx) *
+                (180 / Math.PI);
+
+              setX[i](
+                snapHalf(
+                  geometry.centerX +
+                  Math.cos(angle) * rx +
+                  gustX +
+                  windBias
+                )
+              );
+              setY[i](
+                snapHalf(
+                  geometry.centerY +
+                  Math.sin(angle) * ry +
+                  gustY
+                )
+              );
+              setRotation[i](
+                tangentRotation * (0.42 + config.spinFactor * 0.5) +
+                Math.sin(angle * 1.6 + config.phase) * 7
+              );
+              setScaleX[i](
+                config.stretchX *
+                depthScale *
+                (1 + Math.sin(angle * 1.8 + config.phase) * 0.08)
+              );
+              setScaleY[i](
+                config.stretchY *
+                depthScale *
+                (1 + Math.cos(angle * 1.35 + config.phase) * 0.08)
+              );
+              setOpacity[i](
+                Math.max(
+                  0.045,
+                  config.opacity * (0.52 + depthWave * 0.62)
+                )
+              );
+            });
+          },
+        });
+
+        loopingAnims.push(orbitTween);
+
+        const resizeObserver = new ResizeObserver(updateOrbitGeometry);
+        resizeObserver.observe(card);
+
+        cleanups.push(() => {
+          resizeObserver.disconnect();
+          orbitTween.kill();
+        });
+      }
+
+      // Pause the particle loops while the section is off-screen and resume on
+      // re-entry (same discipline as the main context's chakra loops).
+      if (!reducedMotion && loopingAnims.length > 0) {
+        const setLoopsActive = (active: boolean) => {
+          loopingAnims.forEach((anim) => {
+            if (active) anim.play();
+            else anim.pause();
+          });
+        };
+
+        const visibilityTrigger = ScrollTrigger.create({
+          trigger: section,
+          start: "top bottom",
+          end: "bottom top",
+          refreshPriority: -2,
+          onToggle: (self) => setLoopsActive(self.isActive),
+        });
+        // Sync immediately: particles mount before the section is on-screen.
+        setLoopsActive(visibilityTrigger.isActive);
+        cleanups.push(() => visibilityTrigger.kill());
+      }
+
+      return () => {
+        cleanups.forEach((cleanup) => cleanup());
+        burstTweensRef.current.forEach((tween) => tween.kill());
+        burstTweensRef.current = [];
+      };
+    },
+    { scope: sectionRef, dependencies: [fxMounted] }
   );
 
   // contextSafe would read refs during render (react-hooks/refs), so plain
@@ -785,7 +871,8 @@ export default function MadaraSpecialCard({
             style={{ opacity: 0, transformOrigin: "50% 88%" }}
             aria-hidden="true"
           >
-            {DUST_PARTICLES.map((particle, i) => (
+            {fxMounted &&
+              DUST_PARTICLES.map((particle, i) => (
               <span
                 key={i}
                   className="absolute rounded-full"
@@ -1052,12 +1139,15 @@ export default function MadaraSpecialCard({
 
           {/*
            * Edo Tensei coffin shell.
-           * The shell stays BEHIND the card so the card content remains visible in the final state.
-           * Only the front door temporarily sits above the card while it is closed.
+           * The shell stays BEHIND the card (z-30 < card z-35) so the card
+           * content remains visible in the final state — previously this shell
+           * sat at z-60 ABOVE the card and its top lintel covered the "MADARA"
+           * header. Only the door (extracted to its own layer below) sits
+           * above the card, and only while it is closed.
            */}
           <div
             ref={coffinRef}
-            className="pointer-events-none absolute left-1/2 top-[-40px] md:top-[-90px] z-[60] h-[calc(100%+80px)] md:h-[calc(100%+180px)] w-[calc(100%+80px)] md:w-[calc(100%+140px)] max-w-[840px] -translate-x-1/2"
+            className="pointer-events-none absolute left-1/2 top-[-40px] md:top-[-90px] z-[30] h-[calc(100%+80px)] md:h-[calc(100%+180px)] w-[calc(100%+80px)] md:w-[calc(100%+140px)] max-w-[840px] -translate-x-1/2"
             style={{ transformOrigin: "50% 100%" }}
             aria-hidden="true"
           >
@@ -1165,36 +1255,40 @@ export default function MadaraSpecialCard({
             className="pointer-events-none absolute -inset-[16%] z-[95] overflow-visible"
             aria-hidden="true"
           >
-            <div
-              className="pointer-events-none absolute inset-[14%] rounded-[45%] opacity-55"
-              style={{
-                background:
-                  "radial-gradient(ellipse at center, rgba(205,170,102,.16) 0%, rgba(180,141,79,.10) 34%, rgba(132,95,47,.05) 56%, transparent 76%)",
-                filter: "blur(22px)",
-                mixBlendMode: "screen",
-              }}
-            />
-            {ORBIT_CONFIGS.map((config, i) => (
-              <img
-                key={i}
-                src={sandImg}
-                alt=""
-                loading="lazy"
-                decoding="async"
-                width={Math.round(config.size)}
-                height={Math.round(config.size * (0.48 + config.stretchY * 0.42))}
-                className="absolute left-0 top-0 object-contain"
-                style={{
-                  width: `${config.size}px`,
-                  height: `${config.size * (0.48 + config.stretchY * 0.42)}px`,
-                  opacity: config.opacity,
-                  willChange: "transform, opacity",
-                  filter: `blur(${config.blur}px) saturate(.82) sepia(.14)`,
-                  mixBlendMode: "screen",
-                  display: isMobile && i >= MOBILE_SAND_COUNT ? "none" : undefined,
-                }}
-              />
-            ))}
+            {fxMounted && (
+              <>
+                <div
+                  className="pointer-events-none absolute inset-[14%] rounded-[45%] opacity-55"
+                  style={{
+                    background:
+                      "radial-gradient(ellipse at center, rgba(205,170,102,.16) 0%, rgba(180,141,79,.10) 34%, rgba(132,95,47,.05) 56%, transparent 76%)",
+                    filter: "blur(22px)",
+                    mixBlendMode: "screen",
+                  }}
+                />
+                {ORBIT_CONFIGS.map((config, i) => (
+                  <img
+                    key={i}
+                    src={sandImg}
+                    alt=""
+                    loading="lazy"
+                    decoding="async"
+                    width={Math.round(config.size)}
+                    height={Math.round(config.size * (0.48 + config.stretchY * 0.42))}
+                    className="absolute left-0 top-0 object-contain"
+                    style={{
+                      width: `${config.size}px`,
+                      height: `${config.size * (0.48 + config.stretchY * 0.42)}px`,
+                      opacity: config.opacity,
+                      willChange: fxActive ? "transform, opacity" : "auto",
+                      filter: `blur(${config.blur}px) saturate(.82) sepia(.14)`,
+                      mixBlendMode: "screen",
+                      display: isMobile && i >= MOBILE_SAND_COUNT ? "none" : undefined,
+                    }}
+                  />
+                ))}
+              </>
+            )}
           </div>
         </div>
       </div>

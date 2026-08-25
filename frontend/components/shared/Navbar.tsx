@@ -8,10 +8,12 @@ import { PiHandbagSimpleBold, PiMagnifyingGlassBold, PiUserCircle, PiUserCircleB
 import { selectTotalItems, useCartStore } from '@/lib/cart-store';
 import { useUser } from '@/lib/user-context';
 import { acquireScrollLock, releaseLock } from '@/lib/scroll-lock';
+import ProductSearchOverlay from '@/components/shared/ProductSearch';
 
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
   const overlayRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
   const openCart = useCartStore((s) => s.openCart);
@@ -29,6 +31,7 @@ export default function Navbar() {
   }, []);
 
   const closeMenu = useCallback(() => setIsMenuOpen(false), []);
+  const closeSearch = useCallback(() => setIsSearchOpen(false), []);
 
   useEffect(() => {
     if (!isMenuOpen) return;
@@ -105,14 +108,16 @@ export default function Navbar() {
               <Link href="/products?sort=newest" className="px-2 py-2 text-[#F0F0F0] font-semibold text-xl xl:text-2xl hover:text-[#FF6B00] transition-colors">
                 New Arrivals
               </Link>
-              <Link
-                href="/products"
+              <button
+                type="button"
+                onClick={() => setIsSearchOpen(true)}
                 aria-label="Search products"
+                aria-haspopup="dialog"
                 title="Search"
                 className="p-2 text-[#F0F0F0] hover:text-[#FF6B00] transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
               >
                 <PiMagnifyingGlassBold className="w-6 h-6" />
-              </Link>
+              </button>
               <AccountLink />
               <button
                 onClick={openCart}
@@ -134,14 +139,16 @@ export default function Navbar() {
 
             {/* Mobile/Tablet Controls */}
             <div className="flex items-center gap-2 lg:hidden shrink-0">
-              <Link
-                href="/products"
+              <button
+                type="button"
+                onClick={() => setIsSearchOpen(true)}
                 aria-label="Search products"
+                aria-haspopup="dialog"
                 title="Search"
                 className="p-2 text-[#F0F0F0] hover:text-[#FF6B00] transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
               >
                 <PiMagnifyingGlassBold className="w-6 h-6" />
-              </Link>
+              </button>
               <AccountLink iconOnly />
               <button
                 onClick={openCart}
@@ -222,6 +229,9 @@ export default function Navbar() {
           )}
         </nav>
       </div>
+
+      {/* Inline search overlay — opens on any route, never a navigation. */}
+      <ProductSearchOverlay open={isSearchOpen} onClose={closeSearch} />
     </>
   );
 }

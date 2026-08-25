@@ -1,8 +1,9 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import { useShopNav } from '@/lib/use-shop-nav';
 import { DEFAULT_SORT, SHOP_SORTS } from '@/lib/shop-url';
+import { SearchSuggestions, useProductSuggestions } from '@/components/shared/ProductSearch';
 
 const SORT_LABELS: Record<(typeof SHOP_SORTS)[number], string> = {
   relevance: 'Relevance',
@@ -12,26 +13,24 @@ const SORT_LABELS: Record<(typeof SHOP_SORTS)[number], string> = {
   rating: 'Top Rated',
 };
 
-/** Debounced search — pushes the URL after typing settles; page always resets.
- *  Remounts via `key` whenever the URL-backed value changes, so back/forward
- *  navigation re-syncs the input without refs during render. */
+/**
+ * Search-on-submit only: typing NEVER re-runs the query — the debounced call
+ * while typing populates the live suggestions dropdown exclusively. Enter
+ * (form submit) or picking a suggestion executes the full search. Remounts
+ * via `key` whenever the URL-backed value changes, so back/forward
+ * navigation re-syncs the input.
+ */
 export function SearchBox({ initialValue = '' }: { initialValue?: string }) {
   const { update } = useShopNav();
   const [value, setValue] = useState(initialValue);
-  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  useEffect(() => {
-    return () => {
-      if (timer.current) clearTimeout(timer.current);
-    };
-  }, []);
+  const { suggestions, loading } = useProductSuggestions(value);
+  const showSuggestions = value.trim().length >= 2 && (loading || suggestions.length > 0);
 
   return (
     <form
       role="search"
       onSubmit={(e) => {
         e.preventDefault();
-        if (timer.current) clearTimeout(timer.current);
         update({ search: value.trim() || undefined });
       }}
     >
@@ -45,16 +44,19 @@ export function SearchBox({ initialValue = '' }: { initialValue?: string }) {
           value={value}
           placeholder="Search the armory…"
           maxLength={100}
-          onChange={(e) => {
-            const v = e.target.value;
-            setValue(v);
-            if (timer.current) clearTimeout(timer.current);
-            timer.current = setTimeout(() => {
-              update({ search: v.trim() || undefined });
-            }, 350);
-          }}
+          onChange={(e) => setValue(e.target.value)}
           className="w-full lg:w-72 bg-[#12121A] border border-[#2A2A3A] rounded-lg px-4 py-2 text-sm text-[#F0F0F0] placeholder:text-[#6B6B80] focus:border-[#FF6B00] focus:outline-none"
         />
+        {showSuggestions ? (
+          <div className="absolute left-0 right-0 top-full z-30 mt-2 overflow-hidden rounded-lg border border-[#2A2A3A] bg-[#12121A] shadow-2xl">
+            <SearchSuggestions
+              suggestions={suggestions}
+              loading={loading}
+              query={value}
+              onSelect={(term) => update({ search: term })}
+            />
+          </div>
+        ) : null}
       </div>
     </form>
   );

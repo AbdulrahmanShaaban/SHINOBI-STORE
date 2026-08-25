@@ -135,8 +135,8 @@ function CharacterPanel({ character }: { character: Character }) {
 
 function IntroPanel() {
   return (
-    <div className="flex w-[90vw] md:w-[45vw] lg:w-[40vw] xl:w-[35vw] flex-col justify-center px-6 md:px-10 lg:px-14 z-0">
-      <h2 className="font-anton text-[clamp(48px,8vw,100px)] uppercase leading-[0.85] tracking-[0.01em] text-white">
+    <div className="@container flex w-[90vw] md:w-[45vw] lg:w-[40vw] xl:w-[35vw] flex-col justify-center px-6 md:px-10 lg:px-14 z-0">
+      <h2 className="font-anton text-[clamp(48px,8vw,100px)] uppercase leading-[0.85] tracking-[0.01em] text-white whitespace-nowrap md:text-[clamp(44px,calc(100cqw/5.05),96px)]">
         BEYOND
         <br />
         <span className="bg-gradient-to-r from-[#9333EA] via-[#EC4899] to-[#F97316] bg-clip-text text-transparent">

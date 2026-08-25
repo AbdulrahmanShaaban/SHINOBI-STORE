@@ -191,6 +191,20 @@ export async function checkAvailability(variantIds: string[]): Promise<VariantAv
   });
 }
 
+/**
+ * Browser-facing product search for live suggestions (navbar/shop overlays).
+ * Uses NEXT_PUBLIC_API_URL — the storefront origin must be CORS-allowlisted,
+ * exactly like checkAvailability. Server components keep using listProducts.
+ */
+export function searchProductsBrowser(query: string, limit = 6): Promise<PaginatedProducts> {
+  const search = new URLSearchParams();
+  if (query) search.set('search', query);
+  search.set('limit', String(limit));
+  return rawRequest<PaginatedProducts>(BROWSER_BASE, `/products?${search.toString()}`, {
+    revalidate: 0,
+  });
+}
+
 export function getProduct(slug: string): Promise<ProductDetail> {
   return request<ProductDetail>(
     `/products/${encodeURIComponent(slug)}`,

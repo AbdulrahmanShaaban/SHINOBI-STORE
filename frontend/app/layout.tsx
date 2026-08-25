@@ -10,6 +10,7 @@ import "./globals.css";
 import Navbar from "@/components/shared/Navbar";
 import Cart from "@/components/shared/Cart";
 import CartHydration from "@/components/shared/CartHydration";
+import ToastHost from "@/components/shared/Toast";
 import LoadingScreen from "@/components/LoadingScreen";
 import SmoothScroll from "@/components/shared/SmoothScroll";
 import CustomCursor from "@/components/shared/CustomCursor";
@@ -84,6 +85,7 @@ export default function RootLayout({
           <PublicShell>{children}</PublicShell>
           <Cart />
           <CartHydration />
+          <ToastHost />
         </UserProvider>
       </body>
     </html>

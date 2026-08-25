@@ -1,6 +1,11 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from '../../common/prisma/prisma.service';
+import { AuditService } from '../audit/audit.service';
 import { CacheService } from '../cache/cache.service';
 
 /**
@@ -29,6 +34,13 @@ export interface TaxonomyWriteInput {
   animeId?: string | null;
   sortOrder?: number;
   isFeatured?: boolean;
+}
+
+export interface ProductImageWriteInput {
+  url: string;
+  mediaId?: string;
+  altText?: string;
+  isPrimary?: boolean;
 }
 
 const PRODUCT_FIELDS: readonly (keyof ProductWriteInput)[] = [
@@ -66,6 +78,7 @@ export class AdminCatalogService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly cache: CacheService,
+    private readonly audit: AuditService,
   ) {}
 
   async createProduct(input: ProductWriteInput) {
@@ -120,11 +133,79 @@ export class AdminCatalogService {
 
   /** Fetch any product regardless of status — admin eyes only. */
   async getProduct(id: string) {
-    const product = await this.prisma.product.findUnique({ where: { id } });
+    const product = await this.prisma.product.findUnique({
+      where: { id },
+      include: { images: { orderBy: { sortOrder: 'asc' } } },
+    });
     if (!product) {
       throw new NotFoundException({ code: 'PRODUCT_NOT_FOUND', message: 'Product not found' });
     }
     return product;
+  }
+
+  /**
+   * REPLACE semantics for the product's image set: the previous rows are
+   * deleted and the incoming list is inserted with sortOrder = array index.
+   * At most one primary survives; when none is marked, index 0 wins (the
+   * partial unique index on (product_id) WHERE is_primary makes this a hard
+   * DB invariant, so we normalize before writing).
+   */
+  async setProductImages(
+    productId: string,
+    images: ProductImageWriteInput[],
+    actorUserId?: string,
+    ip?: string,
+  ) {
+    const existing = await this.assertProductExists(productId);
+
+    // Referenced media must exist — a dangling FK would otherwise surface as a 500.
+    const mediaIds = images
+      .map((img) => img.mediaId)
+      .filter((id): id is string => typeof id === 'string');
+    if (mediaIds.length > 0) {
+      const found = await this.prisma.mediaEntry.count({
+        where: { id: { in: [...new Set(mediaIds)] } },
+      });
+      if (found < new Set(mediaIds).size) {
+        throw new BadRequestException({
+          code: 'MEDIA_NOT_FOUND',
+          message: 'One or more referenced media entries do not exist',
+        });
+      }
+    }
+
+    const marked = images.findIndex((img) => img.isPrimary === true);
+    const rows = images.map((img, index) => ({
+      productId,
+      url: img.url,
+      mediaId: img.mediaId ?? null,
+      altText: img.altText ?? null,
+      sortOrder: index,
+      isPrimary: index === (marked === -1 ? 0 : marked),
+    }));
+
+    const saved = await this.prisma.$transaction(async (tx) => {
+      await tx.productImage.deleteMany({ where: { productId } });
+      if (rows.length > 0) {
+        await tx.productImage.createMany({ data: rows });
+      }
+      return tx.productImage.findMany({ where: { productId }, orderBy: { sortOrder: 'asc' } });
+    });
+
+    await this.cache.invalidateProduct(existing.slug);
+    await this.audit.record(
+      actorUserId ?? null,
+      'product.images.replace',
+      'product',
+      productId,
+      {
+        count: saved.length,
+        urls: saved.map((img) => img.url),
+        primaryUrl: saved.find((img) => img.isPrimary)?.url ?? null,
+      },
+      ip,
+    );
+    return { images: saved };
   }
 
   /** Admin list with optional q (name/slug contains) + status filter, paginated. */

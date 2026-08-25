@@ -98,8 +98,49 @@ function MarqueeRow({ row }: { row: (typeof MARQUEE_ROWS)[number] }) {
   );
 }
 
-const QUOTE = "THOSE WHO CANNOT ACKNOWLEDGE THEMSELVES WILL EVENTUALLY FAIL.";
-const QUOTE_CHARS = Array.from(QUOTE);
+const QUOTE_LINES_DESKTOP = [
+  ["THOSE", "WHO", "CANNOT", "ACKNOWLEDGE"],
+  ["THEMSELVES"],
+  ["WILL", "EVENTUALLY", "FAIL."],
+];
+
+const QUOTE_LINES_MOBILE = [
+  ["THOSE", "WHO", "CANNOT"],
+  ["ACKNOWLEDGE"],
+  ["THEMSELVES"],
+  ["WILL", "EVENTUALLY", "FAIL."],
+];
+
+function QuoteLines({ lines }: { lines: string[][] }) {
+  return (
+    <>
+      {lines.map((line, lineIndex) => (
+        <span key={lineIndex} className="block">
+          {line.map((word, wordIndex) => (
+            <span key={wordIndex} style={{ display: "inline" }}>
+              <span style={{ display: "inline-flex" }}>
+                {Array.from(word).map((char, charIndex) => (
+                  <span key={`${wordIndex}-${charIndex}`} className="inline-block overflow-hidden">
+                    <span className="quote-char inline-block will-change-transform" style={{ color: "#F5E6C8" }}>
+                      {char}
+                    </span>
+                  </span>
+                ))}
+              </span>
+              {wordIndex !== line.length - 1 && (
+                <span className="inline-block overflow-hidden">
+                  <span className="quote-char inline-block will-change-transform" style={{ color: "#F5E6C8" }}>
+                    {"\u00A0"}
+                  </span>
+                </span>
+              )}
+            </span>
+          ))}
+        </span>
+      ))}
+    </>
+  );
+}
 
 export default function QuoteSection() {
   const sectionRef = useRef<HTMLElement>(null);
@@ -279,32 +320,13 @@ export default function QuoteSection() {
           className="relative flex min-h-[100svh] w-full flex-col items-center justify-center overflow-hidden"
           style={{ background: "radial-gradient(ellipse at center, #101014 0%, #0A0A0F 100%)" }}
         >
-          <div className="w-full max-w-[1300px] px-6 text-center">
+          <div className="@container w-full max-w-[1300px] px-6 text-center">
             <h2
               ref={quoteTextRef}
-              className="font-anton text-[clamp(34px,10vw,68px)] uppercase leading-[0.88] tracking-[0.02em] md:text-[clamp(48px,5.5vw,100px)]"
+              className="font-anton text-[clamp(34px,10vw,68px)] uppercase leading-[0.88] tracking-[0.02em] md:text-[clamp(40px,calc(100cqw/14.2),96px)]"
               style={{ color: "#F5E6C8" }}
             >
-              {QUOTE.split(" ").map((word, wordIndex, arr) => (
-                <span key={wordIndex} style={{ display: "inline" }}>
-                  <span style={{ display: "inline-flex" }}>
-                    {Array.from(word).map((char, charIndex) => (
-                      <span key={`${wordIndex}-${charIndex}`} className="inline-block overflow-hidden">
-                        <span className="quote-char inline-block will-change-transform" style={{ color: "#F5E6C8" }}>
-                          {char}
-                        </span>
-                      </span>
-                    ))}
-                  </span>
-                  {wordIndex !== arr.length - 1 && (
-                    <span className="inline-block overflow-hidden">
-                      <span className="quote-char inline-block will-change-transform" style={{ color: "#F5E6C8" }}>
-                        {"\u00A0"}
-                      </span>
-                    </span>
-                  )}
-                </span>
-              ))}
+              <QuoteLines lines={QUOTE_LINES_DESKTOP} />
             </h2>
 
             <div ref={attributionRef} className="mt-9 flex flex-col items-center md:mt-12">
@@ -326,32 +348,13 @@ export default function QuoteSection() {
           className="relative flex min-h-[100svh] w-full flex-col items-center justify-center overflow-hidden px-6 text-center"
           style={{ background: "radial-gradient(ellipse at center, #101014 0%, #0A0A0F 100%)" }}
         >
-          <div className="w-full max-w-[1300px]">
+          <div className="@container w-full max-w-[1300px]">
             <h2
               ref={mobileQuoteTextRef}
               className="font-anton text-[clamp(30px,8vw,56px)] uppercase leading-[0.88] tracking-[0.02em]"
               style={{ color: "#F5E6C8" }}
             >
-              {QUOTE.split(" ").map((word, wordIndex, arr) => (
-                <span key={wordIndex} style={{ display: "inline" }}>
-                  <span style={{ display: "inline-flex" }}>
-                    {Array.from(word).map((char, charIndex) => (
-                      <span key={`${wordIndex}-${charIndex}`} className="inline-block overflow-hidden">
-                        <span className="quote-char inline-block will-change-transform" style={{ color: "#F5E6C8" }}>
-                          {char}
-                        </span>
-                      </span>
-                    ))}
-                  </span>
-                  {wordIndex !== arr.length - 1 && (
-                    <span className="inline-block overflow-hidden">
-                      <span className="quote-char inline-block will-change-transform" style={{ color: "#F5E6C8" }}>
-                        {"\u00A0"}
-                      </span>
-                    </span>
-                  )}
-                </span>
-              ))}
+              <QuoteLines lines={QUOTE_LINES_MOBILE} />
             </h2>
 
             <div ref={mobileAttributionRef} className="mt-9 flex flex-col items-center">

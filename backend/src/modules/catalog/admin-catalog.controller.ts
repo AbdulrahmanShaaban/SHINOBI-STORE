@@ -8,13 +8,30 @@ import {
   ParseIntPipe,
   Patch,
   Post,
+  Put,
   Query,
+  Req,
   UseGuards,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
-import { IsBoolean, IsIn, IsOptional, IsString, IsUUID, MaxLength, MinLength } from 'class-validator';
+import { Type } from 'class-transformer';
+import {
+  ArrayMaxSize,
+  IsArray,
+  IsBoolean,
+  IsIn,
+  IsOptional,
+  IsString,
+  IsUUID,
+  MaxLength,
+  MinLength,
+  ValidateNested,
+} from 'class-validator';
+import type { Request } from 'express';
 import { AdminGuard } from '../../common/guards/admin.guard';
+import { CurrentUser } from '../../common/rbac/current-user.decorator';
 import { RequirePermissions } from '../../common/rbac/require-permissions.decorator';
+import type { AuthenticatedUser } from '../../common/rbac/require-permissions.decorator';
 import { AdminCatalogService } from './admin-catalog.service';
 
 class ProductBodyDto {
@@ -50,6 +67,36 @@ class ProductBodyDto {
   featured?: boolean;
 }
 
+/** One image in the replacement set for PUT /admin/products/:id/images. */
+export class ProductImageEntryDto {
+  @IsString()
+  @MinLength(1)
+  @MaxLength(2048)
+  url!: string;
+
+  @IsOptional()
+  @IsUUID()
+  mediaId?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(300)
+  altText?: string;
+
+  @IsOptional()
+  @IsBoolean()
+  isPrimary?: boolean;
+}
+
+class SetProductImagesDto {
+  /** Full ordered replacement set — the previous set is deleted. */
+  @IsArray()
+  @ArrayMaxSize(10)
+  @ValidateNested({ each: true })
+  @Type(() => ProductImageEntryDto)
+  images!: ProductImageEntryDto[];
+}
+
 /**
  * Admin catalog CRUD. Every route requires an admin session (Phase 5) —
  * until then AdminGuard rejects all traffic with SESSIONS_NOT_IMPLEMENTED.
@@ -61,8 +108,6 @@ class ProductBodyDto {
 @Controller('admin')
 export class AdminCatalogController {
   constructor(private readonly adminCatalogService: AdminCatalogService) {}
-
-  @RequirePermissions('products:w')
 
   @Get('products')
   @RequirePermissions('products:r')
@@ -113,5 +158,17 @@ export class AdminCatalogController {
   @ApiOperation({ summary: 'Fetch product incl. drafts (admin)' })
   getProduct(@Param('id') id: string) {
     return this.adminCatalogService.getProduct(id);
+  }
+
+  @RequirePermissions('products:w')
+  @Put('products/:id/images')
+  @ApiOperation({ summary: 'Replace the ordered image set of a product (admin)' })
+  setProductImages(
+    @Param('id') id: string,
+    @Body() body: SetProductImagesDto,
+    @CurrentUser() actor: AuthenticatedUser,
+    @Req() req: Request,
+  ) {
+    return this.adminCatalogService.setProductImages(id, body.images, actor.id, req.ip);
   }
 }

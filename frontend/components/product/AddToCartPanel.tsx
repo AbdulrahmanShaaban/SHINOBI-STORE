@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from 'react';
 import { useCartStore } from '@/lib/cart-store';
+import { pushToast } from '@/components/shared/Toast';
 import { formatPrice } from '@/lib/money';
 import type { ProductDetail, VariantView } from '@/lib/api';
 import StockBadge, { stockLevel } from './StockBadge';
@@ -88,7 +89,17 @@ export default function AddToCartPanel({ product }: { product: ProductDetail }) 
   const [announce, setAnnounce] = useState('');
 
   const onAdd = () => {
-    if (!matchingVariant || matchingVariant.available <= 0 || needsSelection) return;
+    if (!matchingVariant || matchingVariant.available <= 0 || needsSelection) {
+      pushToast({
+        title: 'CANNOT ADD TO CART',
+        description:
+          !matchingVariant || matchingVariant.available <= 0
+            ? `${product.name} is currently sold out.`
+            : 'Select an option for every dimension first.',
+        variant: 'error',
+      });
+      return;
+    }
     addItem({
       variantId: matchingVariant.id,
       productId: product.id,
@@ -104,6 +115,11 @@ export default function AddToCartPanel({ product }: { product: ProductDetail }) 
     });
     setJustAdded(true);
     setAnnounce(`${effectiveQuantity} × ${product.name} added to cart`);
+    pushToast({
+      title: 'ADDED TO CART',
+      description: `${effectiveQuantity} × ${product.name}`,
+      variant: 'success',
+    });
     window.setTimeout(() => setJustAdded(false), 1600);
   };
 
