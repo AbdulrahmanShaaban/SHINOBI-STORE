@@ -69,6 +69,7 @@ export const SECTION_KEYS = [
   'featured_characters',
   'trending_anime',
   'collections',
+  'madara',
   'banner',
   'testimonials',
 ] as const;

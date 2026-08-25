@@ -31,13 +31,13 @@ const SlidingImage = () => {
     <div className="absolute -bottom-10 left-0 flex w-full h-full pointer-events-none overflow-hidden">
       <img
         ref={firstImage}
-        src={"/cloud.webp"}
+         src={"/sections/cloud.webp"}
         alt=""
         className="absolute left-0 bottom-0 h-full min-w-full w-auto max-w-none object-cover"
       />
       <img
         ref={secondImage}
-        src={"/cloud.webp"}
+         src={"/sections/cloud.webp"}
         alt=""
         className="absolute left-0 bottom-0 h-full min-w-full w-auto max-w-none object-cover"
       />

@@ -139,7 +139,7 @@ export default function CardStack() {
             </div>
             <div className="card-body bg-[#1A1A1A] rounded-b-xl p-5 md:p-8 flex flex-col items-center text-center pb-[12vh] md:pb-[35vh]">
               <div className="card-content flex flex-col items-center text-center">
-                <img src="/kunai.svg" alt="" className="w-14 h-14 md:w-20 md:h-20 mb-4 md:mb-6" />
+                <img src="/sections/kunai.svg" alt="" className="w-14 h-14 md:w-20 md:h-20 mb-4 md:mb-6" />
                 <p className="text-[#F0F0F0] text-base md:text-lg leading-relaxed max-w-md">
                   Hard work beats talent when talent doesn't work hard. We don't rely on forbidden jutsu, just pure training and dedication.
                 </p>

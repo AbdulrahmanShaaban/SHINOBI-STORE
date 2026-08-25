@@ -50,7 +50,7 @@ export const metadata: Metadata = {
   description:
     "Premium anime-inspired streetwear for true fans. Hoodies, t-shirts, and accessories.",
   icons: {
-    icon: "/favicon.svg",
+    icon: "/brand/favicon.svg",
   },
 };
 

@@ -119,7 +119,7 @@ export default function HeroSection({
     <section className="relative min-h-[100svh] h-screen overflow-hidden">
       {/* Background sky (decorative; LCP layer → priority) */}
       <Image
-        src="/sky.webp"
+        src="/sections/sky.webp"
         alt=""
         fill
         priority
@@ -129,7 +129,7 @@ export default function HeroSection({
 
       {/* Mountain (decorative) */}
       <Image
-        src="/mountain.webp"
+        src="/sections/mountain.webp"
         alt=""
         fill
         sizes="100vw"

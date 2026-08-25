@@ -31,13 +31,14 @@ describe('magic-byte allowlist', () => {
 });
 
 describe('section config schemas (single source of truth)', () => {
-  it('covers exactly the seven seeded keys', () => {
+  it('covers exactly the eight seeded keys', () => {
     expect(SECTION_KEYS).toEqual([
       'hero',
       'featured_products',
       'featured_characters',
       'trending_anime',
       'collections',
+      'madara',
       'banner',
       'testimonials',
     ]);
@@ -54,12 +55,21 @@ describe('section config schemas (single source of truth)', () => {
     expect(result.ok).toBe(true);
   });
 
+  it('accepts a partially populated madara config', () => {
+    const result = validateConfig('madara', {
+      defaultImg: '/characters/madara-default.png',
+      sixPathsImg: 'https://cdn.example.com/madara-six-paths.png',
+    });
+    expect(result.ok).toBe(true);
+  });
+
   it.each([
     ['hero missing required title', 'hero', { subtitle: 'no title' }],
     ['hero title over 80 chars', 'hero', { title: 'x'.repeat(81) }],
     ['unknown property smuggled in', 'banner', { title: 'ok', admin: true }],
     ['non-object config', 'hero', ['nope']],
     ['unknown section key', 'splash', { anything: true }],
+    ['madara image that is neither http(s) nor root-relative', 'madara', { defaultImg: 'images/madara.png' }],
     [
       'featured_characters item over array cap',
       'featured_characters',

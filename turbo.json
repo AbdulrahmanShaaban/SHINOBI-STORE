@@ -1,0 +1,15 @@
+{
+  "$schema": "https://turborepo.com/schema.json",
+  "globalEnv": ["DATABASE_URL", "REDIS_URL", "NODE_ENV"],
+  "tasks": {
+    "build": {
+      "dependsOn": ["^build"],
+      "outputs": [".next/**", "!.next/cache/**", "dist/**"]
+    },
+    "lint": {},
+    "typecheck": {},
+    "test": {},
+    "test:e2e": {},
+    "test:int": {}
+  }
+}

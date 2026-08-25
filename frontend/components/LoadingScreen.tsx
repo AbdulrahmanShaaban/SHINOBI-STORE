@@ -58,7 +58,7 @@ export default function LoadingScreen() {
               </span>
             ))}
           </div>
-          <img src="/kunai.svg" alt="" className="kunai w-20 h-8 sm:w-32 sm:h-10 md:w-48 md:h-16" />
+          <img src="/sections/kunai.svg" alt="" className="kunai w-20 h-8 sm:w-32 sm:h-10 md:w-48 md:h-16" />
           <div className="flex">
             {Array.from('STORE').map((letter, i) => (
               <span key={i} className="store-letter font-anton text-5xl sm:text-6xl md:text-7xl lg:text-9xl text-white">

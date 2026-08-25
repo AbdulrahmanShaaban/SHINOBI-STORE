@@ -13,8 +13,8 @@ const CHARACTERS = [
     name: "NARUTO",
     id: "naruto",
     price: 29.99,
-    defaultImg: "/naruto-default.png",
-    jutsuImg: "/naruto-rasengan.png",
+    defaultImg: "/characters/naruto-default.png",
+    jutsuImg: "/characters/naruto-rasengan.png",
     borderColor: "var(--primary) 0px 0px 10px",
     accentVar: "var(--primary)",
   },
@@ -22,8 +22,8 @@ const CHARACTERS = [
     name: "ITACHI",
     id: "itachi",
     price: 34.99,
-    defaultImg: "/itachi-default.png",
-    jutsuImg: "/itachi-mangekyou.png",
+    defaultImg: "/characters/itachi-default.png",
+    jutsuImg: "/characters/itachi-mangekyou.png",
     borderColor: "var(--red) 0px 0px 10px",
     accentVar: "var(--red)",
   },
@@ -31,8 +31,8 @@ const CHARACTERS = [
     name: "SASUKE",
     id: "sasuke",
     price: 31.99,
-    defaultImg: "/sasuke-default.png",
-    jutsuImg: "/sasuke-chidori.png",
+    defaultImg: "/characters/sasuke-default.png",
+    jutsuImg: "/characters/sasuke-chidori.png",
     borderColor: "var(--sasuke-accent) 0px 0px 10px",
     accentVar: "var(--sasuke-accent)",
   },
@@ -138,8 +138,8 @@ export default function ShinobiCharacterCards() {
               Never gives up. Never backs down.
             </div>
             <div className="relative w-full flex-1 min-h-[320px] sm:min-h-[450px] md:min-h-[550px] lg:min-h-[650px] overflow-hidden rounded-lg flex items-center justify-center mt-4">
-              <img ref={narutoDefaultRef} src="/naruto-default.png" alt="Naruto" className="absolute inset-0 w-full h-full object-contain" />
-              <img ref={narutoJutsuRef} src="/naruto-rasengan.png" alt="Naruto Rasengan" className="absolute inset-0 w-full h-full object-contain" style={{ opacity: 0 }} />
+              <img ref={narutoDefaultRef} src="/characters/naruto-default.png" alt="Naruto" className="absolute inset-0 w-full h-full object-contain" />
+              <img ref={narutoJutsuRef} src="/characters/naruto-rasengan.png" alt="Naruto Rasengan" className="absolute inset-0 w-full h-full object-contain" style={{ opacity: 0 }} />
             </div>
           </div>
           <div className="w-full p-4 sm:p-5 md:p-6 lg:p-8 pt-4 md:pt-5 pb-8 sm:pb-12 lg:pb-14 mt-auto">
@@ -181,8 +181,8 @@ export default function ShinobiCharacterCards() {
               Sacrifice everything for peace.
             </div>
             <div className="relative w-full flex-1 min-h-[320px] sm:min-h-[450px] md:min-h-[550px] lg:min-h-[650px] overflow-hidden rounded-lg flex items-center justify-center mt-4">
-              <img ref={itachiDefaultRef} src="/itachi-default.png" alt="Itachi" className="absolute inset-0 w-full h-full object-contain" />
-              <img ref={itachiJutsuRef} src="/itachi-mangekyou.png" alt="Itachi Mangekyo" className="absolute inset-0 w-full h-full object-contain" style={{ opacity: 0 }} />
+              <img ref={itachiDefaultRef} src="/characters/itachi-default.png" alt="Itachi" className="absolute inset-0 w-full h-full object-contain" />
+              <img ref={itachiJutsuRef} src="/characters/itachi-mangekyou.png" alt="Itachi Mangekyo" className="absolute inset-0 w-full h-full object-contain" style={{ opacity: 0 }} />
             </div>
           </div>
           <div className="w-full p-4 sm:p-5 md:p-6 lg:p-8 pt-4 md:pt-5 pb-8 sm:pb-12 lg:pb-14 mt-auto">
@@ -224,8 +224,8 @@ export default function ShinobiCharacterCards() {
               Power at any cost.
             </div>
             <div className="relative w-full flex-1 min-h-[320px] sm:min-h-[450px] md:min-h-[550px] lg:min-h-[650px] overflow-hidden rounded-lg flex items-center justify-center mt-4">
-              <img ref={sasukeDefaultRef} src="/sasuke-default.png" alt="Sasuke" className="absolute inset-0 w-full h-full object-contain" />
-              <img ref={sasukeJutsuRef} src="/sasuke-chidori.png" alt="Sasuke Chidori" className="absolute inset-0 w-full h-full object-contain" style={{ opacity: 0 }} />
+              <img ref={sasukeDefaultRef} src="/characters/sasuke-default.png" alt="Sasuke" className="absolute inset-0 w-full h-full object-contain" />
+              <img ref={sasukeJutsuRef} src="/characters/sasuke-chidori.png" alt="Sasuke Chidori" className="absolute inset-0 w-full h-full object-contain" style={{ opacity: 0 }} />
             </div>
           </div>
           <div className="w-full p-4 sm:p-5 md:p-6 lg:p-8 pt-4 md:pt-5 pb-8 sm:pb-12 lg:pb-14 mt-auto">

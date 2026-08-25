@@ -119,7 +119,7 @@ const CHARACTERS: Character[] = [
     description:
       "The Yellow Flash. Precision, speed, and a will strong enough to protect everyone behind him.",
     subline: "THE YELLOW FLASH",
-    image: "/minato.png",
+    image: "/characters/minato.png",
     alt: "Minato Namikaze",
   },
   {
@@ -129,7 +129,7 @@ const CHARACTERS: Character[] = [
     description:
       "Those who do not understand true pain can never understand true peace.",
     subline: "THE SIX PATHS OF PAIN",
-    image: "/pain.png",
+    image: "/characters/pain.png",
     alt: "Pain",
   },
   {
@@ -139,7 +139,7 @@ const CHARACTERS: Character[] = [
     description:
       "A broken dream, a borrowed identity, and a world he wanted to reshape in his own image.",
     subline: "THE MASKED SHINOBI",
-    image: "/obito-default.png",
+    image: "/characters/obito-default.png",
     alt: "Obito Uchiha",
   },
 ];

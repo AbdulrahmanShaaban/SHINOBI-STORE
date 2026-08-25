@@ -2,7 +2,8 @@
  * Deterministic catalog seed (plan §Phase 1).
  * - Idempotent: every entity is upserted by slug/sku — safe to re-run.
  * - No randomness: fixed prices/stock/ratings so tests are reproducible.
- * - Reuses existing public art paths served by the frontend (/<file>.png),
+ * - Reuses existing public art paths served by the frontend, grouped by
+ *   purpose (/characters/<file>.png, /sections/<file>),
  *   so seeded URLs work as-is against the storefront origin.
  *
  * Run: pnpm --filter backend db:seed   (requires DATABASE_URL reachable)
@@ -60,19 +61,19 @@ const categories = [
 ];
 
 const animes = [
-  { slug: 'naruto', name: 'Naruto', description: 'Original series — the Hidden Leaf\'s number one hyperactive ninja.', imageUrl: '/naruto.png', isFeatured: true, sortOrder: 1 },
-  { slug: 'naruto-shippuden', name: 'Naruto Shippuden', description: 'The war arc era — legends clash across the Five Great Nations.', imageUrl: '/kurama.png', isFeatured: true, sortOrder: 2 },
+  { slug: 'naruto', name: 'Naruto', description: 'Original series — the Hidden Leaf\'s number one hyperactive ninja.', imageUrl: '/characters/naruto.png', isFeatured: true, sortOrder: 1 },
+  { slug: 'naruto-shippuden', name: 'Naruto Shippuden', description: 'The war arc era — legends clash across the Five Great Nations.', imageUrl: '/characters/kurama.png', isFeatured: true, sortOrder: 2 },
 ];
 
 const characters = [
-  { slug: 'naruto', name: 'Naruto Uzumaki', anime: 'naruto', imageUrl: '/naruto-default.png' },
-  { slug: 'sasuke', name: 'Sasuke Uchiha', anime: 'naruto', imageUrl: '/sasuke-default.png' },
-  { slug: 'minato', name: 'Minato Namikaze', anime: 'naruto', imageUrl: '/minato.png' },
-  { slug: 'kurama', name: 'Kurama', anime: 'naruto-shippuden', imageUrl: '/kurama.png' },
-  { slug: 'itachi', name: 'Itachi Uchiha', anime: 'naruto-shippuden', imageUrl: '/itachi-default.png' },
-  { slug: 'madara', name: 'Madara Uchiha', anime: 'naruto-shippuden', imageUrl: '/madara-default.png' },
-  { slug: 'obito', name: 'Obito Uchiha', anime: 'naruto-shippuden', imageUrl: '/obito-default.png' },
-  { slug: 'pain', name: 'Pain (Nagato)', anime: 'naruto-shippuden', imageUrl: '/pain.png' },
+  { slug: 'naruto', name: 'Naruto Uzumaki', anime: 'naruto', imageUrl: '/characters/naruto-default.png' },
+  { slug: 'sasuke', name: 'Sasuke Uchiha', anime: 'naruto', imageUrl: '/characters/sasuke-default.png' },
+  { slug: 'minato', name: 'Minato Namikaze', anime: 'naruto', imageUrl: '/characters/minato.png' },
+  { slug: 'kurama', name: 'Kurama', anime: 'naruto-shippuden', imageUrl: '/characters/kurama.png' },
+  { slug: 'itachi', name: 'Itachi Uchiha', anime: 'naruto-shippuden', imageUrl: '/characters/itachi-default.png' },
+  { slug: 'madara', name: 'Madara Uchiha', anime: 'naruto-shippuden', imageUrl: '/characters/madara-default.png' },
+  { slug: 'obito', name: 'Obito Uchiha', anime: 'naruto-shippuden', imageUrl: '/characters/obito-default.png' },
+  { slug: 'pain', name: 'Pain (Nagato)', anime: 'naruto-shippuden', imageUrl: '/characters/pain.png' },
 ];
 
 const tags = [
@@ -93,8 +94,8 @@ const products: ProductSpec[] = [
     category: 'apparel', anime: 'naruto-shippuden', character: 'naruto', tags: ['hoodie'],
     featured: true, ratingAvg: 4.8, reviewCount: 214,
     images: [
-      { url: '/naruto-rasengan.png', altText: 'Naruto forming a Rasengan' },
-      { url: '/naruto-default.png', altText: 'Naruto Uzumaki portrait' },
+      { url: '/characters/naruto-rasengan.png', altText: 'Naruto forming a Rasengan' },
+      { url: '/characters/naruto-default.png', altText: 'Naruto Uzumaki portrait' },
     ],
     variants: APPAREL_SIZES(6900, 8900),
   },
@@ -103,7 +104,7 @@ const products: ProductSpec[] = [
     description: 'Storm-grey hoodie crackling with Chidori lightning linework down both sleeves.',
     category: 'apparel', anime: 'naruto', character: 'sasuke', tags: ['hoodie', 'uchiha'],
     featured: true, ratingAvg: 4.7, reviewCount: 189,
-    images: [{ url: '/sasuke-chidori.png', altText: 'Sasuke channeling Chidori' }],
+    images: [{ url: '/characters/sasuke-chidori.png', altText: 'Sasuke channeling Chidori' }],
     variants: APPAREL_SIZES(6900),
   },
   {
@@ -111,7 +112,7 @@ const products: ProductSpec[] = [
     description: 'Black hoodie scattered with red cloud motifs. A quiet tribute to the strongest of the Akatsuki.',
     category: 'apparel', anime: 'naruto-shippuden', character: 'itachi', tags: ['hoodie', 'akatsuki', 'uchiha'],
     featured: true, ratingAvg: 4.9, reviewCount: 342,
-    images: [{ url: '/itachi-default.png', altText: 'Itachi in Akatsuki robes' }],
+    images: [{ url: '/characters/itachi-default.png', altText: 'Itachi in Akatsuki robes' }],
     variants: APPAREL_SIZES(7400, 9400),
   },
   {
@@ -119,7 +120,7 @@ const products: ProductSpec[] = [
     description: 'Gunmetal hoodie honoring the founder of the Uchiha clan. Gunbai silhouette on the back.',
     category: 'apparel', anime: 'naruto-shippuden', character: 'madara', tags: ['hoodie', 'uchiha'],
     ratingAvg: 4.6, reviewCount: 156,
-    images: [{ url: '/madara-default.png', altText: 'Madara Uchiha portrait' }],
+    images: [{ url: '/characters/madara-default.png', altText: 'Madara Uchiha portrait' }],
     variants: APPAREL_SIZES(7200),
   },
   {
@@ -127,7 +128,7 @@ const products: ProductSpec[] = [
     description: 'Orange-and-black hoodie echoing Tobi\'s masked persona. Spiral emblem over the heart.',
     category: 'apparel', anime: 'naruto-shippuden', character: 'obito', tags: ['hoodie', 'akatsuki'],
     ratingAvg: 4.4, reviewCount: 98,
-    images: [{ url: '/obito-default.png', altText: 'Obito wearing his mask' }],
+    images: [{ url: '/characters/obito-default.png', altText: 'Obito wearing his mask' }],
     variants: APPAREL_SIZES(6700),
   },
   {
@@ -135,7 +136,7 @@ const products: ProductSpec[] = [
     description: 'White-and-gold hoodie celebrating Konoha\'s Fourth Hokage. Flying Raijin mark on the chest.',
     category: 'apparel', anime: 'naruto', character: 'minato', tags: ['hoodie', 'hokage'],
     featured: true, ratingAvg: 4.8, reviewCount: 201,
-    images: [{ url: '/minato.png', altText: 'Minato Namikaze, the Yellow Flash' }],
+    images: [{ url: '/characters/minato.png', altText: 'Minato Namikaze, the Yellow Flash' }],
     variants: APPAREL_SIZES(7000, 8500),
   },
   {
@@ -143,7 +144,7 @@ const products: ProductSpec[] = [
     description: 'Breathable cotton tee with toad-sage eye linework across the shoulders.',
     category: 'apparel', anime: 'naruto-shippuden', character: 'naruto', tags: ['t-shirt'],
     ratingAvg: 4.5, reviewCount: 132,
-    images: [{ url: '/naruto.png', altText: 'Naruto in Sage Mode' }],
+    images: [{ url: '/characters/naruto.png', altText: 'Naruto in Sage Mode' }],
     variants: APPAREL_SIZES(3200),
   },
   {
@@ -151,7 +152,7 @@ const products: ProductSpec[] = [
     description: 'Faded three-tomoe curse pattern wrapping from hem to collar.',
     category: 'apparel', anime: 'naruto', character: 'sasuke', tags: ['t-shirt', 'uchiha'],
     ratingAvg: 4.3, reviewCount: 87,
-    images: [{ url: '/sasuke-default.png', altText: 'Sasuke Uchiha portrait' }],
+    images: [{ url: '/characters/sasuke-default.png', altText: 'Sasuke Uchiha portrait' }],
     variants: APPAREL_SIZES(3000),
   },
   {
@@ -159,7 +160,7 @@ const products: ProductSpec[] = [
     description: 'Soft-wash tee where crows dissolve into a single Sharingan at the neckline.',
     category: 'apparel', anime: 'naruto-shippuden', character: 'itachi', tags: ['t-shirt', 'uchiha'],
     ratingAvg: 4.7, reviewCount: 165,
-    images: [{ url: '/itachi-mangekyou.png', altText: 'Itachi Mangekyo Sharingan art' }],
+    images: [{ url: '/characters/itachi-mangekyou.png', altText: 'Itachi Mangekyo Sharingan art' }],
     variants: APPAREL_SIZES(3300, 4200),
   },
   {
@@ -167,7 +168,7 @@ const products: ProductSpec[] = [
     description: 'Black tee with Rinnegan-ring geometry radiating from center chest.',
     category: 'apparel', anime: 'naruto-shippuden', character: 'madara', tags: ['t-shirt', 'uchiha'],
     ratingAvg: 4.6, reviewCount: 121,
-    images: [{ url: '/madara-six-paths.png', altText: 'Madara in Six Paths form' }],
+    images: [{ url: '/characters/madara-six-paths.png', altText: 'Madara in Six Paths form' }],
     variants: APPAREL_SIZES(3500),
   },
   {
@@ -175,7 +176,7 @@ const products: ProductSpec[] = [
     description: 'Charcoal tee capturing Shinra Tensei shockwave rings around a Rinnegan core.',
     category: 'apparel', anime: 'naruto-shippuden', character: 'pain', tags: ['t-shirt', 'akatsuki'],
     ratingAvg: 4.4, reviewCount: 76,
-    images: [{ url: '/pain.png', altText: 'Pain with Rinnegan eyes' }],
+    images: [{ url: '/characters/pain.png', altText: 'Pain with Rinnegan eyes' }],
     variants: APPAREL_SIZES(3100),
   },
   {
@@ -183,7 +184,7 @@ const products: ProductSpec[] = [
     description: 'Burnt-orange tee with chakra-fox brushstrokes climbing the left side.',
     category: 'apparel', anime: 'naruto-shippuden', character: 'kurama', tags: ['t-shirt'],
     ratingAvg: 4.5, reviewCount: 110,
-    images: [{ url: '/kurama.png', altText: 'Kurama, the Nine-Tails' }],
+    images: [{ url: '/characters/kurama.png', altText: 'Kurama, the Nine-Tails' }],
     variants: APPAREL_SIZES(3200),
   },
   {
@@ -191,7 +192,7 @@ const products: ProductSpec[] = [
     description: 'Artisan resin keycap with a suspended red cloud. Cherry MX compatible.',
     category: 'accessories', anime: 'naruto-shippuden', character: 'itachi', tags: ['keycap', 'akatsuki'],
     featured: true, ratingAvg: 4.9, reviewCount: 64,
-    images: [{ url: '/kunai.svg', altText: 'Kunai icon' }],
+    images: [{ url: '/sections/kunai.svg', altText: 'Kunai icon' }],
     variants: single(2400, 60),
   },
   {
@@ -199,7 +200,7 @@ const products: ProductSpec[] = [
     description: 'Stitched-edge desk mat with a slowly rotating triple-tomoe print. 900×400mm.',
     category: 'accessories', anime: 'naruto', character: 'sasuke', tags: ['uchiha'],
     ratingAvg: 4.6, reviewCount: 58,
-    images: [{ url: '/sky.webp', altText: 'Sky texture background' }],
+    images: [{ url: '/sections/sky.webp', altText: 'Sky texture background' }],
     variants: single(3600, 80),
   },
   {
@@ -208,7 +209,7 @@ const products: ProductSpec[] = [
     category: 'accessories', anime: 'naruto', character: null, tags: [],
     status: product_status.archived,
     ratingAvg: 4.0, reviewCount: 12,
-    images: [{ url: '/kunai.svg', altText: 'Kunai icon' }],
+    images: [{ url: '/sections/kunai.svg', altText: 'Kunai icon' }],
     variants: single(1200, 0),
   },
   {
@@ -216,7 +217,7 @@ const products: ProductSpec[] = [
     description: 'A3 giclée print of the two statues guarding the falls where rivals first clashed.',
     category: 'posters', anime: 'naruto', character: null, tags: ['poster'],
     ratingAvg: 4.7, reviewCount: 143,
-    images: [{ url: '/mountain.webp', altText: 'Mountain valley artwork' }],
+    images: [{ url: '/sections/mountain.webp', altText: 'Mountain valley artwork' }],
     variants: single(2200, 140),
   },
   {
@@ -224,7 +225,7 @@ const products: ProductSpec[] = [
     description: 'Metallic ink print of Madara ascending with truth-seeking orbs in orbit.',
     category: 'posters', anime: 'naruto-shippuden', character: 'madara', tags: ['poster', 'uchiha'],
     featured: true, ratingAvg: 4.8, reviewCount: 97,
-    images: [{ url: '/madara-six-paths.png', altText: 'Madara Six Paths artwork' }],
+    images: [{ url: '/characters/madara-six-paths.png', altText: 'Madara Six Paths artwork' }],
     variants: single(2800, 95),
   },
   {
@@ -232,7 +233,7 @@ const products: ProductSpec[] = [
     description: 'Three-print set: Itachi, Sasuke, and Obito Mangekyo patterns on brushed foil.',
     category: 'posters', anime: 'naruto-shippuden', character: 'itachi', tags: ['poster', 'uchiha'],
     ratingAvg: 4.9, reviewCount: 176,
-    images: [{ url: '/itachi-mangekyou.png', altText: 'Mangekyo Sharingan triptych' }],
+    images: [{ url: '/characters/itachi-mangekyou.png', altText: 'Mangekyo Sharingan triptych' }],
     variants: single(4200, 50, 5200),
   },
   {
@@ -241,8 +242,8 @@ const products: ProductSpec[] = [
     category: 'posters', anime: 'naruto', character: 'naruto', tags: ['poster'],
     ratingAvg: 4.6, reviewCount: 88,
     images: [
-      { url: '/naruto-rasengan.png', altText: 'Rasengan half of the diptych' },
-      { url: '/sasuke-chidori.png', altText: 'Chidori half of the diptych' },
+      { url: '/characters/naruto-rasengan.png', altText: 'Rasengan half of the diptych' },
+      { url: '/characters/sasuke-chidori.png', altText: 'Chidori half of the diptych' },
     ],
     variants: single(2600, 120),
   },
@@ -251,7 +252,7 @@ const products: ProductSpec[] = [
     description: 'PVC figure of Naruto mid-Rasengan with translucent chakra FX and swappable hands.',
     category: 'figures', anime: 'naruto-shippuden', character: 'naruto', tags: ['figure'],
     featured: true, ratingAvg: 4.8, reviewCount: 205,
-    images: [{ url: '/naruto-rasengan.png', altText: 'Naruto Rasengan figure box art' }],
+    images: [{ url: '/characters/naruto-rasengan.png', altText: 'Naruto Rasengan figure box art' }],
     variants: single(11900, 30, 13900),
   },
   {
@@ -259,7 +260,7 @@ const products: ProductSpec[] = [
     description: 'PVC figure of Sasuke lunging with lightning-wrapped fist on a shattered-rock base.',
     category: 'figures', anime: 'naruto', character: 'sasuke', tags: ['figure'],
     ratingAvg: 4.7, reviewCount: 158,
-    images: [{ url: '/sasuke-chidori.png', altText: 'Sasuke Chidori figure box art' }],
+    images: [{ url: '/characters/sasuke-chidori.png', altText: 'Sasuke Chidori figure box art' }],
     variants: single(11900, 26),
   },
   {
@@ -267,7 +268,7 @@ const products: ProductSpec[] = [
     description: 'Premium Itachi figure surrounded by crow-flock transparent wings.',
     category: 'figures', anime: 'naruto-shippuden', character: 'itachi', tags: ['figure', 'uchiha'],
     ratingAvg: 4.9, reviewCount: 264,
-    images: [{ url: '/itachi-mangekyou.png', altText: 'Itachi crow figure art' }],
+    images: [{ url: '/characters/itachi-mangekyou.png', altText: 'Itachi crow figure art' }],
     variants: single(14900, 18),
   },
   {
@@ -276,7 +277,7 @@ const products: ProductSpec[] = [
     category: 'figures', anime: 'naruto-shippuden', character: 'kurama', tags: ['figure'],
     status: product_status.draft,
     ratingAvg: 0, reviewCount: 0,
-    images: [{ url: '/kurama.png', altText: 'Kurama mode figure concept' }],
+    images: [{ url: '/characters/kurama.png', altText: 'Kurama mode figure concept' }],
     variants: single(19900, 100),
   },
   {
@@ -285,7 +286,7 @@ const products: ProductSpec[] = [
     category: 'posters', anime: 'naruto-shippuden', character: 'pain', tags: ['poster', 'akatsuki'],
     status: product_status.draft,
     ratingAvg: 0, reviewCount: 0,
-    images: [{ url: '/pain.png', altText: 'Six Paths of Pain concept' }],
+    images: [{ url: '/characters/pain.png', altText: 'Six Paths of Pain concept' }],
     variants: single(2900, 75),
   },
 ];

@@ -1,24 +1,27 @@
 {
-    "name":  "shinobi-store",
-    "version":  "1.0.0",
-    "private":  true,
-    "description":  "Shinobi Store - Premium anime-inspired e-commerce monorepo",
-    "packageManager":  "pnpm@11.21.0",
-    "engines":  {
-                    "node":  "\u003e=20.9.0"
-                },
-    "scripts":  {
-                    "dev":  "pnpm -r --parallel run dev",
-                    "build":  "pnpm -r run build",
-                    "test":  "pnpm --filter backend test",
-                    "test:e2e":  "pnpm --filter backend test:e2e",
-                    "lint":  "pnpm -r run lint",
-                    "typecheck":  "pnpm -r run typecheck",
-                    "contracts:generate":  "pnpm --filter @shinobi/contracts generate"
-                },
-    "pnpm":  {
-                 "onlyBuiltDependencies":  [
-                                               "msgpackr-extract"
-                                           ]
-             }
+    "name": "shinobi-store",
+    "version": "1.0.0",
+    "private": true,
+    "description": "Shinobi Store - Premium anime-inspired e-commerce monorepo",
+    "packageManager": "pnpm@11.21.0",
+    "engines": {
+        "node": ">=20.9.0"
+    },
+    "scripts": {
+        "dev": "pnpm -r --parallel run dev",
+        "build": "pnpm -r run build",
+        "test": "pnpm --filter backend test",
+        "test:e2e": "pnpm --filter backend test:e2e",
+        "lint": "pnpm -r run lint",
+        "typecheck": "pnpm -r run typecheck",
+        "contracts:generate": "pnpm --filter @shinobi/contracts generate"
+    },
+    "pnpm": {
+        "onlyBuiltDependencies": [
+            "msgpackr-extract"
+        ]
+    },
+    "devDependencies": {
+        "turbo": "^2.10.11"
+    }
 }

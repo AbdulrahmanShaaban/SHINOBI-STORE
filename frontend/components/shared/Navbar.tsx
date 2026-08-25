@@ -85,7 +85,7 @@ export default function Navbar() {
               }`}
             >
               <Image
-                src="/logo.png"
+                src="/brand/logo.png"
                 alt="Shinobi Store Logo"
                 width={1536}
                 height={1024}

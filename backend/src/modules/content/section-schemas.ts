@@ -23,6 +23,7 @@ export const SECTION_KEYS = [
   'featured_characters',
   'trending_anime',
   'collections',
+  'madara',
   'banner',
   'testimonials',
 ] as const;
@@ -167,6 +168,28 @@ export class CollectionsConfigDto {
   items!: CollectionItemDto[];
 }
 
+// ───────────────────────────── madara ─────────────────────────────
+
+/**
+ * MadaraSpecialCard imagery. All optional — the storefront falls back to the
+ * bundled artwork per field when a value is unset. sandImg deliberately stays
+ * a fixed asset: it is rendered ~42× as a blurred, screen-blended particle
+ * texture inside the GSAP orbit (animation art direction), not admin content.
+ */
+export class MadaraConfigDto {
+  @IsOptional()
+  @IsMediaUrl()
+  defaultImg?: string;
+
+  @IsOptional()
+  @IsMediaUrl()
+  jutsuImg?: string;
+
+  @IsOptional()
+  @IsMediaUrl()
+  sixPathsImg?: string;
+}
+
 // ───────────────────────────── banner ─────────────────────────────
 
 export class BannerConfigDto {
@@ -222,6 +245,7 @@ const SECTION_CONFIG_SCHEMAS: Record<SectionKey, new () => object> = {
   featured_characters: FeaturedCharactersConfigDto,
   trending_anime: TrendingAnimeConfigDto,
   collections: CollectionsConfigDto,
+  madara: MadaraConfigDto,
   banner: BannerConfigDto,
   testimonials: TestimonialsConfigDto,
 };

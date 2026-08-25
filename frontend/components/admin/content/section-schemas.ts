@@ -94,6 +94,35 @@ export const SECTION_SCHEMAS: Record<string, ConfigFieldDef[]> = {
       ],
     },
   ],
+  madara: [
+    {
+      name: 'defaultImg',
+      label: 'DEFAULT IMAGE URL',
+      kind: 'scalar',
+      maxLength: 500,
+      placeholder: '/media/madara/… or https://…',
+      helpText:
+        'Absolute http(s) URL or a root-relative path starting with /. Empty keeps the bundled artwork.',
+    },
+    {
+      name: 'jutsuImg',
+      label: 'JUTSU IMAGE URL',
+      kind: 'scalar',
+      maxLength: 500,
+      placeholder: '/media/madara/… or https://…',
+      helpText:
+        'Absolute http(s) URL or a root-relative path starting with /. Empty keeps the bundled artwork.',
+    },
+    {
+      name: 'sixPathsImg',
+      label: 'SIX PATHS IMAGE URL',
+      kind: 'scalar',
+      maxLength: 500,
+      placeholder: '/media/madara/… or https://…',
+      helpText:
+        'Absolute http(s) URL or a root-relative path starting with /. Empty keeps the bundled artwork.',
+    },
+  ],
   banner: [
     { name: 'title', label: 'TITLE', kind: 'scalar', maxLength: 60, required: true },
     { name: 'message', label: 'MESSAGE', kind: 'scalar', multiline: true, maxLength: 140 },

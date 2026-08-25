@@ -67,35 +67,45 @@ jobs:
           pnpm --filter backend db:deploy
           pnpm --filter backend db:seed
 
+      # Turborepo local cache, shared across runs via actions/cache. Stale
+      # entries are harmless — every task result is keyed by a content hash of
+      # its inputs (files + globalEnv), so only matching hashes are restored.
+      - name: Restore Turbo cache
+        uses: actions/cache@v4
+        with:
+          path: .turbo
+          key: turbo-${{ runner.os }}-${{ github.sha }}
+          restore-keys: |
+            turbo-${{ runner.os }}-
+
       - name: Lint backend
-        run: pnpm --filter backend lint
+        run: pnpm exec turbo run lint --filter=backend --cache-dir=.turbo
 
       # Non-blocking: legacy marketing components carry pre-existing lint debt
       # (react-hooks rules in GSAP sections, unescaped entities). Tracked for the
       # frontend rebuild phase — flip to blocking once cleaned up.
       - name: Lint frontend (non-blocking)
-        run: pnpm --filter frontend lint
+        run: pnpm exec turbo run lint --filter=frontend --cache-dir=.turbo
         continue-on-error: true
 
       - name: Typecheck
-        run: pnpm typecheck
+        run: pnpm exec turbo run typecheck --cache-dir=.turbo
 
       - name: Unit tests (backend)
-        run: pnpm --filter backend test
+        run: pnpm exec turbo run test --filter=backend --cache-dir=.turbo
 
       # Runs the full request pipeline; with services up, readiness must be green.
       - name: E2E API tests
-        run: pnpm test:e2e
+        run: pnpm exec turbo run test:e2e --cache-dir=.turbo
 
       # Real-database data correctness: visibility, filter matrix, triggers.
       - name: Integration tests (live DB)
-        run: pnpm --filter backend test:int
+        run: pnpm exec turbo run test:int --cache-dir=.turbo
 
-      - name: Build frontend
-        run: pnpm --filter frontend build
-
-      - name: Build backend
-        run: pnpm --filter backend build
+      # Next.js .next output and NestJS dist are cached between runs; unchanged
+      # packages replay from cache instead of rebuilding.
+      - name: Build all workspaces
+        run: pnpm exec turbo run build --cache-dir=.turbo
 
       # Non-blocking initially — triage existing advisories, then flip to blocking.
       - name: Dependency audit (non-blocking)

@@ -4,7 +4,7 @@ export default function ShinobiLogo() {
   return (
     <div className="flex w-full flex-col items-center justify-center">
       <Image
-              src={"/logo.png"}
+              src={"/brand/logo.png"}
               alt="Shinobi Logo"
               width={800}
               height={800}

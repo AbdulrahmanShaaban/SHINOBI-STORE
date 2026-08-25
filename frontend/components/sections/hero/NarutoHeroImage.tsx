@@ -4,7 +4,7 @@ export default function Naruto() {
   return (
     <div className="naruto-character w-full pointer-events-auto">
       <Image
-        src="/naruto.png"
+        src="/characters/naruto.png"
         alt=""
         width={725}
         height={762}

@@ -5,52 +5,18 @@ import { useRef } from "react";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { DEFAULT_CHARACTERS, type Character } from "./showcase-characters";
 
 gsap.registerPlugin(ScrollTrigger);
 
-type Character = {
-  number: string;
-  eyebrow: string;
-  title: string;
-  description: string;
-  subline: string;
-  image: string;
-  alt: string;
-  skills: string[];
-};
-
-const CHARACTERS: Character[] = [
-  {
-    number: "01",
-    eyebrow: "THE FOURTH HOKAGE",
-    title: "MINATO NAMIKAZE",
-    description: "The Yellow Flash. Precision, speed, and a will strong enough to protect everyone behind him.",
-    subline: "THE YELLOW FLASH",
-    image: "/minato.png",
-    alt: "Minato Namikaze",
-    skills: ["Flying Thunder God", "Rasengan", "Fuinjutsu"],
-  },
-  {
-    number: "02",
-    eyebrow: "THE AKATSUKI FOUNDER",
-    title: "PAIN NAGATO",
-    description: "Those who do not understand true pain can never understand true peace.",
-    subline: "THE SIX PATHS OF PAIN",
-    image: "/pain.png",
-    alt: "Pain Nagato",
-    skills: ["Rinnegan", "Almighty Push", "Planetary Devastation"],
-  },
-  {
-    number: "03",
-    eyebrow: "THE MAN BEHIND THE MASK",
-    title: "OBITO UCHIHA",
-    description: "A broken dream, a borrowed identity, and a world he wanted to reshape in his own image.",
-    subline: "THE MASKED SHINOBI",
-    image: "/obito-default.png",
-    alt: "Obito Uchiha",
-    skills: ["Kamui", "Sharingan", "Wood Release"],
-  },
-];
+interface CharacterShowcaseProps {
+  /**
+   * CMS-resolved panels (featured_characters key). Undefined keeps the
+   * hardcoded DEFAULT_CHARACTERS trio — the storefront must render exactly
+   * the pre-CMS composition whenever the override is absent or too sparse.
+   */
+  characters?: Character[];
+}
 
 const CARD_WIDTH = "w-[85vw] md:w-[74vw] lg:w-[68vw] xl:w-[64vw]";
 
@@ -161,7 +127,8 @@ function IntroPanel() {
   );
 }
 
-export default function CharacterShowcase() {
+export default function CharacterShowcase({ characters }: CharacterShowcaseProps) {
+  const list = characters ?? DEFAULT_CHARACTERS;
   const sectionRef = useRef<HTMLElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
@@ -244,9 +211,9 @@ export default function CharacterShowcase() {
         >
           {/* Spacer guarantees the first character card is positioned beside the Intro text initially */}
           <div className="w-[90vw] md:w-[45vw] lg:w-[40vw] xl:w-[35vw] shrink-0" aria-hidden="true" />
-          <CharacterPanel character={CHARACTERS[0]} />
-          <CharacterPanel character={CHARACTERS[1]} />
-          <CharacterPanel character={CHARACTERS[2]} />
+          {list.map((character) => (
+            <CharacterPanel key={`${character.number}-${character.title}`} character={character} />
+          ))}
           <div aria-hidden="true" className="h-1 w-[8vw] shrink-0" />
         </div>
         

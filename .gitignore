@@ -19,6 +19,9 @@ dist/
 build/
 coverage/
 
+# Turborepo local cache (CI caches this directory via actions/cache)
+.turbo/
+
 # Vercel
 .vercel/
 

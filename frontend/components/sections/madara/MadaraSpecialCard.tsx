@@ -75,10 +75,10 @@ interface MadaraSpecialCardProps {
 }
 
 export default function MadaraSpecialCard({
-  defaultImg = "/madara-default.png",
-  jutsuImg = "/madara-six-paths.png",
-  sixPathsImg = "/madara-six-paths.png",
-  sandImg = "/sand.png",
+  defaultImg = "/characters/madara-default.png",
+  jutsuImg = "/characters/madara-six-paths.png",
+  sixPathsImg = "/characters/madara-six-paths.png",
+  sandImg = "/sections/sand.png",
 }: MadaraSpecialCardProps) {
   const isMobile = useIsMobile();
   const sectionRef = useRef<HTMLElement>(null);
@@ -1159,7 +1159,7 @@ export default function MadaraSpecialCard({
             </div>
           </div>
 
-          {/* Persistent sand.png orbit. This is intentionally outside the card content. */}
+          {/* Persistent /sections/sand.png orbit. This is intentionally outside the card content. */}
           <div
             ref={sandOrbitRef}
             className="pointer-events-none absolute -inset-[16%] z-[95] overflow-visible"

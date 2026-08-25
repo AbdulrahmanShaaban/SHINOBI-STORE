@@ -5,14 +5,16 @@ import ShinobiCharacterCards from '@/components/sections/cards/ShinobiCharacterC
 import MadaraSpecialCard from '@/components/sections/madara/MadaraSpecialCard';
 import QuoteSection from '@/components/sections/showcase/QuoteSection';
 import CharacterShowcase from '@/components/sections/showcase/CharacterShowcase';
+import { resolveShowcaseCharacters } from '@/components/sections/showcase/showcase-characters';
 import StoreFooter from '@/components/shared/StoreFooter';
 import { contentApi, type ContentSection } from '@/lib/content-api';
 
 /**
- * Single source of truth for homepage fallback copy. When the content API is
- * unreachable or a section is absent, the page renders exactly what it did
- * before the CMS integration: today's hero is pure artwork (no title/subtitle
- * overlay), and banner/testimonials are hidden until an admin publishes them.
+ * Single source of truth for homepage fallback copy and artwork. When the
+ * content API is unreachable or a section is absent, the page renders exactly
+ * what it did before the CMS integration: today's hero is pure artwork (no
+ * title/subtitle overlay), and banner/testimonials are hidden until an admin
+ * publishes them.
  */
 const FALLBACKS = {
   hero: {
@@ -21,6 +23,11 @@ const FALLBACKS = {
     imageUrl: '',
     ctaLabel: '',
     ctaHref: '',
+  },
+  madara: {
+    defaultImg: '/characters/madara-default.png',
+    jutsuImg: '/characters/madara-six-paths.png',
+    sixPathsImg: '/characters/madara-six-paths.png',
   },
 } as const;
 
@@ -106,6 +113,8 @@ export default async function Home() {
   const heroConfig = byKey.get('hero')?.config;
   const bannerConfig = byKey.get('banner')?.config;
   const testimonialsConfig = byKey.get('testimonials')?.config;
+  const madaraConfig = byKey.get('madara')?.config;
+  const featuredCharactersConfig = byKey.get('featured_characters')?.config;
 
   return (
     <main className="home-hero-full min-h-screen bg-[#0A0A0F]">
@@ -120,10 +129,14 @@ export default async function Home() {
       <CardStack />
       <ChooseShinobi />
       <ShinobiCharacterCards />
-      <MadaraSpecialCard />
+      <MadaraSpecialCard
+        defaultImg={str(madaraConfig?.defaultImg) || FALLBACKS.madara.defaultImg}
+        jutsuImg={str(madaraConfig?.jutsuImg) || FALLBACKS.madara.jutsuImg}
+        sixPathsImg={str(madaraConfig?.sixPathsImg) || FALLBACKS.madara.sixPathsImg}
+      />
       <QuoteSection />
       {testimonialsConfig ? <CmsTestimonials config={testimonialsConfig} /> : null}
-      <CharacterShowcase />
+      <CharacterShowcase characters={resolveShowcaseCharacters(featuredCharactersConfig)} />
       <StoreFooter />
     </main>
   );
