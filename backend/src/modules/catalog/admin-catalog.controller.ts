@@ -79,6 +79,11 @@ class ProductBodyDto {
   @IsString()
   @MaxLength(10)
   compareAtPrice?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(10)
+  stock?: string;
 }
 
 /** One image in the replacement set for PUT /admin/products/:id/images. */
@@ -165,6 +170,7 @@ export class AdminCatalogController {
       featured: body.featured,
       price: body.price,
       compareAtPrice: body.compareAtPrice,
+      stock: body.stock,
     });
   }
 

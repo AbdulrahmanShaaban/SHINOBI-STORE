@@ -25,6 +25,7 @@ export interface ProductWriteInput {
   featured?: boolean;
   price?: string;
   compareAtPrice?: string;
+  stock?: string;
 }
 
 export interface TaxonomyWriteInput {
@@ -84,7 +85,7 @@ export class AdminCatalogService {
   ) {}
 
   async createProduct(input: ProductWriteInput) {
-    const { price, compareAtPrice, ...productInput } = input;
+    const { price, compareAtPrice, stock, ...productInput } = input;
     const data = pick(productInput, PRODUCT_FIELDS) as Prisma.ProductUncheckedCreateInput;
 
     // categoryId is required by the DB; throw a clear error if missing.
@@ -102,6 +103,7 @@ export class AdminCatalogService {
         const compareAtCents = compareAtPrice
           ? Math.round(parseFloat(compareAtPrice) * 100)
           : undefined;
+        const stockOnHand = stock ? Math.max(0, parseInt(stock, 10) || 0) : 0;
         const sku = `${created.slug}-std`.toUpperCase().slice(0, 40);
         await this.prisma.productVariant.create({
           data: {
@@ -109,7 +111,7 @@ export class AdminCatalogService {
             sku,
             priceCents,
             compareAtPriceCents: compareAtCents && !isNaN(compareAtCents) ? compareAtCents : null,
-            stockOnHand: 0,
+            stockOnHand,
             isActive: true,
           },
         });

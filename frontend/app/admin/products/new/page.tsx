@@ -166,6 +166,7 @@ export default function NewProductPage() {
   const [featured, setFeatured] = useState(false);
   const [price, setPrice] = useState('');
   const [compareAtPrice, setCompareAtPrice] = useState('');
+  const [stock, setStock] = useState('');
 
   const [categories, setCategories] = useState<TaxonomyOption[]>([]);
   const [animes, setAnimes] = useState<TaxonomyOption[]>([]);
@@ -264,6 +265,7 @@ export default function NewProductPage() {
         featured,
         price: price.trim() || undefined,
         compareAtPrice: compareAtPrice.trim() || undefined,
+        stock: stock.trim() || undefined,
       };
       const { id } = await adminApi.createProduct(input);
 
@@ -367,7 +369,7 @@ export default function NewProductPage() {
           }}
         />
 
-        {/* PRICE */}
+        {/* PRICE + STOCK */}
         <div className="flex flex-col sm:flex-row gap-4">
           <div className="flex flex-col gap-2 flex-1">
             <label className="font-cinzel font-bold text-sm uppercase tracking-widest text-[#6B6B80]">
@@ -395,6 +397,19 @@ export default function NewProductPage() {
               onChange={(e) => setCompareAtPrice(e.target.value)}
               className="bg-[#16161F] border border-[#2A2A3A] rounded-lg px-4 py-3 font-inter text-[#F0F0F0] focus:border-[#FF6B00] focus:outline-none transition-colors"
               placeholder="0.00 (optional)"
+            />
+          </div>
+          <div className="flex flex-col gap-2 flex-1">
+            <label className="font-cinzel font-bold text-sm uppercase tracking-widest text-[#6B6B80]">
+              STOCK QTY
+            </label>
+            <input
+              type="number"
+              min="0"
+              value={stock}
+              onChange={(e) => setStock(e.target.value)}
+              className="bg-[#16161F] border border-[#2A2A3A] rounded-lg px-4 py-3 font-inter text-[#F0F0F0] focus:border-[#FF6B00] focus:outline-none transition-colors"
+              placeholder="0"
             />
           </div>
         </div>

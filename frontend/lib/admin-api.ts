@@ -225,6 +225,7 @@ export interface ProductCreateInput {
   featured?: boolean;
   price?: string;
   compareAtPrice?: string;
+  stock?: string;
 }
 
 export const adminApi = {
