@@ -5,13 +5,5 @@
       "source": "/(.*)",
       "destination": "/api"
     }
-  ],
-  "functions": {
-    "api/index.ts": {
-      "includeFiles": [
-        "node_modules/.prisma/**",
-        "node_modules/@prisma/client/**"
-      ]
-    }
-  }
+  ]
 }
