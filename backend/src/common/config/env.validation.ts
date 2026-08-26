@@ -52,11 +52,14 @@ export function validateEnv(config: Record<string, unknown>): Record<string, unk
     );
   }
 
-  // §12: the mock payment provider auto-confirms orders — it must be
-  // impossible to reach production without real Stripe credentials.
-  if (validated.NODE_ENV === 'production' && !process.env.STRIPE_SECRET_KEY) {
+  const provider = process.env.PAYMENT_PROVIDER?.toLowerCase();
+  if (
+    validated.NODE_ENV === 'production' &&
+    provider !== 'demo' &&
+    !process.env.STRIPE_SECRET_KEY
+  ) {
     throw new Error(
-      'Invalid environment configuration:\n  - production requires STRIPE_SECRET_KEY (mock payments are dev/test only)',
+      'Invalid environment configuration:\n  - production requires STRIPE_SECRET_KEY or PAYMENT_PROVIDER=demo (mock payments are dev/test only)',
     );
   }
 
