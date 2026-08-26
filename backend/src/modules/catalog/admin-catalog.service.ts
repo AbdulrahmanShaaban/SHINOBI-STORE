@@ -240,6 +240,40 @@ export class AdminCatalogService {
     return { images: saved };
   }
 
+  /** Update the first variant's price/compareAtPrice for a product. */
+  async updateProductVariantPricing(
+    productId: string,
+    price?: string,
+    compareAtPrice?: string,
+  ) {
+    await this.assertProductExists(productId);
+
+    const variant = await this.prisma.productVariant.findFirst({
+      where: { productId, isActive: true },
+      orderBy: { createdAt: 'asc' },
+    });
+    if (!variant) {
+      throw new NotFoundException({ code: 'VARIANT_NOT_FOUND', message: 'No active variant found for this product' });
+    }
+
+    const data: Prisma.ProductVariantUncheckedUpdateInput = {};
+    if (price !== undefined) {
+      const priceCents = Math.round(parseFloat(price) * 100);
+      if (!isNaN(priceCents) && priceCents > 0) data.priceCents = priceCents;
+    }
+    if (compareAtPrice !== undefined) {
+      const compareAtCents = compareAtPrice
+        ? Math.round(parseFloat(compareAtPrice) * 100)
+        : null;
+      data.compareAtPriceCents = compareAtCents && !isNaN(compareAtCents) ? compareAtCents : null;
+    }
+
+    return this.prisma.productVariant.update({
+      where: { id: variant.id },
+      data,
+    });
+  }
+
   /** Admin list with optional q (name/slug contains) + status filter, paginated. */
   async listProducts(opts: { q?: string; status?: string; page: number; limit: number }) {
     const where: Prisma.ProductWhereInput = {};

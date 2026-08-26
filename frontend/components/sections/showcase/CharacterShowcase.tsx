@@ -22,6 +22,15 @@ interface CharacterShowcaseProps {
 const CARD_WIDTH = "w-[85vw] md:w-[74vw] lg:w-[68vw] xl:w-[64vw]";
 
 function CharacterPanel({ character }: { character: Character }) {
+  const hasDiscount = character.price && character.originalPrice;
+  const discountPct = hasDiscount
+    ? Math.round(
+        ((parseFloat(character.originalPrice!) - parseFloat(character.price!)) /
+          parseFloat(character.originalPrice!)) *
+          100
+      )
+    : 0;
+
   return (
     <article
       className={`showcase-panel relative flex h-[75svh] min-h-[550px] md:min-h-[520px] shrink-0 ${CARD_WIDTH} overflow-hidden rounded-[2rem] border border-white/10 shadow-2xl`}
@@ -45,7 +54,6 @@ function CharacterPanel({ character }: { character: Character }) {
         </div>
         
         {/* Right Side: Content (Glassmorphism) */}
-        {/* OPACITY CONTROLS: The background opacity of this card is managed here by 'bg-black/60'. Change '60' to a higher/lower number (e.g. 40, 80) to adjust transparency. */}
         <div className="relative z-20 flex w-full h-[55%] md:h-full md:w-[55%] flex-col justify-center p-6 sm:p-8 md:p-10 lg:p-14 bg-black/60 backdrop-blur-xl overflow-hidden">
           {/* Background Number */}
           <span
@@ -79,24 +87,42 @@ function CharacterPanel({ character }: { character: Character }) {
           </div>
           
           {/* CTA — pinned to bottom-left of the glass panel */}
-          <Link
-            href={`/products?character=${encodeURIComponent(character.slug)}`}
-            className="showcase-cta absolute bottom-6 left-6 sm:bottom-8 sm:left-8 md:bottom-10 md:left-10 lg:bottom-14 lg:left-14 z-10 flex items-center gap-3 font-anton text-[14px] md:text-[17px] uppercase tracking-[0.25em] text-white hover:text-[#F97316] transition-colors w-max"
-          >
-            EXPLORE
-            <svg
-              className="h-5 w-5 md:h-6 md:w-6"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              aria-hidden="true"
+          <div className="showcase-cta absolute bottom-6 left-6 sm:bottom-8 sm:left-8 md:bottom-10 md:left-10 lg:bottom-14 lg:left-14 z-10 flex flex-col gap-3 w-max">
+            {/* Discount badge */}
+            {hasDiscount && (
+              <div className="flex items-center gap-3">
+                <span className="relative px-3 py-1.5 bg-gradient-to-r from-[#CC0000] to-[#FF6B00] rounded-lg font-cinzel text-[11px] md:text-[13px] font-black tracking-wider text-white shadow-lg shadow-[#FF6B00]/30">
+                  -{discountPct}% OFF
+                </span>
+                <div className="flex items-baseline gap-2">
+                  <span className="font-anton text-[22px] md:text-[28px] text-[#3DDC84] tracking-wide">
+                    ${character.price}
+                  </span>
+                  <span className="font-inter text-[13px] md:text-[15px] text-white/40 line-through">
+                    ${character.originalPrice}
+                  </span>
+                </div>
+              </div>
+            )}
+            <Link
+              href={`/products/${character.productSlug}`}
+              className="group flex items-center gap-3 font-anton text-[14px] md:text-[17px] uppercase tracking-[0.25em] text-white hover:text-[#F97316] transition-colors"
             >
-              <path d="M5 12h14M12 5l7 7-7 7" />
-            </svg>
-          </Link>
+              EXPLORE
+              <svg
+                className="h-5 w-5 md:h-6 md:w-6 transition-transform group-hover:translate-x-1"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M5 12h14M12 5l7 7-7 7" />
+              </svg>
+            </Link>
+          </div>
         </div>
       </div>
     </article>

@@ -16,6 +16,7 @@ export interface Character {
   alt: string;
   skills: string[];
   slug: string;
+  productSlug: string;
   price?: string;
   originalPrice?: string;
 }
@@ -24,6 +25,7 @@ export interface Character {
 export interface CmsShowcaseCharacter {
   name: string;
   slug: string;
+  productSlug?: string;
   imageUrl?: string;
   tagline?: string;
   skills?: string;
@@ -42,6 +44,9 @@ export const DEFAULT_CHARACTERS: Character[] = [
     alt: "Minato Namikaze",
     skills: ["Flying Thunder God", "Rasengan", "Fuinjutsu"],
     slug: "minato-namikaze",
+    productSlug: "minato-hokage-hoodie",
+    price: "49.99",
+    originalPrice: "70.00",
   },
   {
     number: "02",
@@ -53,6 +58,9 @@ export const DEFAULT_CHARACTERS: Character[] = [
     alt: "Pain Nagato",
     skills: ["Rinnegan", "Almighty Push", "Planetary Devastation"],
     slug: "pain-nagato",
+    productSlug: "pain-six-paths-tee",
+    price: "19.99",
+    originalPrice: "31.00",
   },
   {
     number: "03",
@@ -64,6 +72,9 @@ export const DEFAULT_CHARACTERS: Character[] = [
     alt: "Obito Uchiha",
     skills: ["Kamui", "Sharingan", "Wood Release"],
     slug: "obito-uchiha",
+    productSlug: "obito-masked-hoodie",
+    price: "44.99",
+    originalPrice: "67.00",
   },
 ];
 
@@ -82,6 +93,7 @@ function cmsItems(config: Record<string, unknown> | undefined): CmsShowcaseChara
     .map((entry) => ({
       name: typeof entry.name === 'string' ? entry.name.trim() : '',
       slug: typeof entry.slug === 'string' ? entry.slug.trim() : '',
+      productSlug: typeof entry.productSlug === 'string' ? entry.productSlug.trim() : '',
       imageUrl: typeof entry.imageUrl === 'string' ? entry.imageUrl.trim() : '',
       tagline: typeof entry.tagline === 'string' ? entry.tagline.trim() : '',
       skills: typeof entry.skills === 'string' ? entry.skills.trim() : '',
@@ -119,8 +131,9 @@ export function resolveShowcaseCharacters(
       subline: item.tagline || base.subline,
       skills: cmsSkills && cmsSkills.length > 0 ? cmsSkills : base.skills,
       slug: item.slug || base.slug,
-      price: item.price || undefined,
-      originalPrice: item.originalPrice || undefined,
+      productSlug: item.productSlug || base.productSlug,
+      price: item.price || base.price,
+      originalPrice: item.originalPrice || base.originalPrice,
     };
   });
 }

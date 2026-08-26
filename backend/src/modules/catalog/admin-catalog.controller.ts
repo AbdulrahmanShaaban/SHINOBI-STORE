@@ -25,6 +25,7 @@ import {
   IsUUID,
   MaxLength,
   MinLength,
+  ValidateIf,
   ValidateNested,
 } from 'class-validator';
 import type { Request } from 'express';
@@ -46,14 +47,17 @@ class ProductBodyDto {
   @IsString()
   description?: string;
 
+  @ValidateIf((o) => o.categoryId != null && o.categoryId !== '')
   @IsOptional()
   @IsUUID()
   categoryId?: string;
 
+  @ValidateIf((o) => o.animeId != null && o.animeId !== '')
   @IsOptional()
   @IsUUID()
   animeId?: string | null;
 
+  @ValidateIf((o) => o.characterId != null && o.characterId !== '')
   @IsOptional()
   @IsUUID()
   characterId?: string | null;
@@ -195,6 +199,16 @@ export class AdminCatalogController {
     @Req() req: Request,
   ) {
     return this.adminCatalogService.setProductImages(id, body.images, actor.id, req.ip);
+  }
+
+  @RequirePermissions('products:w')
+  @Patch('products/:id/pricing')
+  @ApiOperation({ summary: 'Update the default variant pricing for a product (admin)' })
+  updateProductPricing(
+    @Param('id') id: string,
+    @Body() body: { price?: string; compareAtPrice?: string },
+  ) {
+    return this.adminCatalogService.updateProductVariantPricing(id, body.price, body.compareAtPrice);
   }
 
   @RequirePermissions('products:w')

@@ -11,7 +11,7 @@ function makeService() {
       ]),
     },
     character: {
-      findMany: jest.fn().mockResolvedValue([{ slug: 'naruto', name: 'Naruto Uzumaki', imageUrl: '/x.png', anime: { slug: 'naruto', name: 'Naruto' } }]),
+      findMany: jest.fn().mockResolvedValue([{ id: 'ch1', slug: 'naruto', name: 'Naruto Uzumaki', imageUrl: '/x.png', anime: { slug: 'naruto', name: 'Naruto' } }]),
     },
     tag: { findMany: jest.fn().mockResolvedValue([{ slug: 'hoodie', name: 'Hoodie' }]) },
   };
@@ -31,7 +31,7 @@ describe('TaxonomiesService', () => {
     expect(tx.product.groupBy).toHaveBeenCalledWith(
       expect.objectContaining({ by: ['categoryId'], where: { status: 'active' } }),
     );
-    expect(rows).toEqual([{ slug: 'apparel', name: 'Apparel', parentId: null, productCount: 7 }]);
+    expect(rows).toEqual([{ id: 'c1', slug: 'apparel', name: 'Apparel', parentId: null, productCount: 7 }]);
   });
 
   it('matches anime counts to animes by internal id — never by slug', async () => {
@@ -43,7 +43,7 @@ describe('TaxonomiesService', () => {
     (tx.product.groupBy as jest.Mock).mockResolvedValue([{ animeId: 'a1', _count: { _all: 3 } }]);
 
     const rows = await service.listAnimes();
-    expect(rows[0]).toEqual({ slug: 'slug-a', name: 'A', imageUrl: null, isFeatured: false, productCount: 3 });
+    expect(rows[0]).toEqual({ id: 'a1', slug: 'slug-a', name: 'A', imageUrl: null, isFeatured: false, productCount: 3 });
   });
 
   it('defaults missing anime counts to zero without dropping the anime', async () => {

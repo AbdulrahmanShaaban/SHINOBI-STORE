@@ -24,7 +24,7 @@ export class TaxonomiesService {
         }),
       ]);
       const countByCategory = new Map(counts.map((c) => [c.categoryId, c._count._all]));
-      return categories.map(({ id, ...c }) => ({ ...c, productCount: countByCategory.get(id) ?? 0 }));
+      return categories.map((c) => ({ id: c.id, slug: c.slug, name: c.name, parentId: c.parentId, productCount: countByCategory.get(c.id) ?? 0 }));
     });
   }
 
@@ -44,7 +44,7 @@ export class TaxonomiesService {
       const countByAnime = new Map(
         counts.flatMap((c) => (c.animeId !== null ? [[c.animeId, c._count._all] as const] : [])),
       );
-      return animes.map(({ id, ...a }) => ({ ...a, productCount: countByAnime.get(id) ?? 0 }));
+      return animes.map((a) => ({ id: a.id, slug: a.slug, name: a.name, imageUrl: a.imageUrl, isFeatured: a.isFeatured, productCount: countByAnime.get(a.id) ?? 0 }));
     });
   }
 
@@ -52,6 +52,7 @@ export class TaxonomiesService {
     return this.prisma.character.findMany({
       orderBy: { name: 'asc' },
       select: {
+        id: true,
         slug: true,
         name: true,
         imageUrl: true,
