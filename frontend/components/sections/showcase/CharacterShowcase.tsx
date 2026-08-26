@@ -35,6 +35,15 @@ function CharacterPanel({ character }: { character: Character }) {
     <article
       className={`showcase-panel relative flex h-[75svh] min-h-[550px] md:min-h-[520px] shrink-0 ${CARD_WIDTH} overflow-hidden rounded-[2rem] border border-white/10 shadow-2xl`}
     >
+      {/* Discount Ribbon — top-left, tilted */}
+      {hasDiscount && (
+        <div
+          className="absolute top-5 -left-3 z-30 px-4 py-1.5 bg-gradient-to-r from-[#CC0000] to-[#FF6B00] font-cinzel text-[11px] md:text-[13px] font-black tracking-wider text-white shadow-lg shadow-[#FF6B00]/30"
+          style={{ transform: "rotate(-6deg)", transformOrigin: "left center" }}
+        >
+          -{discountPct}% OFF
+        </div>
+      )}
       <div className="relative flex flex-col md:flex-row h-full w-full z-10">
         {/* Left Side: Image */}
         <div className="showcase-visual relative flex w-full h-[45%] md:h-full md:w-[45%] items-end justify-center overflow-visible md:items-center bg-[#1A1A1A] md:rounded-l-[2rem]">
@@ -88,20 +97,15 @@ function CharacterPanel({ character }: { character: Character }) {
           
           {/* CTA — pinned to bottom-left of the glass panel */}
           <div className="showcase-cta absolute bottom-6 left-6 sm:bottom-8 sm:left-8 md:bottom-10 md:left-10 lg:bottom-14 lg:left-14 z-10 flex flex-col gap-3 w-max">
-            {/* Discount badge */}
+            {/* Price */}
             {hasDiscount && (
-              <div className="flex items-center gap-3">
-                <span className="relative px-3 py-1.5 bg-gradient-to-r from-[#CC0000] to-[#FF6B00] rounded-lg font-cinzel text-[11px] md:text-[13px] font-black tracking-wider text-white shadow-lg shadow-[#FF6B00]/30">
-                  -{discountPct}% OFF
+              <div className="flex items-baseline gap-2">
+                <span className="font-anton text-[22px] md:text-[28px] text-[#3DDC84] tracking-wide">
+                  ${character.price}
                 </span>
-                <div className="flex items-baseline gap-2">
-                  <span className="font-anton text-[22px] md:text-[28px] text-[#3DDC84] tracking-wide">
-                    ${character.price}
-                  </span>
-                  <span className="font-inter text-[13px] md:text-[15px] text-white/40 line-through">
-                    ${character.originalPrice}
-                  </span>
-                </div>
+                <span className="font-inter text-[13px] md:text-[15px] text-white/40 line-through">
+                  ${character.originalPrice}
+                </span>
               </div>
             )}
             <Link
