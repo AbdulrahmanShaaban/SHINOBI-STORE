@@ -108,6 +108,9 @@ export default function Navbar() {
               <Link href="/products?sort=newest" className="px-2 py-2 text-[#F0F0F0] font-semibold text-xl xl:text-2xl hover:text-[#FF6B00] transition-colors">
                 New Arrivals
               </Link>
+              <Link href="/community" className="px-2 py-2 text-[#F0F0F0] font-semibold text-xl xl:text-2xl hover:text-[#FF6B00] transition-colors">
+                Community
+              </Link>
               <button
                 type="button"
                 onClick={() => setIsSearchOpen(true)}
@@ -217,6 +220,9 @@ export default function Navbar() {
           </Link>
           <Link href="/products?sort=newest" onClick={closeMenu} className="font-semibold text-2xl text-[#F0F0F0] hover:text-[#FF6B00] transition-colors">
             New Arrivals
+          </Link>
+          <Link href="/community" onClick={closeMenu} className="font-semibold text-2xl text-[#F0F0F0] hover:text-[#FF6B00] transition-colors">
+            Community
           </Link>
           {user ? (
             <Link href="/account" onClick={closeMenu} className="font-semibold text-2xl text-[#F0F0F0] hover:text-[#FF6B00] transition-colors">

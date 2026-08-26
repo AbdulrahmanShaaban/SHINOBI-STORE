@@ -17,7 +17,10 @@ export default function StockBadge({
   available?: number;
 }) {
   const labels: Record<StockLevel, string> = {
-    in_stock: 'IN STOCK',
+    in_stock:
+      typeof available === 'number' && available > 0
+        ? `IN STOCK — ${available} AVAILABLE`
+        : 'IN STOCK',
     low_stock:
       typeof available === 'number' && available > 0
         ? `ONLY ${available} LEFT`

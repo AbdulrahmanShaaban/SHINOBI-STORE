@@ -15,6 +15,7 @@ export const PERMISSIONS: Record<Role, readonly string[]> = {
     'customers:r',
     'inventory:w',
     'reviews:w',
+    'reviews:create',
     'coupons:w',
     'content:w',
     'media:w',

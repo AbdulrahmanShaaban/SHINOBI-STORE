@@ -24,27 +24,22 @@ const FOOTER_LINKS = [
     href: "/community",
     icon: <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2M9 7a4 4 0 100-8 4 4 0 000 8zM23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75" /></svg>
   },
-  {
-    label: "CONTACT",
-    href: "/contact",
-    icon: <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
-  },
 ];
 
 const SOCIAL_LINKS = [
   {
     label: "INSTAGRAM",
-    href: "#",
+    href: "https://www.instagram.com/shinobistore",
     icon: <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="2" y="2" width="20" height="20" rx="5" ry="5" /><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z" /><line x1="17.5" y1="6.5" x2="17.51" y2="6.5" /></svg>
   },
   {
     label: "X (TWITTER)",
-    href: "#",
+    href: "https://x.com/shinobistore",
     icon: <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M18.9 2H22l-6.9 7.9L23 22h-6.3l-4.9-6.4L6.2 22H3l7.4-8.5L1 2h6.4l4.4 5.9L18.9 2zm-1.1 18h1.7L6.6 3.9H4.8L17.8 20z" /></svg>
   },
   {
     label: "TIKTOK",
-    href: "#",
+    href: "https://www.tiktok.com/@shinobistore",
     icon: <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M16.6 5.82A4.28 4.28 0 0 1 15.54 3h-3.09v12.4a2.59 2.59 0 1 1-2.59-2.59c.27 0 .53.04.77.12v-3.15a5.76 5.76 0 1 0 5.76 5.76V9.68a7.35 7.35 0 0 0 4.3 1.38V7.96a4.28 4.28 0 0 1-4.09-2.14z" /></svg>
   },
 ];
@@ -133,7 +128,7 @@ export default function StoreFooter() {
 
       {/* Massive Top Text */}
       <div className="w-full overflow-hidden pt-12 md:pt-16 pb-8 md:pb-12 flex items-center justify-center relative flex-shrink-0">
-        <h1 className="footer-massive-text font-anton text-[clamp(3rem,10vw,10rem)] leading-[0.75] tracking-tight uppercase flex overflow-hidden select-none">
+        <h1 className="footer-massive-text font-anton text-[clamp(4rem,14vw,14rem)] leading-[0.75] tracking-tight uppercase flex overflow-hidden select-none">
           {Array.from("SHINOBI ").map((char, i) => (
             <span key={i} className="inline-block text-white/5">{char === " " ? "\u00A0" : char}</span>
           ))}

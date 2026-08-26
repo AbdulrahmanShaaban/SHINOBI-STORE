@@ -20,7 +20,7 @@ interface OptionGroup {
  */
 function buildOptionGroups(variants: VariantView[]): OptionGroup[] {
   const groups: OptionGroup[] = [];
-  for (const dimension of ['optionSize', 'optionColor'] as const) {
+  for (const dimension of ['optionColor'] as const) {
     const byValue = new Map<string, VariantView[]>();
     for (const variant of variants) {
       const value = variant[dimension];
@@ -32,7 +32,7 @@ function buildOptionGroups(variants: VariantView[]): OptionGroup[] {
     if (byValue.size > 1) {
       groups.push({
         dimension,
-        label: dimension === 'optionSize' ? 'Size' : 'Color',
+        label: dimension === 'optionColor' ? 'Color' : dimension,
         values: Array.from(byValue.entries())
           .sort(([a], [b]) => a.localeCompare(b))
           .map(([value, list]) => ({
