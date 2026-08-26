@@ -4,6 +4,7 @@ import { MockPaymentProvider } from './mock-payment.provider';
 import { DemoPaymentProvider } from './demo-payment.provider';
 import { DemoPaymentsController } from './demo-payments.controller';
 import { PAYMENT_PROVIDER, type PaymentProvider } from './payment-provider.port';
+import { OrdersModule } from '../orders/orders.module';
 
 /**
  * Provider selection at boot (priority order):
@@ -14,6 +15,7 @@ import { PAYMENT_PROVIDER, type PaymentProvider } from './payment-provider.port'
  */
 @Global()
 @Module({
+  imports: [OrdersModule],
   controllers: [DemoPaymentsController],
   providers: [
     {
