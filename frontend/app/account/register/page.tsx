@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import AuthCard, { buttonClass, inputClass } from '@/components/auth/AuthCard';
+import PasswordInput from '@/components/auth/PasswordInput';
 import { authApi, AuthError } from '@/lib/auth';
 
 const PASSWORD_RULE = 'At least 10 characters with letters and numbers.';
@@ -91,16 +92,14 @@ export default function RegisterPage() {
           <label htmlFor="reg-password" className="block text-xs font-cinzel font-bold text-[#B8B8CC] mb-1">
             PASSWORD
           </label>
-          <input
+          <PasswordInput
             id="reg-password"
-            type="password"
             autoComplete="new-password"
             required
             minLength={10}
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            aria-describedby="reg-password-rule"
-            className={inputClass}
+            onChange={setPassword}
+            describedBy="reg-password-rule"
           />
           <p id="reg-password-rule" className="mt-1 text-xs text-[#6B6B80]">
             {PASSWORD_RULE}

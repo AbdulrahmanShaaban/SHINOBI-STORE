@@ -4,6 +4,7 @@ import { Suspense, useState } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import AuthCard, { buttonClass, inputClass } from '@/components/auth/AuthCard';
+import PasswordInput from '@/components/auth/PasswordInput';
 import { authApi, mergeGuestCart, AuthError } from '@/lib/auth';
 import { useUser } from '@/lib/user-context';
 import { useCartStore } from '@/lib/cart-store';
@@ -124,14 +125,12 @@ function LoginForm() {
               Forgot it?
             </Link>
           </div>
-          <input
+          <PasswordInput
             id="login-password"
-            type="password"
             autoComplete="current-password"
             required
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className={inputClass}
+            onChange={setPassword}
           />
         </div>
         <button type="submit" disabled={busy} className={buttonClass}>
