@@ -36,7 +36,7 @@ export default function AboutPage() {
         </div>
         <div className="rounded-xl border border-[#2A2A3A] bg-[#12121A] p-8 flex items-center justify-center">
           <div className="text-center">
-            <span className="font-bebas text-[5rem] text-[#FF6B00] leading-none">信</span>
+            <img src="/sections/kunai-white.svg" alt="" className="w-24 h-24 mx-auto mb-4" />
             <p className="font-inter text-sm text-[#6B6B80] mt-2 tracking-wider">SHINOBI — THE HIDDEN ONE</p>
           </div>
         </div>
@@ -65,26 +65,24 @@ export default function AboutPage() {
             {
               title: 'AUTHENTICITY',
               desc: 'Every item is sourced from official licensors and verified partners. No bootlegs, no compromises.',
-              icon: '刀',
+              icon: '/sections/icon-trust.svg',
             },
             {
               title: 'QUALITY',
               desc: 'From print-on-demand apparel to hand-painted figures, quality is at the core of every product we ship.',
-              icon: '忍',
+              icon: '/sections/icon-quality.svg',
             },
             {
               title: 'COMMUNITY',
               desc: 'We are fans building for fans. Your feedback shapes our catalog, our drops, and our future.',
-              icon: '魂',
+              icon: '/sections/icon-community.svg',
             },
           ].map((item) => (
             <div
               key={item.title}
               className="rounded-xl border border-[#2A2A3A] bg-[#12121A] p-6 hover:border-[#FF6B00]/40 transition-colors"
             >
-              <span className="font-bebas text-4xl text-[#FF6B00] leading-none block mb-3">
-                {item.icon}
-              </span>
+              <img src={item.icon} alt="" className="w-12 h-12 mb-3" />
               <h3 className="font-cinzel text-sm font-bold text-[#F0F0F0] uppercase tracking-wider mb-2">
                 {item.title}
               </h3>

@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <!-- Shield outline -->
+  <path d="M32 4 L56 16 V36 C56 50 44 58 32 62 C20 58 8 50 8 36 V16 Z" stroke="white" stroke-width="2.5" fill="white" fill-opacity="0.06" opacity="0.9"/>
+  <!-- Inner shield -->
+  <path d="M32 12 L48 20 V36 C48 46 40 52 32 55 C24 52 16 46 16 36 V20 Z" stroke="white" stroke-width="1.5" fill="none" opacity="0.4"/>
+  <!-- Checkmark -->
+  <path d="M22 32 L29 39 L42 24" stroke="white" stroke-width="2.5" fill="none" opacity="0.8" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

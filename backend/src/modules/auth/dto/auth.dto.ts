@@ -63,3 +63,10 @@ export class ResetPasswordDto {
   @Matches(/\d/, { message: 'password must contain a number' })
   password!: string;
 }
+
+export class ResendVerificationDto {
+  @ApiProperty()
+  @IsEmail()
+  @MaxLength(254)
+  email!: string;
+}

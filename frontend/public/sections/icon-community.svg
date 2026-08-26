@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <!-- People group -->
+  <circle cx="32" cy="18" r="8" stroke="white" stroke-width="2" fill="white" fill-opacity="0.08" opacity="0.85"/>
+  <circle cx="16" cy="22" r="6" stroke="white" stroke-width="1.5" fill="white" fill-opacity="0.06" opacity="0.6"/>
+  <circle cx="48" cy="22" r="6" stroke="white" stroke-width="1.5" fill="white" fill-opacity="0.06" opacity="0.6"/>
+  <!-- Bodies -->
+  <path d="M20 34 Q20 28 32 28 Q44 28 44 34" stroke="white" stroke-width="2" fill="none" opacity="0.6" stroke-linecap="round"/>
+  <path d="M8 38 Q8 32 16 32 Q22 32 22 36" stroke="white" stroke-width="1.5" fill="none" opacity="0.45" stroke-linecap="round"/>
+  <path d="M42 36 Q42 32 48 32 Q56 32 56 38" stroke="white" stroke-width="1.5" fill="none" opacity="0.45" stroke-linecap="round"/>
+  <!-- Connection lines -->
+  <path d="M22 40 Q32 48 42 40" stroke="white" stroke-width="1.5" fill="none" opacity="0.5" stroke-linecap="round"/>
+  <circle cx="32" cy="44" r="3" fill="white" opacity="0.5"/>
+</svg>

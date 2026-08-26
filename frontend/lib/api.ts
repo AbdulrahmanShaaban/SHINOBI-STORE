@@ -252,6 +252,45 @@ export async function submitReview(
   return { id: data.id, status: data.status ?? 'pending' };
 }
 
+// ── Recent Reviews (community page) ──────────────────────────────────────────
+
+export interface RecentReview {
+  id: string;
+  rating: number;
+  title?: string | null;
+  body: string;
+  createdAt: string;
+  author: string;
+  productSlug: string;
+  productName: string;
+}
+
+/** Server-facing (cached briefly); used by the community page. */
+export function getRecentReviews(
+  params: { page?: number; limit?: number } = {},
+): Promise<{ items: RecentReview[]; total: number }> {
+  const search = new URLSearchParams();
+  if (params.page && params.page > 1) search.set('page', String(params.page));
+  if (params.limit) search.set('limit', String(params.limit));
+  const qs = search.toString();
+  return request<{ items: RecentReview[]; total: number }>(
+    `/reviews/recent${qs ? `?${qs}` : ''}`,
+    60,
+  );
+}
+
+/** Lightweight product list for the review form selector. */
+export function getProductList(
+  params: { limit?: number } = {},
+): Promise<{ items: Array<{ id: string; name: string; slug: string }> }> {
+  const search = new URLSearchParams();
+  search.set('limit', String(params.limit ?? 50));
+  return request<{ items: Array<{ id: string; name: string; slug: string }> }>(
+    `/products?${search.toString()}`,
+    60,
+  );
+}
+
 export function getProduct(slug: string): Promise<ProductDetail> {
   return request<ProductDetail>(
     `/products/${encodeURIComponent(slug)}`,

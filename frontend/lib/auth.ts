@@ -85,6 +85,15 @@ export const authApi = {
 
   resetPassword: (input: { token: string; password: string }) =>
     request<{ ok: boolean }>('/auth/reset-password', { method: 'POST', body: JSON.stringify(input) }),
+
+  verifyEmail: (token: string) =>
+    request<{ ok: boolean }>(`/auth/verify-email?token=${encodeURIComponent(token)}`),
+
+  resendVerification: (email: string) =>
+    request<{ ok: boolean }>('/auth/resend-verification', {
+      method: 'POST',
+      body: JSON.stringify({ email }),
+    }),
 };
 
 /** Server-cart merge at login (§9.1). Failures never block the login UX. */

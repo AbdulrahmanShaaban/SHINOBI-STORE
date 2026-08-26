@@ -35,12 +35,12 @@ export default function RegisterPage() {
   if (done) {
     return (
       <AuthCard
-        title="WELCOME, SHINOBI"
-        subtitle="Your account is ready. Sign in to continue."
-        footer={{ text: 'Have an account?', href: '/account/login', linkText: 'Sign in' }}
+        title="CHECK YOUR INBOX"
+        subtitle="A verification link has been sent to your email. Please verify before signing in."
+        footer={{ text: 'Already verified?', href: '/account/login', linkText: 'Sign in' }}
       >
         <Link href="/account/login" className={buttonClass + ' block text-center'}>
-          CONTINUE TO SIGN IN
+          GO TO SIGN IN
         </Link>
       </AuthCard>
     );

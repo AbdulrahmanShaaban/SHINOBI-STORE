@@ -1,10 +1,11 @@
 import { createHash, randomBytes } from 'node:crypto';
-import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { argon2id, argon2Verify } from 'hash-wasm';
 import { PrismaService } from '../../common/prisma/prisma.service';
 import { RedisService } from '../../common/redis/redis.service';
 import { logger } from '../../common/logger/logger';
 import { SessionsService } from './sessions.service';
+import { EmailService } from '../notifications/email.service';
 
 /**
  * OWASP-aligned argon2id parameters (64 MiB, t=2, p=1).
@@ -23,6 +24,7 @@ export class AuthService {
     private readonly prisma: PrismaService,
     private readonly sessions: SessionsService,
     private readonly redis: RedisService,
+    private readonly email: EmailService,
   ) {}
 
   async register(input: { email: string; password: string; fullName: string }): Promise<void> {
@@ -30,8 +32,22 @@ export class AuthService {
     const passwordHash = await this.hashPassword(input.password);
 
     try {
-      await this.prisma.user.create({
+      const user = await this.prisma.user.create({
         data: { email, passwordHash, fullName: input.fullName.trim() },
+        select: { id: true },
+      });
+
+      const token = randomBytes(24).toString('base64url');
+      const baseUrl = process.env.BASE_URL ?? 'http://localhost:3000';
+      await this.prisma.emailVerificationToken.create({
+        data: {
+          userId: user.id,
+          tokenHash: this.hashToken(token),
+          expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
+        },
+      });
+      await this.email.sendVerificationEmail(email, token, baseUrl).catch((err) => {
+        logger.warn({ err: (err as Error).message }, 'failed to send verification email');
       });
     } catch (err) {
       // Unique violation → the email already exists. Respond identically to a
@@ -57,7 +73,7 @@ export class AuthService {
     const email = input.email.trim().toLowerCase();
     const user = await this.prisma.user.findUnique({
       where: { email },
-      select: { id: true, email: true, fullName: true, role: true, passwordHash: true, isActive: true, deletedAt: true },
+      select: { id: true, email: true, fullName: true, role: true, passwordHash: true, isActive: true, deletedAt: true, emailVerifiedAt: true },
     });
 
     if (!user || !user.isActive || user.deletedAt) {
@@ -67,6 +83,13 @@ export class AuthService {
 
     const valid = await this.verifyPassword(user.passwordHash, input.password);
     if (!valid) throw this.invalidCredentials();
+
+    if (!user.emailVerifiedAt) {
+      throw new UnauthorizedException({
+        code: 'EMAIL_NOT_VERIFIED',
+        message: 'Please verify your email before signing in',
+      });
+    }
 
     const { token, expiresAt } = await this.sessions.create(user.id, meta);
     return {
@@ -95,7 +118,10 @@ export class AuthService {
             expiresAt: new Date(Date.now() + 30 * 60 * 1000),
           },
         });
-        // Phase 6 replaces this with the queued email. Dev/test echo only.
+        const baseUrl = process.env.BASE_URL ?? 'http://localhost:3000';
+        await this.email.sendPasswordResetEmail(normalized, token, baseUrl).catch((err) => {
+          logger.warn({ err: (err as Error).message }, 'failed to send password reset email');
+        });
         if (process.env.NODE_ENV !== 'production') devToken = token;
         logger.info({ userId: user.id }, 'password reset requested');
       } else if (!user) {
@@ -167,6 +193,61 @@ export class AuthService {
     } catch {
       return true;
     }
+  }
+
+  async verifyEmail(token: string): Promise<void> {
+    const tokenHash = this.hashToken(token);
+
+    const claimed = await this.prisma.$queryRaw<{ id: string; user_id: string }[]>`
+      UPDATE "email_verification_tokens"
+      SET "used_at" = NOW()
+      WHERE "token_hash" = ${tokenHash}
+        AND "used_at" IS NULL
+        AND "expires_at" > NOW()
+      RETURNING "id", "user_id"
+    `;
+    const claim = claimed[0];
+    if (!claim) {
+      throw new NotFoundException({
+        code: 'VERIFICATION_TOKEN_INVALID',
+        message: 'This verification link is invalid or has expired',
+      });
+    }
+
+    await this.prisma.user.update({
+      where: { id: claim.user_id },
+      data: { emailVerifiedAt: new Date() },
+    });
+  }
+
+  async resendVerification(email: string): Promise<void> {
+    const normalized = email.trim().toLowerCase();
+    const user = await this.prisma.user.findUnique({
+      where: { email: normalized },
+      select: { id: true, emailVerifiedAt: true, isActive: true, deletedAt: true },
+    });
+    if (!user || !user.isActive || user.deletedAt || user.emailVerifiedAt) {
+      return;
+    }
+
+    // Invalidate any existing unused tokens for this user.
+    await this.prisma.emailVerificationToken.updateMany({
+      where: { userId: user.id, usedAt: null },
+      data: { usedAt: new Date() },
+    });
+
+    const token = randomBytes(24).toString('base64url');
+    const baseUrl = process.env.BASE_URL ?? 'http://localhost:3000';
+    await this.prisma.emailVerificationToken.create({
+      data: {
+        userId: user.id,
+        tokenHash: this.hashToken(token),
+        expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
+      },
+    });
+    await this.email.sendVerificationEmail(normalized, token, baseUrl).catch((err) => {
+      logger.warn({ err: (err as Error).message }, 'failed to resend verification email');
+    });
   }
 
   private invalidCredentials(): UnauthorizedException {

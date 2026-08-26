@@ -1,10 +1,10 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, HttpException, Post, Req, Res } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, HttpException, Post, Query, Req, Res } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import type { Request, Response } from 'express';
 import { Throttle } from '@nestjs/throttler';
 import { AuthService } from './auth.service';
 import { SessionsService } from './sessions.service';
-import { ForgotPasswordDto, LoginDto, RegisterDto, ResetPasswordDto } from './dto/auth.dto';
+import { ForgotPasswordDto, LoginDto, RegisterDto, ResetPasswordDto, ResendVerificationDto } from './dto/auth.dto';
 import { Public } from '../../common/guards/public.decorator';
 import { SESSION_COOKIE } from '../../common/guards/session.guard';
 
@@ -107,6 +107,25 @@ export class AuthController {
   @ApiOperation({ summary: 'Consume a reset token and set a new password (revokes all sessions)' })
   async reset(@Body() body: ResetPasswordDto) {
     await this.auth.resetPassword(body.token, body.password);
+    return { ok: true };
+  }
+
+  @Public()
+  @Get('verify-email')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Verify email address via token' })
+  async verifyEmail(@Query('token') token: string) {
+    await this.auth.verifyEmail(token);
+    return { ok: true };
+  }
+
+  @Public()
+  @Post('resend-verification')
+  @Throttle(AUTH_THROTTLE)
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Resend email verification link' })
+  async resendVerification(@Body() body: ResendVerificationDto) {
+    await this.auth.resendVerification(body.email);
     return { ok: true };
   }
 }

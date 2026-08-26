@@ -104,6 +104,36 @@ export class ReviewsService {
     }
   }
 
+  async listRecentReviews(page = 1, limit = 20) {
+    const where = { status: 'approved' as const };
+    const [items, total] = await Promise.all([
+      this.prisma.review.findMany({
+        where,
+        orderBy: { createdAt: 'desc' },
+        skip: (page - 1) * limit,
+        take: limit,
+        include: {
+          user: { select: { fullName: true } },
+          product: { select: { slug: true, name: true } },
+        },
+      }),
+      this.prisma.review.count({ where }),
+    ]);
+    return {
+      items: items.map((review) => ({
+        id: review.id,
+        rating: review.rating,
+        title: review.title,
+        body: review.body,
+        createdAt: review.createdAt,
+        author: review.user.fullName,
+        productSlug: review.product.slug,
+        productName: review.product.name,
+      })),
+      total,
+    };
+  }
+
   async listAdmin(status: 'pending' | 'approved' | 'rejected' | undefined, page = 1) {
     const limit = 20;
     const where = status ? { status } : undefined;

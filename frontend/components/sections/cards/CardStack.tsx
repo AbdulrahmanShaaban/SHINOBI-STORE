@@ -166,20 +166,7 @@ export default function CardStack() {
             </div>
             <div className="card-body bg-[#1A1A1A] rounded-b-xl p-5 md:p-8 flex flex-col items-center text-center pb-[12vh] md:pb-[35vh]">
               <div className="card-content flex flex-col items-center text-center">
-                <svg className="w-16 h-16 md:w-24 md:h-24 mb-4 md:mb-6 text-[#FF7F00]" viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="2">
-                  {/* Sharingan Eye */}
-                  <circle cx="50" cy="50" r="36" />
-                  <circle cx="50" cy="50" r="24" />
-                  <circle cx="50" cy="50" r="6" fill="currentColor" />
-                  <path d="M50 26 L50 44" strokeLinecap="round" />
-                  <path d="M50 56 L50 74" strokeLinecap="round" />
-                  <path d="M26 50 L44 50" strokeLinecap="round" />
-                  <path d="M56 50 L74 50" strokeLinecap="round" />
-                  <path d="M33 33 L45 45" strokeLinecap="round" />
-                  <path d="M55 55 L67 67" strokeLinecap="round" />
-                  <path d="M67 33 L55 45" strokeLinecap="round" />
-                  <path d="M45 55 L33 67" strokeLinecap="round" />
-                </svg>
+                <img src="/sections/sharingan-white.svg" alt="" className="w-16 h-16 md:w-24 md:h-24 mb-4 md:mb-6" />
                 <p className="text-[#F0F0F0] text-base md:text-lg leading-relaxed max-w-md">
                   We never go back on our word. That is our ninja way. If it doesn&apos;t align with the village&apos;s mission, it doesn&apos;t make the cut.
                 </p>
@@ -206,14 +193,7 @@ export default function CardStack() {
             </div>
             <div className="card-body bg-[#1A1A1A] rounded-b-xl p-5 md:p-8 flex flex-col items-center text-center pb-[12vh] md:pb-[35vh]">
               <div className="card-content flex flex-col items-center text-center">
-                <svg className="w-16 h-16 md:w-24 md:h-24 mb-4 md:mb-6 text-[#FF7F00]" viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="2">
-                  {/* Leaf Village Emblem */}
-                  <path d="M50 15 Q70 30 70 55 Q70 80 50 90 Q30 80 30 55 Q30 30 50 15" strokeLinecap="round" strokeLinejoin="round" />
-                  <path d="M50 30 Q50 55 50 70" strokeLinecap="round" />
-                  <path d="M38 48 Q50 55 62 48" strokeLinecap="round" />
-                  <path d="M35 60 Q50 68 65 60" strokeLinecap="round" />
-                  <circle cx="50" cy="42" r="3" fill="currentColor" />
-                </svg>
+                <img src="/sections/leaf-village-white.svg" alt="" className="w-16 h-16 md:w-24 md:h-24 mb-4 md:mb-6" />
                 <p className="text-[#F0F0F0] text-base md:text-lg leading-relaxed max-w-md">
                   Perfect chakra control. No unnecessary ingredients, no fillers. Just the essential energy needed to complete the mission.
                 </p>
@@ -240,16 +220,7 @@ export default function CardStack() {
             </div>
             <div className="card-body bg-[#1A1A1A] rounded-b-xl p-5 md:p-8 flex flex-col items-center text-center pb-[12vh] md:pb-[35vh]">
               <div className="card-content flex flex-col items-center text-center">
-                <svg className="w-16 h-16 md:w-24 md:h-24 mb-4 md:mb-6 text-[#FF7F00]" viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="2">
-                  {/* Scroll/Seal */}
-                  <rect x="20" y="25" width="60" height="50" rx="3" />
-                  <path d="M20 30 Q15 30 15 35 Q15 40 20 40" strokeLinecap="round" />
-                  <path d="M80 30 Q85 30 85 35 Q85 40 80 40" strokeLinecap="round" />
-                  <path d="M20 60 Q15 60 15 65 Q15 70 20 70" strokeLinecap="round" />
-                  <path d="M80 60 Q85 60 85 65 Q85 70 80 70" strokeLinecap="round" />
-                  <circle cx="50" cy="50" r="8" />
-                  <path d="M46 50 L50 46 L54 50 L50 54 Z" fill="currentColor" />
-                </svg>
+                <img src="/sections/scroll-seal-white.svg" alt="" className="w-16 h-16 md:w-24 md:h-24 mb-4 md:mb-6" />
                 <p className="text-[#F0F0F0] text-base md:text-lg leading-relaxed max-w-md">
                   Loyalty above all. A bond that cannot be broken by rogue elements. We stay true to our allies and our creed.
                 </p>
