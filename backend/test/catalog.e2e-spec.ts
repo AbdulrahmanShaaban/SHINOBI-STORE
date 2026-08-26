@@ -15,7 +15,7 @@ import { CatalogModule } from '../src/modules/catalog/catalog.module';
 
 const productRow = {
   id: '11111111-1111-4111-8111-111111111111',
-  slug: 'naruto-rasengan-hoodie',
+  slug: 'naruto-rasengan-figure',
   name: 'Rasengan Training Hoodie',
   featured: true,
   ratingAvg: Number('4.80'),
@@ -72,7 +72,7 @@ function stubPrisma() {
       count: jest.fn().mockResolvedValue(1),
       findFirst: jest.fn().mockImplementation(({ where }: { where: { slug: string; status: string } }) =>
         Promise.resolve(
-          where.slug === 'naruto-rasengan-hoodie' && where.status === 'active' ? detailRow : null,
+          where.slug === 'naruto-rasengan-figure' && where.status === 'active' ? detailRow : null,
         ),
       ),
     },
@@ -89,7 +89,7 @@ function stubPrisma() {
           compareAtPriceCents: 8900,
           stockOnHand: 40,
           reserved: 5,
-          product: { slug: 'naruto-rasengan-hoodie' },
+          product: { slug: 'naruto-rasengan-figure' },
         },
       ]),
     },
@@ -122,7 +122,7 @@ describe('Catalog API contracts (e2e, db-stubbed)', () => {
 
       expect(res.body.meta).toEqual({ page: 1, limit: 12, total: 1, totalPages: 1 });
       expect(res.body.items[0]).toMatchObject({
-        slug: 'naruto-rasengan-hoodie',
+        slug: 'naruto-rasengan-figure',
         priceFromCents: 6900,
         primaryImageUrl: '/naruto-rasengan.png',
       });
@@ -189,7 +189,7 @@ describe('Catalog API contracts (e2e, db-stubbed)', () => {
           compareAtPriceCents: 8900,
           stockOnHand: 40,
           reserved: 5,
-          product: { slug: 'naruto-rasengan-hoodie' },
+          product: { slug: 'naruto-rasengan-figure' },
         },
       ]);
 
@@ -203,7 +203,7 @@ describe('Catalog API contracts (e2e, db-stubbed)', () => {
         variantId: '11111111-1111-4111-8111-111111111111',
         available: 35,
         priceCents: 6900,
-        productSlug: 'naruto-rasengan-hoodie',
+        productSlug: 'naruto-rasengan-figure',
       });
       expect(res.body[0]).not.toHaveProperty('stockOnHand');
       expect(res.body[0]).not.toHaveProperty('reserved');
@@ -229,7 +229,7 @@ describe('Catalog API contracts (e2e, db-stubbed)', () => {
   describe('GET /api/v1/products/:slug', () => {
     it('serves active products with computed availability only', async () => {
       const res = await request(app.getHttpServer())
-        .get('/api/v1/products/naruto-rasengan-hoodie')
+        .get('/api/v1/products/naruto-rasengan-figure')
         .expect(200);
 
       expect(res.body.variants[0]).toMatchObject({

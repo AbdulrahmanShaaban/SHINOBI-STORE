@@ -57,7 +57,7 @@ const PNG_FIXTURE = Buffer.concat([PNG_SIGNATURE, Buffer.alloc(64, 0xae)]);
 
 const SEEDED_SECTIONS = [
   { key: 'hero', isVisible: true, sortOrder: 10, config: { title: 'Own the legend' } },
-  { key: 'featured_products', isVisible: true, sortOrder: 20, config: { productSlugs: ['naruto-rasengan-hoodie'] } },
+  { key: 'featured_products', isVisible: true, sortOrder: 20, config: { productSlugs: ['naruto-rasengan-figure'] } },
   { key: 'featured_characters', isVisible: true, sortOrder: 30, config: { items: [] } },
   { key: 'trending_anime', isVisible: true, sortOrder: 40, config: { animeSlugs: ['naruto'] } },
   { key: 'collections', isVisible: true, sortOrder: 50, config: { items: [] } },

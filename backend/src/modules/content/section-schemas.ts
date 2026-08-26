@@ -125,6 +125,13 @@ export class FeaturedCharacterItemDto {
   @IsString()
   @MaxLength(80)
   tagline?: string;
+
+  @IsOptional()
+  @IsArray()
+  @ArrayMaxSize(4)
+  @IsString({ each: true })
+  @MaxLength(40, { each: true })
+  skills?: string[];
 }
 
 export class FeaturedCharactersConfigDto {

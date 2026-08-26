@@ -7,6 +7,7 @@ import QuoteSection from '@/components/sections/showcase/QuoteSection';
 import CharacterShowcase from '@/components/sections/showcase/CharacterShowcase';
 import { resolveShowcaseCharacters } from '@/components/sections/showcase/showcase-characters';
 import StoreFooter from '@/components/shared/StoreFooter';
+import ScrollToTop from '@/components/shared/ScrollToTop';
 import { contentApi, type ContentSection } from '@/lib/content-api';
 
 /**
@@ -138,6 +139,7 @@ export default async function Home() {
       {testimonialsConfig ? <CmsTestimonials config={testimonialsConfig} /> : null}
       <CharacterShowcase characters={resolveShowcaseCharacters(featuredCharactersConfig)} />
       <StoreFooter />
+      <ScrollToTop />
     </main>
   );
 }

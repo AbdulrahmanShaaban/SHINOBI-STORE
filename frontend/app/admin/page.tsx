@@ -13,6 +13,9 @@ import { useAdminList } from '@/components/admin/use-admin-list';
 import { formatDateTime } from '@/components/admin/format';
 import { toneForStatus, type StatusTone } from '@/components/admin/StatusBadge';
 import { tdClass } from '@/components/admin/ui';
+import dynamic from 'next/dynamic';
+
+const OrdersBarChart = dynamic(() => import('@/components/admin/OrdersBarChart'), { ssr: false });
 
 function lowStockSeverity(stockOnHand: number, reserved: number) {
   if (stockOnHand === 0 || reserved > stockOnHand) {
@@ -86,6 +89,12 @@ export default function AdminDashboardPage() {
                   })}
             </div>
           </SectionCard>
+
+          {data && Object.keys(data.ordersByStatus).length > 0 ? (
+            <SectionCard title="ORDERS BREAKDOWN" className="mb-8" padded>
+              <OrdersBarChart data={data.ordersByStatus} />
+            </SectionCard>
+          ) : null}
 
           <section aria-labelledby="low-stock-heading" className="mb-8">
             <div className="mb-3 flex items-center justify-between gap-3">

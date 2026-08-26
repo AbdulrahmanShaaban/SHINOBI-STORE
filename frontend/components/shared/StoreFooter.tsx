@@ -133,7 +133,7 @@ export default function StoreFooter() {
 
       {/* Massive Top Text */}
       <div className="w-full overflow-hidden pt-12 md:pt-16 pb-8 md:pb-12 flex items-center justify-center relative flex-shrink-0">
-        <h1 className="footer-massive-text font-anton text-[18vw] leading-[0.75] tracking-tight uppercase flex overflow-hidden select-none">
+        <h1 className="footer-massive-text font-anton text-[clamp(3rem,10vw,10rem)] leading-[0.75] tracking-tight uppercase flex overflow-hidden select-none">
           {Array.from("SHINOBI ").map((char, i) => (
             <span key={i} className="inline-block text-white/5">{char === " " ? "\u00A0" : char}</span>
           ))}
@@ -192,12 +192,12 @@ export default function StoreFooter() {
 
         {/* Section 2: Contact Email */}
         <div className="footer-anim border-t border-white/10 px-6 py-6">
-          <a href="mailto:support@shinobistore.com" className="inline-flex items-center gap-3 font-inter text-sm text-white/60 hover:text-[#F97316] transition-colors">
+          <a href="mailto:aboodxs3a@gmail.com" className="inline-flex items-center gap-3 font-inter text-sm text-white/60 hover:text-[#F97316] transition-colors">
             <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
               <rect x="3" y="5" width="18" height="14" rx="2" />
               <polyline points="3 7 12 13 21 7" />
             </svg>
-            support@shinobistore.com
+            aboodxs3a@gmail.com
           </a>
         </div>
 
@@ -326,12 +326,12 @@ export default function StoreFooter() {
 
           {/* Contact Email */}
           <div className="footer-anim mt-32 relative z-10 flex justify-start">
-            <a href="mailto:support@shinobistore.com" className="inline-flex items-center gap-3 font-inter text-base text-white/60 hover:text-[#F97316] transition-colors bg-white/5 border border-white/10 px-4 py-2 rounded">
+            <a href="mailto:aboodxs3a@gmail.com" className="inline-flex items-center gap-3 font-inter text-base text-white/60 hover:text-[#F97316] transition-colors bg-white/5 border border-white/10 px-4 py-2 rounded">
               <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
                 <rect x="3" y="5" width="18" height="14" rx="2" />
                 <polyline points="3 7 12 13 21 7" />
               </svg>
-              support@shinobistore.com
+              aboodxs3a@gmail.com
             </a>
           </div>
 
@@ -412,4 +412,4 @@ export default function StoreFooter() {
       </div>
     </footer>
   );
-}
+}

@@ -842,14 +842,14 @@ export default function MadaraSpecialCard({
 
           <div
             ref={cardRef}
-            className="relative z-[35] flex justify-center w-full"
+            className="relative z-[70] flex justify-center w-full"
             style={{ clipPath: "inset(0% 0% 0% 0%)" }}
           >
             <div
               className="flex flex-col rounded-xl overflow-hidden w-full max-w-[700px]"
               style={{ backgroundColor: "#1a0808", border: "2px solid #8b1a1a" }}
             >
-              <div className="flex flex-col items-center w-full flex-1 p-6 md:p-8 lg:p-10 pb-0">
+              <div className="flex flex-col items-center w-full p-6 md:p-8 lg:p-10 pb-0 pt-12 md:pt-16 lg:pt-20">
                 <div
                   className="font-anton uppercase text-[32px] md:text-[40px] lg:text-[48px] leading-none"
                   style={{ color: "#F5E6C8" }}
@@ -1014,17 +1014,17 @@ export default function MadaraSpecialCard({
               <div className="w-full p-4 sm:p-6 md:p-8 lg:p-10 pt-4 md:pt-5 pb-8 sm:pb-12 lg:pb-14 mt-auto">
                 <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 md:gap-4 mx-0 sm:mx-4 md:mx-6 lg:mx-8">
                   <Link
-                    href="/products/madara-uchiha-hoodie"
+                    href="/products/six-paths-poster"
                     className="flex-1 h-[52px] sm:h-[64px] md:h-[68px] lg:h-[72px] px-4 sm:px-8 md:px-10 lg:px-12 rounded-lg font-cinzel font-bold text-[13px] sm:text-[15px] md:text-[16px] flex items-center justify-between transition-all hover:brightness-110 active:scale-[0.97]"
                     style={{ backgroundColor: "#F4E9D3", color: "#1A1A1A" }}
                   >
-                    <span>BUY NOW</span>
+                    <span className="whitespace-nowrap">BUY NOW</span>
                     <span className="font-inter text-[12px] sm:text-[13px] md:text-[14px] font-semibold">
                       $49.99
                     </span>
                   </Link>
                   <Link
-                    href="/products/madara-uchiha-hoodie"
+                    href="/products/six-paths-poster"
                     className="flex-1 h-[52px] sm:h-[64px] md:h-[68px] lg:h-[72px] px-4 sm:px-8 md:px-10 lg:px-12 rounded-lg font-cinzel font-bold text-[13px] sm:text-[15px] md:text-[16px] flex items-center justify-between transition-all hover:brightness-110 active:scale-[0.97]"
                     style={{
                       backgroundColor: "transparent",
@@ -1032,7 +1032,7 @@ export default function MadaraSpecialCard({
                       border: "1.5px solid white",
                     }}
                   >
-                    <span>VIEW PRODUCT</span>
+                    <span className="whitespace-nowrap">VIEW PRODUCT</span>
                     <svg
                       className="w-5 h-5 sm:w-6 sm:h-6 flex-shrink-0"
                       viewBox="0 0 24 24"

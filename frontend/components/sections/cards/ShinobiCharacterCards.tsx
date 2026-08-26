@@ -145,19 +145,19 @@ export default function ShinobiCharacterCards() {
           <div className="w-full p-4 sm:p-5 md:p-6 lg:p-8 pt-4 md:pt-5 pb-8 sm:pb-12 lg:pb-14 mt-auto">
             <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 md:gap-4 mx-0 sm:mx-4 md:mx-6 lg:mx-8">
               <Link
-                href="/products/naruto-rasengan-hoodie"
+                href="/products/naruto-rasengan-figure"
                 className="flex-1 h-[52px] sm:h-[64px] md:h-[68px] lg:h-[72px] px-4 sm:px-8 md:px-10 lg:px-12 rounded-lg font-cinzel font-bold text-[13px] sm:text-[15px] md:text-[16px] flex items-center justify-between transition-all hover:brightness-110 active:scale-[0.97]"
                 style={{ backgroundColor: "#F4E9D3", color: "#1A1A1A" }}
               >
-                <span>BUY NOW</span>
-                <span className="font-bebas text-2xl sm:text-3xl leading-none">$29.99</span>
+                <span className="whitespace-nowrap">BUY NOW</span>
+                <span className="font-bebas text-xl sm:text-2xl leading-none">$119.00</span>
               </Link>
               <Link
-                href="/products/naruto-rasengan-hoodie"
+                href="/products/naruto-rasengan-figure"
                 className="flex-1 h-[52px] sm:h-[64px] md:h-[68px] lg:h-[72px] px-4 sm:px-8 md:px-10 lg:px-12 rounded-lg font-cinzel font-bold text-[13px] sm:text-[15px] md:text-[16px] flex items-center justify-between transition-all hover:brightness-110 active:scale-[0.97]"
                 style={{ backgroundColor: "transparent", color: "white", border: "1.5px solid white" }}
               >
-                <span>VIEW PRODUCT</span>
+                <span className="whitespace-nowrap">VIEW PRODUCT</span>
                 <svg className="w-5 h-5 sm:w-6 sm:h-6 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M5 12h14M12 5l7 7-7 7" />
                 </svg>
@@ -188,19 +188,19 @@ export default function ShinobiCharacterCards() {
           <div className="w-full p-4 sm:p-5 md:p-6 lg:p-8 pt-4 md:pt-5 pb-8 sm:pb-12 lg:pb-14 mt-auto">
             <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 md:gap-4 mx-0 sm:mx-4 md:mx-6 lg:mx-8">
               <Link
-                href="/products/itachi-akatsuki-hoodie"
+                href="/products/itachi-mangekyou-figure"
                 className="flex-1 h-[52px] sm:h-[64px] md:h-[68px] lg:h-[72px] px-4 sm:px-8 md:px-10 lg:px-12 rounded-lg font-cinzel font-bold text-[13px] sm:text-[15px] md:text-[16px] flex items-center justify-between transition-all hover:brightness-110 active:scale-[0.97]"
                 style={{ backgroundColor: "#F4E9D3", color: "#1A1A1A" }}
               >
-                <span>BUY NOW</span>
-                <span className="font-bebas text-2xl sm:text-3xl leading-none">$34.99</span>
+                <span className="whitespace-nowrap">BUY NOW</span>
+                <span className="font-bebas text-xl sm:text-2xl leading-none">$149.00</span>
               </Link>
               <Link
-                href="/products/itachi-akatsuki-hoodie"
+                href="/products/itachi-mangekyou-figure"
                 className="flex-1 h-[52px] sm:h-[64px] md:h-[68px] lg:h-[72px] px-4 sm:px-8 md:px-10 lg:px-12 rounded-lg font-cinzel font-bold text-[13px] sm:text-[15px] md:text-[16px] flex items-center justify-between transition-all hover:brightness-110 active:scale-[0.97]"
                 style={{ backgroundColor: "transparent", color: "white", border: "1.5px solid white" }}
               >
-                <span>VIEW PRODUCT</span>
+                <span className="whitespace-nowrap">VIEW PRODUCT</span>
                 <svg className="w-5 h-5 sm:w-6 sm:h-6 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M5 12h14M12 5l7 7-7 7" />
                 </svg>
@@ -231,19 +231,19 @@ export default function ShinobiCharacterCards() {
           <div className="w-full p-4 sm:p-5 md:p-6 lg:p-8 pt-4 md:pt-5 pb-8 sm:pb-12 lg:pb-14 mt-auto">
             <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 md:gap-4 mx-0 sm:mx-4 md:mx-6 lg:mx-8">
               <Link
-                href="/products/sasuke-chidori-hoodie"
+                href="/products/sasuke-chidori-figure"
                 className="flex-1 h-[52px] sm:h-[64px] md:h-[68px] lg:h-[72px] px-4 sm:px-8 md:px-10 lg:px-12 rounded-lg font-cinzel font-bold text-[13px] sm:text-[15px] md:text-[16px] flex items-center justify-between transition-all hover:brightness-110 active:scale-[0.97]"
                 style={{ backgroundColor: "#F4E9D3", color: "#1A1A1A" }}
               >
-                <span>BUY NOW</span>
-                <span className="font-bebas text-2xl sm:text-3xl leading-none">$31.99</span>
+                <span className="whitespace-nowrap">BUY NOW</span>
+                <span className="font-bebas text-xl sm:text-2xl leading-none">$119.00</span>
               </Link>
               <Link
-                href="/products/sasuke-chidori-hoodie"
+                href="/products/sasuke-chidori-figure"
                 className="flex-1 h-[52px] sm:h-[64px] md:h-[68px] lg:h-[72px] px-4 sm:px-8 md:px-10 lg:px-12 rounded-lg font-cinzel font-bold text-[13px] sm:text-[15px] md:text-[16px] flex items-center justify-between transition-all hover:brightness-110 active:scale-[0.97]"
                 style={{ backgroundColor: "transparent", color: "white", border: "1.5px solid white" }}
               >
-                <span>VIEW PRODUCT</span>
+                <span className="whitespace-nowrap">VIEW PRODUCT</span>
                 <svg className="w-5 h-5 sm:w-6 sm:h-6 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M5 12h14M12 5l7 7-7 7" />
                 </svg>

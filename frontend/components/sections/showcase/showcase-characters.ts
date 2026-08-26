@@ -23,6 +23,7 @@ export interface CmsShowcaseCharacter {
   slug: string;
   imageUrl?: string;
   tagline?: string;
+  skills?: string;
 }
 
 export const DEFAULT_CHARACTERS: Character[] = [
@@ -75,6 +76,7 @@ function cmsItems(config: Record<string, unknown> | undefined): CmsShowcaseChara
       slug: typeof entry.slug === 'string' ? entry.slug.trim() : '',
       imageUrl: typeof entry.imageUrl === 'string' ? entry.imageUrl.trim() : '',
       tagline: typeof entry.tagline === 'string' ? entry.tagline.trim() : '',
+      skills: typeof entry.skills === 'string' ? entry.skills.trim() : '',
     }))
     .filter((item) => item.name !== '');
 }
@@ -95,6 +97,9 @@ export function resolveShowcaseCharacters(
 
   return items.map((item, index) => {
     const base = DEFAULT_CHARACTERS[index % DEFAULT_CHARACTERS.length];
+    const cmsSkills = item.skills
+      ? item.skills.split(',').map((s) => s.trim()).filter(Boolean)
+      : undefined;
     return {
       ...base,
       number: String(index + 1).padStart(2, '0'),
@@ -102,6 +107,7 @@ export function resolveShowcaseCharacters(
       alt: item.name,
       image: item.imageUrl || base.image,
       subline: item.tagline || base.subline,
+      skills: cmsSkills && cmsSkills.length > 0 ? cmsSkills : base.skills,
     };
   });
 }

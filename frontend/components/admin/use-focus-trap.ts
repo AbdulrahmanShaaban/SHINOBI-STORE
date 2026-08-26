@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
+import { acquireScrollLock, releaseLock } from '@/lib/scroll-lock';
 
 const FOCUSABLE = [
   'a[href]',
@@ -27,6 +28,7 @@ export function useFocusTrap<T extends HTMLElement>(
 ): React.RefObject<T | null> {
   const ref = useRef<T>(null);
   const onCloseRef = useRef(onClose);
+  const lockKeyRef = useRef(`focus-trap-${Math.random().toString(36).slice(2, 9)}`);
 
   useEffect(() => {
     onCloseRef.current = onClose;
@@ -38,8 +40,7 @@ export function useFocusTrap<T extends HTMLElement>(
     if (!node) return;
 
     const previousFocused = document.activeElement as HTMLElement | null;
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
+    acquireScrollLock(lockKeyRef.current);
 
     const initial =
       node.querySelector<HTMLElement>('[data-autofocus]') ?? focusableIn(node)[0];
@@ -72,7 +73,7 @@ export function useFocusTrap<T extends HTMLElement>(
     node.addEventListener('keydown', onKeyDown);
     return () => {
       node.removeEventListener('keydown', onKeyDown);
-      document.body.style.overflow = previousOverflow;
+      releaseLock(lockKeyRef.current);
       previousFocused?.focus?.();
     };
   }, [active]);

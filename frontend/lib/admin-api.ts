@@ -215,6 +215,16 @@ export interface ProductUpdateInput {
   status?: 'draft' | 'active' | 'archived';
 }
 
+export interface ProductCreateInput {
+  name: string;
+  description?: string;
+  categoryId?: string;
+  animeId?: string | null;
+  characterId?: string | null;
+  status?: 'draft' | 'active' | 'archived';
+  featured?: boolean;
+}
+
 export const adminApi = {
   getDashboard: () => request<DashboardData>('/admin/dashboard'),
 
@@ -281,6 +291,24 @@ export const adminApi = {
     request<unknown>(`/admin/products/${encodeURIComponent(id)}`, {
       method: 'PATCH',
       body: JSON.stringify(body),
+    }),
+
+  createProduct: (body: ProductCreateInput) =>
+    request<{ id: string; slug: string }>('/admin/products', {
+      method: 'POST',
+      body: JSON.stringify(body),
+    }),
+
+  createAnime: (name: string) =>
+    request<{ id: string; slug: string; name: string }>('/admin/animes', {
+      method: 'POST',
+      body: JSON.stringify({ name }),
+    }),
+
+  createCharacter: (name: string) =>
+    request<{ id: string; slug: string; name: string }>('/admin/characters', {
+      method: 'POST',
+      body: JSON.stringify({ name }),
     }),
 
   setProductImages: (id: string, images: ProductImageInput[]) =>

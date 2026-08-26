@@ -16,11 +16,6 @@
         "typecheck": "pnpm -r run typecheck",
         "contracts:generate": "pnpm --filter @shinobi/contracts generate"
     },
-    "pnpm": {
-        "onlyBuiltDependencies": [
-            "msgpackr-extract"
-        ]
-    },
     "devDependencies": {
         "turbo": "^2.10.11"
     }

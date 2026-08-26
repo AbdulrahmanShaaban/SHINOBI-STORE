@@ -93,7 +93,7 @@ export default function ProductDetailView({ product, related, reviews }: Product
             <Link href="/" className="hover:text-[#FF6B00] transition-colors">Home</Link>
           </li>
           <li aria-hidden="true">/</li>
-          <li>{product.category.name}</li>
+          <li><Link href={`/products?category=${product.category.slug}`} className="hover:text-[#FF6B00] transition-colors">{product.category.name}</Link></li>
           <li aria-hidden="true">/</li>
           <li aria-current="page" className="text-[#F0F0F0]">{product.name}</li>
         </ol>

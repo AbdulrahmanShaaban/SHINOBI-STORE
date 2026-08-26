@@ -17,7 +17,7 @@ export interface ItemFieldDef {
 export interface ConfigFieldDef {
   name: string;
   label: string;
-  kind: 'scalar' | 'slugList' | 'itemList';
+  kind: 'scalar' | 'slugList' | 'itemList' | 'image';
   /** scalar only */
   multiline?: boolean;
   maxLength?: number;
@@ -37,11 +37,9 @@ export const SECTION_SCHEMAS: Record<string, ConfigFieldDef[]> = {
     { name: 'subtitle', label: 'SUBTITLE', kind: 'scalar', multiline: true, maxLength: 160 },
     {
       name: 'imageUrl',
-      label: 'IMAGE URL',
-      kind: 'scalar',
-      maxLength: 500,
-      placeholder: '/media/hero/… or https://…',
-      helpText: 'Absolute http(s) URL or a root-relative path starting with /.',
+      label: 'HERO IMAGE',
+      kind: 'image',
+      helpText: 'Upload an image or enter a URL starting with /.',
     },
     { name: 'ctaLabel', label: 'CTA LABEL', kind: 'scalar', maxLength: 30 },
     { name: 'ctaHref', label: 'CTA LINK', kind: 'scalar', maxLength: 200, placeholder: '/products' },
@@ -67,6 +65,7 @@ export const SECTION_SCHEMAS: Record<string, ConfigFieldDef[]> = {
         { name: 'slug', label: 'SLUG', maxLength: 120, required: true },
         { name: 'imageUrl', label: 'IMAGE URL', maxLength: 500, required: false },
         { name: 'tagline', label: 'TAGLINE', maxLength: 80, required: false },
+        { name: 'skills', label: 'SKILLS (comma-separated)', maxLength: 200, required: false },
       ],
     },
   ],
@@ -97,36 +96,27 @@ export const SECTION_SCHEMAS: Record<string, ConfigFieldDef[]> = {
   madara: [
     {
       name: 'defaultImg',
-      label: 'DEFAULT IMAGE URL',
-      kind: 'scalar',
-      maxLength: 500,
-      placeholder: '/media/madara/… or https://…',
-      helpText:
-        'Absolute http(s) URL or a root-relative path starting with /. Empty keeps the bundled artwork.',
+      label: 'DEFAULT IMAGE',
+      kind: 'image',
+      helpText: 'Upload or enter a URL. Empty keeps the bundled artwork.',
     },
     {
       name: 'jutsuImg',
-      label: 'JUTSU IMAGE URL',
-      kind: 'scalar',
-      maxLength: 500,
-      placeholder: '/media/madara/… or https://…',
-      helpText:
-        'Absolute http(s) URL or a root-relative path starting with /. Empty keeps the bundled artwork.',
+      label: 'JUTSU IMAGE',
+      kind: 'image',
+      helpText: 'Upload or enter a URL. Empty keeps the bundled artwork.',
     },
     {
       name: 'sixPathsImg',
-      label: 'SIX PATHS IMAGE URL',
-      kind: 'scalar',
-      maxLength: 500,
-      placeholder: '/media/madara/… or https://…',
-      helpText:
-        'Absolute http(s) URL or a root-relative path starting with /. Empty keeps the bundled artwork.',
+      label: 'SIX PATHS IMAGE',
+      kind: 'image',
+      helpText: 'Upload or enter a URL. Empty keeps the bundled artwork.',
     },
   ],
   banner: [
     { name: 'title', label: 'TITLE', kind: 'scalar', maxLength: 60, required: true },
     { name: 'message', label: 'MESSAGE', kind: 'scalar', multiline: true, maxLength: 140 },
-    { name: 'imageUrl', label: 'IMAGE URL', kind: 'scalar', maxLength: 500 },
+    { name: 'imageUrl', label: 'BANNER IMAGE', kind: 'image' },
     { name: 'ctaLabel', label: 'CTA LABEL', kind: 'scalar', maxLength: 30 },
     { name: 'ctaHref', label: 'CTA LINK', kind: 'scalar', maxLength: 200 },
   ],

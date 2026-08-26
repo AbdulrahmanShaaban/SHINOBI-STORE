@@ -16,10 +16,9 @@ import {
 export class MockPaymentProvider implements PaymentProvider {
   readonly name = 'mock';
 
-  async createPayment(input: CreatePaymentInput): Promise<CreatedPayment> {
+  async createPayment(_input: CreatePaymentInput): Promise<CreatedPayment> {
     return {
       providerRef: `pi_mock_${randomUUID()}`,
-      clientSecret: `cs_mock_${input.referenceId}`,
       status: 'succeeded', // mock: instantly paid
     };
   }

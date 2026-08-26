@@ -129,7 +129,7 @@ export default function CardStack() {
                 ))}
               </div>
               <h2 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold text-black font-bangers tracking-wide">
-                NO JUTSU SHORTCUTS
+                DISCIPLINE OVER SHORTCUTS
               </h2>
               <div className="flex gap-1">
                 {[...Array(3)].map((_, i) => (
@@ -141,7 +141,7 @@ export default function CardStack() {
               <div className="card-content flex flex-col items-center text-center">
                 <img src="/sections/kunai.svg" alt="" className="w-14 h-14 md:w-20 md:h-20 mb-4 md:mb-6" />
                 <p className="text-[#F0F0F0] text-base md:text-lg leading-relaxed max-w-md">
-                  Hard work beats talent when talent doesn't work hard. We don't rely on forbidden jutsu, just pure training and dedication.
+                  Hard work beats talent when talent doesn&apos;t work hard. We don&apos;t rely on forbidden jutsu, just pure training and dedication.
                 </p>
               </div>
             </div>
@@ -156,7 +156,7 @@ export default function CardStack() {
                 ))}
               </div>
               <h2 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold text-black font-bangers tracking-wide">
-                NO LACK OF RESOLVE
+                RESOLVE, NOT RETREAT
               </h2>
               <div className="flex gap-1">
                 {[...Array(3)].map((_, i) => (
@@ -167,12 +167,21 @@ export default function CardStack() {
             <div className="card-body bg-[#1A1A1A] rounded-b-xl p-5 md:p-8 flex flex-col items-center text-center pb-[12vh] md:pb-[35vh]">
               <div className="card-content flex flex-col items-center text-center">
                 <svg className="w-16 h-16 md:w-24 md:h-24 mb-4 md:mb-6 text-[#FF7F00]" viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="2">
-                  {/* Shuriken */}
-                  <path d="M50 10 L60 40 L90 50 L60 60 L50 90 L40 60 L10 50 L40 40 Z" strokeLinecap="round" strokeLinejoin="round" />
-                  <circle cx="50" cy="50" r="8" />
+                  {/* Sharingan Eye */}
+                  <circle cx="50" cy="50" r="36" />
+                  <circle cx="50" cy="50" r="24" />
+                  <circle cx="50" cy="50" r="6" fill="currentColor" />
+                  <path d="M50 26 L50 44" strokeLinecap="round" />
+                  <path d="M50 56 L50 74" strokeLinecap="round" />
+                  <path d="M26 50 L44 50" strokeLinecap="round" />
+                  <path d="M56 50 L74 50" strokeLinecap="round" />
+                  <path d="M33 33 L45 45" strokeLinecap="round" />
+                  <path d="M55 55 L67 67" strokeLinecap="round" />
+                  <path d="M67 33 L55 45" strokeLinecap="round" />
+                  <path d="M45 55 L33 67" strokeLinecap="round" />
                 </svg>
                 <p className="text-[#F0F0F0] text-base md:text-lg leading-relaxed max-w-md">
-                  We never go back on our word. That is our ninja way. If it doesn't align with the village's mission, it doesn't make the cut.
+                  We never go back on our word. That is our ninja way. If it doesn&apos;t align with the village&apos;s mission, it doesn&apos;t make the cut.
                 </p>
               </div>
             </div>
@@ -187,7 +196,7 @@ export default function CardStack() {
                 ))}
               </div>
               <h2 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold text-black font-bangers tracking-wide">
-                NO CHAKRA WASTE
+                CHAKRA SPENT WITH PURPOSE
               </h2>
               <div className="flex gap-1">
                 {[...Array(3)].map((_, i) => (
@@ -198,10 +207,12 @@ export default function CardStack() {
             <div className="card-body bg-[#1A1A1A] rounded-b-xl p-5 md:p-8 flex flex-col items-center text-center pb-[12vh] md:pb-[35vh]">
               <div className="card-content flex flex-col items-center text-center">
                 <svg className="w-16 h-16 md:w-24 md:h-24 mb-4 md:mb-6 text-[#FF7F00]" viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="2">
-                  {/* Chakra Flame */}
-                  <path d="M50 10 Q65 30 65 50 Q65 70 50 85 Q35 70 35 50 Q35 30 50 10" strokeLinecap="round" />
-                  <path d="M50 25 Q58 40 58 52 Q58 64 50 72 Q42 64 42 52 Q42 40 50 25" strokeLinecap="round" />
-                  <path d="M50 40 Q54 48 54 54 Q54 60 50 65 Q46 60 46 54 Q46 48 50 40" strokeLinecap="round" />
+                  {/* Leaf Village Emblem */}
+                  <path d="M50 15 Q70 30 70 55 Q70 80 50 90 Q30 80 30 55 Q30 30 50 15" strokeLinecap="round" strokeLinejoin="round" />
+                  <path d="M50 30 Q50 55 50 70" strokeLinecap="round" />
+                  <path d="M38 48 Q50 55 62 48" strokeLinecap="round" />
+                  <path d="M35 60 Q50 68 65 60" strokeLinecap="round" />
+                  <circle cx="50" cy="42" r="3" fill="currentColor" />
                 </svg>
                 <p className="text-[#F0F0F0] text-base md:text-lg leading-relaxed max-w-md">
                   Perfect chakra control. No unnecessary ingredients, no fillers. Just the essential energy needed to complete the mission.
@@ -219,7 +230,7 @@ export default function CardStack() {
                 ))}
               </div>
               <h2 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold text-black font-bangers tracking-wide">
-                NO DESERTION
+                LOYALTY TO THE LAST
               </h2>
               <div className="flex gap-1">
                 {[...Array(3)].map((_, i) => (
@@ -230,16 +241,17 @@ export default function CardStack() {
             <div className="card-body bg-[#1A1A1A] rounded-b-xl p-5 md:p-8 flex flex-col items-center text-center pb-[12vh] md:pb-[35vh]">
               <div className="card-content flex flex-col items-center text-center">
                 <svg className="w-16 h-16 md:w-24 md:h-24 mb-4 md:mb-6 text-[#FF7F00]" viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="2">
-                  {/* Ninja Headband */}
-                  <rect x="10" y="35" width="80" height="20" rx="2" />
-                  <path d="M10 45 L5 35 L15 45" strokeLinecap="round" strokeLinejoin="round" />
-                  <path d="M90 45 L95 35 L85 45" strokeLinecap="round" strokeLinejoin="round" />
-                  {/* Leaf Village Symbol */}
-                  <path d="M50 25 L50 35 M50 35 L40 45 M50 35 L60 45 M45 40 L55 40" strokeLinecap="round" />
-                  <circle cx="50" cy="32" r="3" />
+                  {/* Scroll/Seal */}
+                  <rect x="20" y="25" width="60" height="50" rx="3" />
+                  <path d="M20 30 Q15 30 15 35 Q15 40 20 40" strokeLinecap="round" />
+                  <path d="M80 30 Q85 30 85 35 Q85 40 80 40" strokeLinecap="round" />
+                  <path d="M20 60 Q15 60 15 65 Q15 70 20 70" strokeLinecap="round" />
+                  <path d="M80 60 Q85 60 85 65 Q85 70 80 70" strokeLinecap="round" />
+                  <circle cx="50" cy="50" r="8" />
+                  <path d="M46 50 L50 46 L54 50 L50 54 Z" fill="currentColor" />
                 </svg>
                 <p className="text-[#F0F0F0] text-base md:text-lg leading-relaxed max-w-md">
-                  Loyalty above all. A bond that cannot be broken by rogue elements. We stay true to our allies and our diet.
+                  Loyalty above all. A bond that cannot be broken by rogue elements. We stay true to our allies and our creed.
                 </p>
               </div>
             </div>

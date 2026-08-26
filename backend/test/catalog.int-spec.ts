@@ -73,7 +73,7 @@ describe('Catalog API against live Postgres', () => {
         expect(res.body.meta.total).toBe(ACTIVE_TOTAL);
         const slugs: string[] = res.body.items.map((i: { slug: string }) => i.slug);
         for (const slug of INVISIBLE_SLUGS) expect(slugs).not.toContain(slug);
-        expect(slugs).toContain('naruto-rasengan-hoodie');
+        expect(slugs).toContain('naruto-rasengan-figure');
       }),
     );
 
@@ -151,7 +151,7 @@ describe('Catalog API against live Postgres', () => {
           .get('/api/v1/products?search=rasengan&limit=50')
           .expect(200);
         expect(rasengan.body.meta.total).toBeGreaterThanOrEqual(1);
-        expect(rasengan.body.items[0].slug).toBe('naruto-rasengan-hoodie');
+        expect(rasengan.body.items[0].slug).toBe('naruto-rasengan-figure');
 
         // 'akatsuki' lives in tags/anime names, not the keycap's own text.
         const akatsuki = await request(app.getHttpServer())
@@ -175,7 +175,7 @@ describe('Catalog API against live Postgres', () => {
         const res = await request(app.getHttpServer())
           .get('/api/v1/products?search=rasengen')
           .expect(200);
-        expect(res.body.items.map((i: { slug: string }) => i.slug)).toContain('naruto-rasengan-hoodie');
+        expect(res.body.items.map((i: { slug: string }) => i.slug)).toContain('naruto-rasengan-figure');
       }),
     );
   });
@@ -237,7 +237,7 @@ describe('Catalog API against live Postgres', () => {
       'computes availability from stock minus reserved on the seeded hoodie',
       itDb(async () => {
         const res = await request(app.getHttpServer())
-          .get('/api/v1/products/naruto-rasengan-hoodie')
+          .get('/api/v1/products/naruto-rasengan-figure')
           .expect(200);
         const large = res.body.variants.find((v: { optionSize: string | null }) => v.optionSize === 'L');
         // Seeded: stockOnHand 35, reserved 3 → available 32.
@@ -258,7 +258,7 @@ describe('Catalog API against live Postgres', () => {
           SELECT p."price_from_cents",
                  (SELECT MIN(v."price_cents") FROM "product_variants" v
                   WHERE v."product_id" = p."id" AND v."is_active") AS min_active
-          FROM "products" p WHERE p."slug" = 'naruto-rasengan-hoodie'`;
+          FROM "products" p WHERE p."slug" = 'naruto-rasengan-figure'`;
         expect(rows[0].min_active).not.toBeNull();
         expect(Number(rows[0].price_from_cents)).toBe(Number(rows[0].min_active));
       }),
@@ -269,7 +269,7 @@ describe('Catalog API against live Postgres', () => {
       itDb(async () => {
         const rows = await prisma.$queryRaw<{ hits: number }[]>`
           SELECT COUNT(*)::int AS hits FROM "products"
-          WHERE "search" @@ to_tsquery('english', 'rasengan') AND "slug" = 'naruto-rasengan-hoodie'`;
+          WHERE "search" @@ to_tsquery('english', 'rasengan') AND "slug" = 'naruto-rasengan-figure'`;
         expect(rows[0].hits).toBe(1);
 
         const tagWeighted = await prisma.$queryRaw<{ hits: number }[]>`

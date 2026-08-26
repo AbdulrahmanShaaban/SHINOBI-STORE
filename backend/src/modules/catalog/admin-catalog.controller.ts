@@ -97,6 +97,13 @@ class SetProductImagesDto {
   images!: ProductImageEntryDto[];
 }
 
+class TaxonomyBodyDto {
+  @IsString()
+  @MinLength(1)
+  @MaxLength(120)
+  name!: string;
+}
+
 /**
  * Admin catalog CRUD. Every route requires an admin session (Phase 5) —
  * until then AdminGuard rejects all traffic with SESSIONS_NOT_IMPLEMENTED.
@@ -125,16 +132,22 @@ export class AdminCatalogController {
       limit: Math.min(Math.max(limit, 1), 50),
     });
   }
+  @RequirePermissions('products:w')
   @Post('products')
   @ApiOperation({ summary: 'Create product (admin)' })
   createProduct(@Body() body: ProductBodyDto) {
+    const slug = (body.name ?? '')
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-|-$/g, '');
     return this.adminCatalogService.createProduct({
+      slug,
       name: body.name ?? '',
       description: body.description ?? '',
       categoryId: body.categoryId ?? '',
       animeId: body.animeId,
       characterId: body.characterId,
-      status: body.status,
+      status: body.status ?? 'draft',
       featured: body.featured,
     });
   }
@@ -170,5 +183,27 @@ export class AdminCatalogController {
     @Req() req: Request,
   ) {
     return this.adminCatalogService.setProductImages(id, body.images, actor.id, req.ip);
+  }
+
+  @RequirePermissions('products:w')
+  @Post('animes')
+  @ApiOperation({ summary: 'Create anime taxonomy (admin)' })
+  createAnime(@Body() body: TaxonomyBodyDto) {
+    const slug = body.name
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-|-$/g, '');
+    return this.adminCatalogService.createAnime({ slug, name: body.name });
+  }
+
+  @RequirePermissions('products:w')
+  @Post('characters')
+  @ApiOperation({ summary: 'Create character taxonomy (admin)' })
+  createCharacter(@Body() body: TaxonomyBodyDto) {
+    const slug = body.name
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-|-$/g, '');
+    return this.adminCatalogService.createCharacter({ slug, name: body.name });
   }
 }

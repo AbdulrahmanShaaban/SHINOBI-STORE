@@ -36,7 +36,6 @@ export default function AdminProductsPage() {
   return (
     <div>
       <h1 className="sr-only">Products</h1>
-      <p className="-mt-1 mb-5 text-sm text-[#6B6B80]">Variants editor ships next.</p>
 
       <DataTableToolbar
         searchValue={qDraft}
@@ -48,11 +47,19 @@ export default function AdminProductsPage() {
         searchPlaceholder="Search by name or slug…"
         searchLabel="Search products"
         actions={
-          result && result.meta ? (
-            <span className="hidden text-xs uppercase tracking-wider text-[#6B6B80] lg:block">
-              {result.meta.total} total
-            </span>
-          ) : null
+          <div className="flex items-center gap-3">
+            {result && result.meta ? (
+              <span className="hidden text-xs uppercase tracking-wider text-[#6B6B80] lg:block">
+                {result.meta.total} total
+              </span>
+            ) : null}
+            <Link
+              href="/admin/products/new"
+              className="h-[36px] px-4 rounded-lg font-cinzel font-bold text-xs tracking-wider bg-[#CC0000] text-[#F0F0F0] hover:bg-[#FF6B00] transition-all flex items-center"
+            >
+              + ADD PRODUCT
+            </Link>
+          </div>
         }
       />
 

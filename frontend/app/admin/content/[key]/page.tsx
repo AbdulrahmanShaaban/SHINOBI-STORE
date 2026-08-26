@@ -6,6 +6,7 @@ import { useParams, useRouter } from 'next/navigation';
 import {
   contentApi,
   type ContentSection,
+  type MediaEntry,
 } from '@/lib/content-api';
 import {
   buildConfig,
@@ -20,6 +21,7 @@ import EmptyState from '@/components/admin/EmptyState';
 import ErrorState from '@/components/admin/ErrorState';
 import SectionCard from '@/components/admin/SectionCard';
 import { SkeletonText } from '@/components/admin/Skeleton';
+import { pushToast } from '@/components/shared/Toast';
 import {
   btnGhost,
   helpClass,
@@ -54,6 +56,12 @@ export default function AdminSectionEditPage() {
   const [saveError, setSaveError] = useState<string | null>(null);
   const [flash, setFlash] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
+  const [uploadingField, setUploadingField] = useState<string | null>(null);
+  const [mediaPickerField, setMediaPickerField] = useState<string | null>(null);
+  const [mediaPickerItems, setMediaPickerItems] = useState<MediaEntry[]>([]);
+  const [mediaPickerLoading, setMediaPickerLoading] = useState(false);
+  const [mediaPickerPage, setMediaPickerPage] = useState(1);
+  const [mediaPickerHasMore, setMediaPickerHasMore] = useState(true);
 
   useEffect(() => {
     if (!flash) return;
@@ -254,6 +262,147 @@ export default function AdminSectionEditPage() {
     );
   };
 
+  const handleImageUpload = async (field: ConfigFieldDef, file: File) => {
+    setUploadingField(field.name);
+    try {
+      const entry = await contentApi.uploadMedia(file, 'general');
+      setScalar(field.name, entry.url);
+    } catch (err: unknown) {
+      pushToast({ title: 'UPLOAD FAILED', description: err instanceof Error ? err.message : 'Unknown error', variant: 'error' });
+    } finally {
+      setUploadingField(null);
+    }
+  };
+
+  const openMediaPicker = async (fieldName: string) => {
+    setMediaPickerField(fieldName);
+    setMediaPickerPage(1);
+    setMediaPickerItems([]);
+    setMediaPickerHasMore(true);
+    setMediaPickerLoading(true);
+    try {
+      const result = await contentApi.listMedia('general', 1);
+      setMediaPickerItems(result.items);
+      setMediaPickerHasMore(result.meta.page < result.meta.totalPages);
+    } catch {
+      pushToast({ title: 'ERROR', description: 'Failed to load media', variant: 'error' });
+    } finally {
+      setMediaPickerLoading(false);
+    }
+  };
+
+  const loadMoreMedia = async () => {
+    const nextPage = mediaPickerPage + 1;
+    setMediaPickerLoading(true);
+    try {
+      const result = await contentApi.listMedia('general', nextPage);
+      setMediaPickerItems((prev) => [...prev, ...result.items]);
+      setMediaPickerPage(nextPage);
+      setMediaPickerHasMore(result.meta.page < result.meta.totalPages);
+    } catch {
+      pushToast({ title: 'ERROR', description: 'Failed to load more media', variant: 'error' });
+    } finally {
+      setMediaPickerLoading(false);
+    }
+  };
+
+  const renderImageField = (field: ConfigFieldDef) => {
+    const value = typeof values[field.name] === 'string' ? (values[field.name] as string) : '';
+    const id = `field-${field.name}`;
+    const isUploading = uploadingField === field.name;
+    const isPickerOpen = mediaPickerField === field.name;
+    return (
+      <div>
+        <label htmlFor={id} className={labelClass}>
+          {field.label}
+          {field.required ? <span className="ml-1 text-[#FF6B00]">*</span> : null}
+        </label>
+        <div className="flex gap-3 items-start">
+          <div className="flex-1">
+            <input
+              id={id}
+              type="text"
+              value={value}
+              placeholder="/sections/… or https://…"
+              onChange={(e) => setScalar(field.name, e.target.value)}
+              className={inputClass}
+            />
+            {field.helpText ? <span className={helpClass}>{field.helpText}</span> : null}
+          </div>
+          <button
+            type="button"
+            onClick={() => isPickerOpen ? setMediaPickerField(null) : openMediaPicker(field.name)}
+            className="shrink-0 h-[44px] px-4 rounded-lg border border-[#2A2A3A] font-cinzel text-xs font-bold uppercase tracking-wider text-[#B8B8CC] hover:border-[#FF6B00] hover:text-[#F0F0F0] transition-colors"
+          >
+            {isPickerOpen ? 'CLOSE' : 'BROWSE'}
+          </button>
+          <label className="shrink-0 h-[44px] px-4 rounded-lg border border-[#2A2A3A] font-cinzel text-xs font-bold uppercase tracking-wider text-[#B8B8CC] hover:border-[#FF6B00] hover:text-[#F0F0F0] transition-colors flex items-center cursor-pointer">
+            {isUploading ? 'UPLOADING…' : 'UPLOAD'}
+            <input
+              type="file"
+              accept="image/*"
+              className="hidden"
+              disabled={isUploading}
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) handleImageUpload(field, file);
+                e.target.value = '';
+              }}
+            />
+          </label>
+        </div>
+        {isPickerOpen && (
+          <div className="mt-3 rounded-lg border border-[#2A2A3A] bg-[#12121A] p-3">
+            {mediaPickerLoading && mediaPickerItems.length === 0 ? (
+              <div className="py-8 text-center text-sm text-[#6B6B80] font-inter">Loading media…</div>
+            ) : mediaPickerItems.length === 0 ? (
+              <div className="py-8 text-center text-sm text-[#6B6B80] font-inter">No media in the general folder yet.</div>
+            ) : (
+              <>
+                <div className="grid grid-cols-4 sm:grid-cols-6 gap-2 max-h-60 overflow-y-auto">
+                  {mediaPickerItems.map((item) => (
+                    <button
+                      key={item.id}
+                      type="button"
+                      onClick={() => {
+                        setScalar(field.name, item.url);
+                        setMediaPickerField(null);
+                      }}
+                      className={`relative aspect-square rounded-lg overflow-hidden border-2 transition-colors ${
+                        value === item.url
+                          ? 'border-[#FF6B00]'
+                          : 'border-transparent hover:border-[#FF6B00]/50'
+                      }`}
+                    >
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={item.url} alt={item.altText ?? ''} className="w-full h-full object-cover" />
+                    </button>
+                  ))}
+                </div>
+                {mediaPickerHasMore && (
+                  <button
+                    type="button"
+                    onClick={loadMoreMedia}
+                    disabled={mediaPickerLoading}
+                    className="mt-2 w-full h-8 rounded border border-[#2A2A3A] text-xs font-cinzel font-bold text-[#6B6B80] hover:text-[#FF6B00] hover:border-[#FF6B00] transition-colors"
+                  >
+                    {mediaPickerLoading ? 'LOADING…' : 'LOAD MORE'}
+                  </button>
+                )}
+              </>
+            )}
+          </div>
+        )}
+        {value ? (
+          <div className="mt-2 relative w-full max-w-[200px] h-[100px] rounded-lg overflow-hidden border border-[#2A2A3A] bg-[#12121A]">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={value} alt="" className="w-full h-full object-cover" />
+          </div>
+        ) : null}
+      </div>
+    );
+  };
+
   const renderItemField = (field: ConfigFieldDef) => {
     const rows = Array.isArray(values[field.name]) ? (values[field.name] as ItemRow[]) : [];
     const atMax = Boolean(field.maxItems && rows.length >= field.maxItems);
@@ -401,9 +550,10 @@ export default function AdminSectionEditPage() {
             className="space-y-6 p-5 sm:p-6"
           >
             {fields.map((field) => {
-              if (field.kind === 'scalar') return renderScalarField(field);
-              if (field.kind === 'slugList') return renderSlugListField(field);
-              return renderItemField(field);
+              if (field.kind === 'scalar') return <div key={field.name}>{renderScalarField(field)}</div>;
+              if (field.kind === 'slugList') return <div key={field.name}>{renderSlugListField(field)}</div>;
+              if (field.kind === 'image') return <div key={field.name}>{renderImageField(field)}</div>;
+              return <div key={field.name}>{renderItemField(field)}</div>;
             })}
 
             <div className="flex flex-wrap items-center gap-3 pt-2">

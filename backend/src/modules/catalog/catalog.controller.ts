@@ -36,7 +36,7 @@ export class CatalogController {
 
   @Get(':slug')
   @ApiOperation({ summary: 'Product detail by slug (public; drafts are invisible)' })
-  @ApiParam({ name: 'slug', example: 'naruto-rasengan-hoodie' })
+  @ApiParam({ name: 'slug', example: 'naruto-rasengan-figure' })
   @ApiOkResponse({ description: 'Active product with variants, images and taxonomy' })
   @ApiNotFoundResponse({ description: 'Unknown or non-active slug' })
   detail(@Param('slug') slug: string) {
