@@ -99,17 +99,20 @@ export default function Navbar() {
           <div className="flex items-center justify-end h-full">
             {/* Desktop Navigation */}
             <div className="hidden lg:flex items-center gap-3 lg:gap-5 shrink-0">
-              <Link href="/" className="px-2 py-2 text-[#F0F0F0] font-semibold text-xl xl:text-2xl hover:text-[#FF6B00] transition-colors">
+              <Link href="/" className="px-2 py-2 text-[#F0F0F0] font-semibold text-xl xl:text-2xl hover:text-[#FF6B00] transition-colors uppercase">
                 Home
               </Link>
-              <Link href="/products" className="px-2 py-2 text-[#F0F0F0] font-semibold text-xl xl:text-2xl hover:text-[#FF6B00] transition-colors">
+              <Link href="/products" className="px-2 py-2 text-[#F0F0F0] font-semibold text-xl xl:text-2xl hover:text-[#FF6B00] transition-colors uppercase">
                 Shop
               </Link>
-              <Link href="/products?sort=newest" className="px-2 py-2 text-[#F0F0F0] font-semibold text-xl xl:text-2xl hover:text-[#FF6B00] transition-colors">
+              <Link href="/products?sort=newest" className="px-2 py-2 text-[#F0F0F0] font-semibold text-xl xl:text-2xl hover:text-[#FF6B00] transition-colors uppercase">
                 New Arrivals
               </Link>
-              <Link href="/community" className="px-2 py-2 text-[#F0F0F0] font-semibold text-xl xl:text-2xl hover:text-[#FF6B00] transition-colors">
+              <Link href="/community" className="px-2 py-2 text-[#F0F0F0] font-semibold text-xl xl:text-2xl hover:text-[#FF6B00] transition-colors uppercase">
                 Community
+              </Link>
+              <Link href="/about" className="px-2 py-2 text-[#F0F0F0] font-semibold text-xl xl:text-2xl hover:text-[#FF6B00] transition-colors uppercase">
+                About
               </Link>
               <button
                 type="button"
@@ -212,17 +215,20 @@ export default function Navbar() {
         <nav className={`flex flex-col items-center gap-7 ${contentTransition} ${
           isMenuOpen ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
         }`}>
-          <Link href="/" onClick={closeMenu} className="font-semibold text-2xl text-[#F0F0F0] hover:text-[#FF6B00] transition-colors">
+          <Link href="/" onClick={closeMenu} className="font-semibold text-2xl text-[#F0F0F0] hover:text-[#FF6B00] transition-colors uppercase">
             Home
           </Link>
-          <Link href="/products" onClick={closeMenu} className="font-semibold text-2xl text-[#F0F0F0] hover:text-[#FF6B00] transition-colors">
+          <Link href="/products" onClick={closeMenu} className="font-semibold text-2xl text-[#F0F0F0] hover:text-[#FF6B00] transition-colors uppercase">
             Shop
           </Link>
-          <Link href="/products?sort=newest" onClick={closeMenu} className="font-semibold text-2xl text-[#F0F0F0] hover:text-[#FF6B00] transition-colors">
+          <Link href="/products?sort=newest" onClick={closeMenu} className="font-semibold text-2xl text-[#F0F0F0] hover:text-[#FF6B00] transition-colors uppercase">
             New Arrivals
           </Link>
-          <Link href="/community" onClick={closeMenu} className="font-semibold text-2xl text-[#F0F0F0] hover:text-[#FF6B00] transition-colors">
+          <Link href="/community" onClick={closeMenu} className="font-semibold text-2xl text-[#F0F0F0] hover:text-[#FF6B00] transition-colors uppercase">
             Community
+          </Link>
+          <Link href="/about" onClick={closeMenu} className="font-semibold text-2xl text-[#F0F0F0] hover:text-[#FF6B00] transition-colors uppercase">
+            About
           </Link>
           {user ? (
             <Link href="/account" onClick={closeMenu} className="font-semibold text-2xl text-[#F0F0F0] hover:text-[#FF6B00] transition-colors">

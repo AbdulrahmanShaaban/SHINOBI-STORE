@@ -20,6 +20,8 @@ export default function SmoothScroll() {
   useEffect(() => {
     // Disable on admin routes — native scroll is required
     if (pathname.startsWith('/admin')) return;
+    // Disable on shop and product detail pages — scroll gets stuck
+    if (pathname === '/products' || pathname.startsWith('/products/')) return;
     // Disable smooth scrolling on mobile — native touch scroll handles momentum
     if (window.matchMedia('(max-width: 767px)').matches) return;
 

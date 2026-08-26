@@ -7,6 +7,7 @@ import { loadStripe, type Stripe } from '@stripe/stripe-js';
 import { Elements, PaymentElement, useElements, useStripe } from '@stripe/react-stripe-js';
 import { useCartStore } from '@/lib/cart-store';
 import { formatPrice } from '@/lib/money';
+import DemoPaymentForm from '@/components/checkout/DemoPaymentForm';
 
 /**
  * §14.2 client entry. Two phases:
@@ -85,7 +86,8 @@ export default function CheckoutPage() {
         return;
       }
       if (body.clientSecret) {
-        if (!publishableKey) {
+        const isDemo = body.clientSecret.startsWith('demo_');
+        if (!isDemo && !publishableKey) {
           // Order is reserved server-side; without the publishable key we
           // cannot render the payment step. Tell the operator exactly why.
           setError(
@@ -143,7 +145,9 @@ export default function CheckoutPage() {
   );
 
   // ── Phase 2: payment ────────────────────────────────────────────────────────
-  if (placed && stripePromise) {
+  const isDemoPayment = !!placed?.clientSecret?.startsWith('demo_');
+
+  if (placed && (isDemoPayment || stripePromise)) {
     return (
       <main className="mx-auto w-full max-w-5xl px-4 py-12">
         <h1 className="font-bebas text-5xl tracking-wide text-[#F0F0F0] mb-2">PAYMENT</h1>
@@ -154,18 +158,28 @@ export default function CheckoutPage() {
 
         <div className="grid lg:grid-cols-[1fr_360px] gap-8">
           <section className="rounded-xl border border-[#2A2A3A] bg-[#16161F] p-6">
-            <Elements
-              stripe={stripePromise}
-              options={{
-                clientSecret: placed.clientSecret,
-                appearance: { theme: 'night', variables: { colorPrimary: '#FF6B00' } },
-              }}
-            >
-              <ConfirmPaymentForm
+            {isDemoPayment ? (
+              <DemoPaymentForm
                 orderNumber={placed.orderNumber}
+                clientSecret={placed.clientSecret}
+                totalCents={totalCents}
+                currency="USD"
                 onDone={() => finishOrder(placed.orderNumber)}
               />
-            </Elements>
+            ) : (
+              <Elements
+                stripe={stripePromise!}
+                options={{
+                  clientSecret: placed.clientSecret,
+                  appearance: { theme: 'night', variables: { colorPrimary: '#FF6B00' } },
+                }}
+              >
+                <ConfirmPaymentForm
+                  orderNumber={placed.orderNumber}
+                  onDone={() => finishOrder(placed.orderNumber)}
+                />
+              </Elements>
+            )}
           </section>
 
           <aside className="rounded-xl border border-[#2A2A3A] bg-[#16161F] p-6 h-fit" aria-label="Order summary">
@@ -182,8 +196,9 @@ export default function CheckoutPage() {
             </ul>
             {summary}
             <p className="mt-4 text-xs text-[#6B6B80]">
-              Payments are processed by Stripe. Confirmation is verified server-side — this page
-              never marks an order paid on its own.
+              {isDemoPayment
+                ? 'This is a demo checkout — no real charges. Payment verification happens server-side.'
+                : 'Payments are processed by Stripe. Confirmation is verified server-side — this page never marks an order paid on its own.'}
             </p>
           </aside>
         </div>

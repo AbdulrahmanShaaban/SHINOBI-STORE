@@ -179,6 +179,24 @@ export interface AuditLogResult {
   meta: PageMeta;
 }
 
+export interface AdminReview {
+  id: string;
+  productId: string;
+  userId: string;
+  rating: number;
+  title?: string;
+  body: string;
+  status: 'pending' | 'approved' | 'rejected';
+  createdAt: string;
+  product?: { name: string; slug: string };
+  user?: { fullName: string; email: string };
+}
+
+export interface ReviewListResult {
+  items: AdminReview[];
+  meta: PageMeta;
+}
+
 export interface AdminProductRow {
   id: string;
   slug?: string | null;
@@ -204,9 +222,20 @@ export interface ProductImageRow {
   isPrimary: boolean;
 }
 
+export interface ProductVariantRow {
+  id: string;
+  sku: string;
+  priceCents: number;
+  compareAtPriceCents: number | null;
+  stockOnHand: number;
+  reserved: number;
+  isActive: boolean;
+}
+
 export interface AdminProductDetail extends AdminProductRow {
   description?: string | null;
   images?: ProductImageRow[];
+  variants?: ProductVariantRow[];
 }
 
 export interface ProductUpdateInput {
@@ -330,6 +359,18 @@ export const adminApi = {
       { method: 'PUT', body: JSON.stringify({ images }) },
     ),
 
+  updateProductPricing: (id: string, body: { price?: string; compareAtPrice?: string }) =>
+    request<unknown>(`/admin/products/${encodeURIComponent(id)}/pricing`, {
+      method: 'PATCH',
+      body: JSON.stringify(body),
+    }),
+
+  updateProductStock: (id: string, body: { stock: string }) =>
+    request<unknown>(`/admin/products/${encodeURIComponent(id)}/stock`, {
+      method: 'PATCH',
+      body: JSON.stringify(body),
+    }),
+
   listQueues: () => request<QueueInfo[]>('/admin/queues'),
 
   listFailedJobs: (queue: string, page?: number) =>
@@ -342,6 +383,20 @@ export const adminApi = {
       `/admin/queues/${encodeURIComponent(queue)}/failed/${encodeURIComponent(jobId)}/requeue`,
       { method: 'POST' },
     ),
+
+  listReviews: (params: { status?: string; page?: number } = {}) =>
+    request<ReviewListResult>(withQuery('/admin/reviews', params)),
+
+  moderateReview: (id: string, body: { status: 'approved' | 'rejected' }) =>
+    request<unknown>(`/admin/reviews/${encodeURIComponent(id)}/moderate`, {
+      method: 'POST',
+      body: JSON.stringify(body),
+    }),
+
+  deleteReview: (id: string) =>
+    request<unknown>(`/admin/reviews/${encodeURIComponent(id)}`, {
+      method: 'DELETE',
+    }),
 };
 
 export interface QueueCounts {

@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   ParseUUIDPipe,
@@ -48,5 +49,16 @@ export class AdminReviewsController {
     @Req() req: Request,
   ) {
     return this.reviews.moderate(id, body.status, actor.id, req.ip);
+  }
+
+  @Delete(':id')
+  @RequirePermissions('reviews:w')
+  @ApiOperation({ summary: 'Delete a review permanently (recomputes product rating aggregate)' })
+  delete(
+    @Param('id', ParseUUIDPipe) id: string,
+    @CurrentUser() actor: AuthenticatedUser,
+    @Req() req: Request,
+  ) {
+    return this.reviews.deleteReview(id, actor.id, req.ip);
   }
 }

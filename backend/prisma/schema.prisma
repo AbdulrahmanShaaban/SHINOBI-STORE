@@ -506,6 +506,7 @@ enum coupon_type {
 
 enum payment_provider {
   stripe
+  demo
 }
 
 enum payment_status {

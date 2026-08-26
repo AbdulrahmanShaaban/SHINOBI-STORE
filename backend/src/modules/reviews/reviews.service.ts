@@ -182,4 +182,42 @@ export class ReviewsService {
 
     return { id, status, ...result };
   }
+
+  async deleteReview(id: string, actorUserId: string, ip?: string) {
+    const review = await this.prisma.review.findUnique({
+      where: { id },
+      select: { id: true, productId: true, status: true },
+    });
+    if (!review) {
+      throw new NotFoundException({ code: 'REVIEW_NOT_FOUND', message: 'Review not found' });
+    }
+
+    await this.prisma.$transaction(async (tx) => {
+      await tx.review.delete({ where: { id } });
+      const aggregate = await tx.review.aggregate({
+        where: { productId: review.productId, status: 'approved' },
+        _avg: { rating: true },
+        _count: true,
+      });
+      await tx.product.update({
+        where: { id: review.productId },
+        data: {
+          ratingAvg: aggregate._avg.rating ? Number(aggregate._avg.rating.toFixed(2)) : 0,
+          reviewCount: aggregate._count,
+        },
+        select: { slug: true },
+      });
+    });
+
+    await this.audit?.record(
+      actorUserId,
+      'review.delete',
+      'review',
+      id,
+      { previousStatus: review.status },
+      ip,
+    );
+
+    return { id, deleted: true };
+  }
 }

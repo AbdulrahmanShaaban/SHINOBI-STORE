@@ -169,7 +169,10 @@ export class AdminCatalogService {
   async getProduct(id: string) {
     const product = await this.prisma.product.findUnique({
       where: { id },
-      include: { images: { orderBy: { sortOrder: 'asc' } } },
+      include: {
+        images: { orderBy: { sortOrder: 'asc' } },
+        variants: { orderBy: { createdAt: 'asc' } },
+      },
     });
     if (!product) {
       throw new NotFoundException({ code: 'PRODUCT_NOT_FOUND', message: 'Product not found' });
@@ -273,6 +276,26 @@ export class AdminCatalogService {
     return this.prisma.productVariant.update({
       where: { id: variant.id },
       data,
+    });
+  }
+
+  /** Update the first active variant's stock for a product. */
+  async updateProductVariantStock(productId: string, stock: string) {
+    await this.assertProductExists(productId);
+
+    const variant = await this.prisma.productVariant.findFirst({
+      where: { productId, isActive: true },
+      orderBy: { createdAt: 'asc' },
+    });
+    if (!variant) {
+      throw new NotFoundException({ code: 'VARIANT_NOT_FOUND', message: 'No active variant found' });
+    }
+
+    const stockOnHand = Math.max(0, parseInt(stock, 10) || 0);
+
+    return this.prisma.productVariant.update({
+      where: { id: variant.id },
+      data: { stockOnHand },
     });
   }
 

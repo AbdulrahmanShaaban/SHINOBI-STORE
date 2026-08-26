@@ -218,6 +218,16 @@ export class AdminCatalogController {
   }
 
   @RequirePermissions('products:w')
+  @Patch('products/:id/stock')
+  @ApiOperation({ summary: 'Update the default variant stock for a product (admin)' })
+  updateProductStock(
+    @Param('id') id: string,
+    @Body() body: { stock: string },
+  ) {
+    return this.adminCatalogService.updateProductVariantStock(id, body.stock);
+  }
+
+  @RequirePermissions('products:w')
   @Post('animes')
   @ApiOperation({ summary: 'Create anime taxonomy (admin)' })
   createAnime(@Body() body: TaxonomyBodyDto) {

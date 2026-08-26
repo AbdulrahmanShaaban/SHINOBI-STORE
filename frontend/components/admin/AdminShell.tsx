@@ -22,6 +22,7 @@ import {
   IconOrders,
   IconProducts,
   IconQueues,
+  IconReviews,
   IconStore,
 } from '@/components/admin/icons';
 
@@ -43,6 +44,7 @@ const NAV_GROUPS: { label: string; items: NavItem[] }[] = [
       { href: '/admin/products', label: 'PRODUCTS', icon: IconProducts },
       { href: '/admin/customers', label: 'CUSTOMERS', icon: IconCustomers },
       { href: '/admin/coupons', label: 'COUPONS', icon: IconCoupons },
+      { href: '/admin/reviews', label: 'REVIEWS', icon: IconReviews },
     ],
   },
   {
@@ -66,6 +68,7 @@ const SECTION_TITLES: Record<string, string> = {
   products: 'PRODUCTS',
   customers: 'CUSTOMERS',
   coupons: 'COUPONS',
+  reviews: 'REVIEWS',
   content: 'CONTENT',
   media: 'MEDIA LIBRARY',
   'audit-log': 'AUDIT LOG',

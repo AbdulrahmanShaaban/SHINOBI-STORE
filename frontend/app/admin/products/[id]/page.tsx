@@ -7,6 +7,7 @@ import {
   adminApi,
   type AdminProductDetail,
   type ProductImageRow,
+  type ProductVariantRow,
   type ProductUpdateInput,
 } from '@/lib/admin-api';
 import { contentApi } from '@/lib/content-api';
@@ -107,6 +108,14 @@ export default function AdminProductEditPage() {
   const [imagesFlash, setImagesFlash] = useState(false);
   const imageFileInputRef = useRef<HTMLInputElement>(null);
 
+  const [variant, setVariant] = useState<ProductVariantRow | null>(null);
+  const [editPrice, setEditPrice] = useState('');
+  const [editCompareAt, setEditCompareAt] = useState('');
+  const [editStock, setEditStock] = useState('');
+  const [pricingSaving, setPricingSaving] = useState(false);
+  const [pricingError, setPricingError] = useState<string | null>(null);
+  const [pricingFlash, setPricingFlash] = useState(false);
+
   useEffect(() => {
     let alive = true;
     adminApi
@@ -119,6 +128,11 @@ export default function AdminProductEditPage() {
         setStatus(typeof p.status === 'string' ? p.status : 'draft');
         setImageDraft(toImageDraft(p.images));
         setSavedImages(toImageDraft(p.images));
+        const v = Array.isArray(p.variants) && p.variants.length > 0 ? p.variants[0] : null;
+        setVariant(v);
+        setEditPrice(v ? (v.priceCents / 100).toFixed(2) : '');
+        setEditCompareAt(v?.compareAtPriceCents ? (v.compareAtPriceCents / 100).toFixed(2) : '');
+        setEditStock(v ? String(v.stockOnHand) : '0');
         setLoadError(null);
         setLoading(false);
       })
@@ -135,13 +149,14 @@ export default function AdminProductEditPage() {
   const retry = () => setRetryNonce((n) => n + 1);
 
   useEffect(() => {
-    if (!flash && !imagesFlash) return;
+    if (!flash && !imagesFlash && !pricingFlash) return;
     const timer = setTimeout(() => {
       setFlash(false);
       setImagesFlash(false);
+      setPricingFlash(false);
     }, 3000);
     return () => clearTimeout(timer);
-  }, [flash, imagesFlash]);
+  }, [flash, imagesFlash, pricingFlash]);
 
   const trimmedName = name.trim();
   const nameError =
@@ -266,6 +281,36 @@ export default function AdminProductEditPage() {
       setImagesError(err instanceof Error ? err.message : 'Could not save the images.');
     } finally {
       setImagesSaving(false);
+    }
+  };
+
+  const pricingDirty =
+    variant !== null &&
+    (editPrice !== (variant.priceCents / 100).toFixed(2) ||
+      editCompareAt !== (variant.compareAtPriceCents ? (variant.compareAtPriceCents / 100).toFixed(2) : '') ||
+      editStock !== String(variant.stockOnHand));
+
+  const savePricing = async (): Promise<void> => {
+    setPricingError(null);
+    setPricingSaving(true);
+    try {
+      await adminApi.updateProductPricing(id, {
+        price: editPrice || undefined,
+        compareAtPrice: editCompareAt || undefined,
+      });
+      await adminApi.updateProductStock(id, { stock: editStock || '0' });
+      setPricingFlash(true);
+      const fresh = await adminApi.getProduct(id);
+      setProduct(fresh);
+      const v = Array.isArray(fresh.variants) && fresh.variants.length > 0 ? fresh.variants[0] : null;
+      setVariant(v);
+      setEditPrice(v ? (v.priceCents / 100).toFixed(2) : '');
+      setEditCompareAt(v?.compareAtPriceCents ? (v.compareAtPriceCents / 100).toFixed(2) : '');
+      setEditStock(v ? String(v.stockOnHand) : '0');
+    } catch (err: unknown) {
+      setPricingError(err instanceof Error ? err.message : 'Could not save pricing/stock.');
+    } finally {
+      setPricingSaving(false);
     }
   };
 
@@ -409,6 +454,103 @@ export default function AdminProductEditPage() {
             {saving ? 'SAVING…' : 'SAVE CHANGES'}
           </button>
         </form>
+      </SectionCard>
+
+      <SectionCard title="PRICING & STOCK" tone="raised" className="mt-8">
+        <div className="space-y-5">
+          <div>
+            <label className={labelClass}>PRICE FROM</label>
+            <p className="text-[#FFB800]">{formatPrice(product.priceFromCents)}</p>
+          </div>
+
+          <div>
+            <label htmlFor="product-price" className={labelClass}>
+              PRICE (USD)
+            </label>
+            <input
+              id="product-price"
+              type="number"
+              step="0.01"
+              min="0"
+              value={editPrice}
+              onChange={(e) => setEditPrice(e.target.value)}
+              disabled={pricingSaving}
+              placeholder="0.00"
+              className={inputClass}
+            />
+          </div>
+
+          <div>
+            <label htmlFor="product-compare-at" className={labelClass}>
+              COMPARE AT PRICE (USD)
+            </label>
+            <input
+              id="product-compare-at"
+              type="number"
+              step="0.01"
+              min="0"
+              value={editCompareAt}
+              onChange={(e) => setEditCompareAt(e.target.value)}
+              disabled={pricingSaving}
+              placeholder="0.00"
+              className={inputClass}
+            />
+            <p className={`${helpClass} mt-1`}>
+              Optional original price shown as strikethrough on storefront.
+            </p>
+          </div>
+
+          <div>
+            <label htmlFor="product-stock" className={labelClass}>
+              STOCK QUANTITY
+            </label>
+            <input
+              id="product-stock"
+              type="number"
+              step="1"
+              min="0"
+              value={editStock}
+              onChange={(e) => setEditStock(e.target.value)}
+              disabled={pricingSaving}
+              placeholder="0"
+              className={inputClass}
+            />
+            <p className={`${helpClass} mt-1`}>
+              Units on hand for the default variant.
+            </p>
+          </div>
+
+          {pricingError ? (
+            <p role="alert" className="rounded-lg border border-[#CC0000]/50 bg-[#CC0000]/10 px-4 py-2.5 text-sm text-[#F0F0F0]">
+              {pricingError}
+            </p>
+          ) : null}
+          {pricingFlash ? (
+            <p
+              role="status"
+              aria-live="polite"
+              className="rounded-lg border border-[#22C55E]/40 bg-[#22C55E]/10 px-4 py-2.5 text-sm text-[#4ADE80]"
+            >
+              Saved.
+            </p>
+          ) : null}
+
+          <div className="flex flex-wrap items-center gap-3">
+            <button
+              type="button"
+              disabled={pricingSaving || !pricingDirty}
+              onClick={() => void savePricing()}
+              className={btnPrimary}
+            >
+              {pricingSaving ? 'SAVING…' : 'SAVE PRICING'}
+            </button>
+            {pricingDirty && !pricingSaving ? (
+              <span className="inline-flex items-center whitespace-nowrap rounded-full border border-[#FFB800]/40 bg-[#FFB800]/10 px-2.5 py-0.5 font-cinzel text-[11px] font-bold uppercase tracking-wider text-[#FFB800]">
+                Unsaved changes
+              </span>
+            ) : null}
+          </div>
+        </div>
       </SectionCard>
 
       <SectionCard title="IMAGES" tone="raised" className="mt-8">
