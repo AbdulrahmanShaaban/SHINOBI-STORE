@@ -66,3 +66,5 @@ _legacy-cleanup-pending/
 
 # Documentation 
 docs/
+.vercel
+.env*
