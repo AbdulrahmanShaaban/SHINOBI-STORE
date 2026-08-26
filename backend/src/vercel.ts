@@ -6,9 +6,7 @@ import serverlessExpress from '@vendia/serverless-express';
 import { AppModule } from './app.module';
 import { configureApp } from './app.setup';
 
-let cachedHandler:
-  | ReturnType<typeof serverlessExpress>
-  | undefined;
+let cachedHandler: ReturnType<typeof serverlessExpress> | undefined;
 
 async function createHandler() {
   const app = await NestFactory.create<NestExpressApplication>(
@@ -20,7 +18,6 @@ async function createHandler() {
   );
 
   await configureApp(app);
-
   await app.init();
 
   return serverlessExpress({
@@ -28,13 +25,18 @@ async function createHandler() {
   });
 }
 
-export default async function handler(
-  req: any,
-  res: any,
-) {
+export default async function handler(req: any, res: any) {
   if (!cachedHandler) {
     cachedHandler = await createHandler();
   }
 
-  return (cachedHandler as any)(req, res);
+  return new Promise((resolve, reject) => {
+    cachedHandler!(req, res, (error: unknown) => {
+      if (error) {
+        reject(error);
+      } else {
+        resolve(undefined);
+      }
+    });
+  });
 }
