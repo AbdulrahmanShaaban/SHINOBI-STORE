@@ -21,9 +21,6 @@ ALTER TABLE "cart_items" ALTER COLUMN "updated_at" DROP DEFAULT;
 ALTER TABLE "carts" ALTER COLUMN "updated_at" DROP DEFAULT;
 
 -- AlterTable
-ALTER TABLE "homepage_sections" ALTER COLUMN "updated_at" DROP DEFAULT;
-
--- AlterTable
 ALTER TABLE "inventory_transactions" DROP COLUMN "actor_type",
 ADD COLUMN     "actorType" "event_actor" NOT NULL DEFAULT 'system';
 

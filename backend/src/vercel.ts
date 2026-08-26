@@ -2,28 +2,39 @@ import 'reflect-metadata';
 import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import serverlessExpress from '@vendia/serverless-express';
-import type { Callback, Context, Handler } from 'aws-lambda';
+
 import { AppModule } from './app.module';
 import { configureApp } from './app.setup';
 
-let cachedHandler: Handler;
+let cachedHandler:
+  | ReturnType<typeof serverlessExpress>
+  | undefined;
 
-async function bootstrap(): Promise<Handler> {
-  const app = await NestFactory.create<NestExpressApplication>(AppModule, {
-    logger: false,
-    rawBody: true,
-  });
+async function createHandler() {
+  const app = await NestFactory.create<NestExpressApplication>(
+    AppModule,
+    {
+      logger: false,
+      rawBody: true,
+    },
+  );
 
   await configureApp(app);
+
   await app.init();
 
-  const expressApp = app.getHttpAdapter().getInstance();
-  return serverlessExpress({ app: expressApp });
+  return serverlessExpress({
+    app: app.getHttpAdapter().getInstance(),
+  });
 }
 
-export const handler: Handler = async (event: unknown, context: Context, callback: Callback) => {
+export default async function handler(
+  req: any,
+  res: any,
+) {
   if (!cachedHandler) {
-    cachedHandler = await bootstrap();
+    cachedHandler = await createHandler();
   }
-  return cachedHandler(event, context, callback);
-};
+
+  return (cachedHandler as any)(req, res);
+}
