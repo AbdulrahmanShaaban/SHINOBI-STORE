@@ -7,7 +7,9 @@ import {
   contentApi,
   type ContentSection,
   type MediaEntry,
+  type MediaFolder,
 } from '@/lib/content-api';
+import { adminApi } from '@/lib/admin-api';
 import {
   buildConfig,
   initialValues,
@@ -436,6 +438,112 @@ export default function AdminSectionEditPage() {
               <div className="grid gap-3 sm:grid-cols-2">
                 {(field.itemFields ?? []).map((def) => {
                   const defId = `field-${field.name}-${index}-${def.name}`;
+                  if (def.kind === 'image-inline') {
+                    const imgVal = row[def.name] ?? '';
+                    const imgUploading = uploadingField === `${field.name}-${index}-${def.name}`;
+                    return (
+                      <div key={def.name}>
+                        <label htmlFor={defId} className="mb-1 block font-cinzel text-xs font-bold text-[#B8B8CC]">
+                          {def.label}
+                          {def.required ? <span className="ml-1 text-[#FF6B00]">*</span> : null}
+                        </label>
+                        <div className="flex gap-2 items-start">
+                          <input
+                            id={defId}
+                            type="text"
+                            maxLength={def.maxLength}
+                            value={imgVal}
+                            placeholder="URL or upload"
+                            onChange={(e) => setItemField(field, index, def.name, e.target.value)}
+                            className={`${inputClass} flex-1`}
+                          />
+                          <label className="shrink-0 h-[44px] px-3 rounded-lg border border-[#2A2A3A] font-cinzel text-[10px] font-bold uppercase tracking-wider text-[#B8B8CC] hover:border-[#FF6B00] hover:text-[#F0F0F0] transition-colors flex items-center cursor-pointer">
+                            {imgUploading ? '…' : 'UPLOAD'}
+                            <input
+                              type="file"
+                              accept="image/*"
+                              className="hidden"
+                              disabled={imgUploading}
+                              onChange={async (e) => {
+                                const file = e.target.files?.[0];
+                                if (!file) return;
+                                const upKey = `${field.name}-${index}-${def.name}`;
+                                setUploadingField(upKey);
+                                try {
+                                  const folder: MediaFolder = key === 'collections' ? 'collections' : 'characters';
+                                  const entry = await contentApi.uploadMedia(file, folder);
+                                  setItemField(field, index, def.name, entry.url);
+                                } catch (err: unknown) {
+                                  console.error('[MediaUpload]', err);
+                                  const msg = err instanceof Error ? err.message : String(err);
+                                  pushToast({ title: 'UPLOAD FAILED', description: msg, variant: 'error' });
+                                } finally {
+                                  setUploadingField(null);
+                                }
+                                e.target.value = '';
+                              }}
+                            />
+                          </label>
+                        </div>
+                        {imgVal ? (
+                          <div className="mt-2 w-full max-w-[120px] h-[60px] rounded-lg overflow-hidden border border-[#2A2A3A] bg-[#12121A]">
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img src={imgVal} alt="" className="w-full h-full object-cover" />
+                          </div>
+                        ) : null}
+                      </div>
+                    );
+                  }
+                  if (def.kind === 'tags') {
+                    const rawTags = row[def.name] ?? '';
+                    const tags = rawTags ? rawTags.split(',').map((t) => t.trim()).filter(Boolean) : [];
+                    return (
+                      <div key={def.name} className="sm:col-span-2">
+                        <label className="mb-1 block font-cinzel text-xs font-bold text-[#B8B8CC]">
+                          {def.label}
+                          {def.required ? <span className="ml-1 text-[#FF6B00]">*</span> : null}
+                        </label>
+                        <div className="flex flex-wrap gap-1.5 mb-2">
+                          {tags.map((tag, ti) => (
+                            <span
+                              key={`${tag}-${ti}`}
+                              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#FF6B00]/15 border border-[#FF6B00]/30 text-[11px] font-cinzel font-bold text-[#FF6B00]"
+                            >
+                              {tag}
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  const next = tags.filter((_, i) => i !== ti).join(', ');
+                                  setItemField(field, index, def.name, next);
+                                }}
+                                className="ml-0.5 text-[#FF6B00]/60 hover:text-[#FF6B00] transition-colors"
+                              >
+                                ×
+                              </button>
+                            </span>
+                          ))}
+                        </div>
+                        <input
+                          id={defId}
+                          type="text"
+                          placeholder="Type a skill and press Enter"
+                          maxLength={def.maxLength}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                              e.preventDefault();
+                              const val = (e.target as HTMLInputElement).value.trim();
+                              if (val && !tags.includes(val)) {
+                                const next = tags.length > 0 ? `${rawTags}, ${val}` : val;
+                                setItemField(field, index, def.name, next);
+                              }
+                              (e.target as HTMLInputElement).value = '';
+                            }
+                          }}
+                          className={inputClass}
+                        />
+                      </div>
+                    );
+                  }
                   return (
                     <div key={def.name}>
                       <label htmlFor={defId} className="mb-1 block font-cinzel text-xs font-bold text-[#B8B8CC]">

@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useRef } from "react";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
@@ -78,7 +79,10 @@ function CharacterPanel({ character }: { character: Character }) {
           </div>
           
           {/* CTA — pinned to bottom-left of the glass panel */}
-          <div className="showcase-cta absolute bottom-6 left-6 sm:bottom-8 sm:left-8 md:bottom-10 md:left-10 lg:bottom-14 lg:left-14 z-10 flex items-center gap-3 font-anton text-[14px] md:text-[17px] uppercase tracking-[0.25em] text-white hover:text-[#F97316] transition-colors cursor-pointer w-max">
+          <Link
+            href={`/products?character=${encodeURIComponent(character.slug)}`}
+            className="showcase-cta absolute bottom-6 left-6 sm:bottom-8 sm:left-8 md:bottom-10 md:left-10 lg:bottom-14 lg:left-14 z-10 flex items-center gap-3 font-anton text-[14px] md:text-[17px] uppercase tracking-[0.25em] text-white hover:text-[#F97316] transition-colors w-max"
+          >
             EXPLORE
             <svg
               className="h-5 w-5 md:h-6 md:w-6"
@@ -92,7 +96,7 @@ function CharacterPanel({ character }: { character: Character }) {
             >
               <path d="M5 12h14M12 5l7 7-7 7" />
             </svg>
-          </div>
+          </Link>
         </div>
       </div>
     </article>

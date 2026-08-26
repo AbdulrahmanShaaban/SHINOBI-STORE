@@ -12,12 +12,13 @@ export interface ItemFieldDef {
   label: string;
   maxLength: number;
   required: boolean;
+  kind?: 'scalar' | 'image-inline' | 'tags';
 }
 
 export interface ConfigFieldDef {
   name: string;
   label: string;
-  kind: 'scalar' | 'slugList' | 'itemList' | 'image';
+  kind: 'scalar' | 'slugList' | 'itemList' | 'image' | 'image-inline' | 'tags';
   /** scalar only */
   multiline?: boolean;
   maxLength?: number;
@@ -63,9 +64,11 @@ export const SECTION_SCHEMAS: Record<string, ConfigFieldDef[]> = {
       itemFields: [
         { name: 'name', label: 'NAME', maxLength: 40, required: true },
         { name: 'slug', label: 'SLUG', maxLength: 120, required: true },
-        { name: 'imageUrl', label: 'IMAGE URL', maxLength: 500, required: false },
+        { name: 'imageUrl', label: 'IMAGE', maxLength: 500, required: false, kind: 'image-inline' },
         { name: 'tagline', label: 'TAGLINE', maxLength: 80, required: false },
-        { name: 'skills', label: 'SKILLS (comma-separated)', maxLength: 200, required: false },
+        { name: 'skills', label: 'SKILLS', maxLength: 200, required: false, kind: 'tags' },
+        { name: 'price', label: 'PRICE', maxLength: 10, required: false },
+        { name: 'originalPrice', label: 'ORIGINAL PRICE', maxLength: 10, required: false },
       ],
     },
   ],
@@ -89,7 +92,7 @@ export const SECTION_SCHEMAS: Record<string, ConfigFieldDef[]> = {
       itemFields: [
         { name: 'title', label: 'TITLE', maxLength: 40, required: true },
         { name: 'href', label: 'LINK', maxLength: 200, required: true },
-        { name: 'imageUrl', label: 'IMAGE URL', maxLength: 500, required: false },
+        { name: 'imageUrl', label: 'IMAGE', maxLength: 500, required: false, kind: 'image-inline' },
       ],
     },
   ],
@@ -186,7 +189,7 @@ export type BuildResult =
 const SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
 function isEmptyRow(row: ItemRow): boolean {
-  return Object.values(row).every((v) => v.trim() === '');
+  return Object.values(row).every((v) => (Array.isArray(v) ? v.length === 0 : v.trim() === ''));
 }
 
 /**
@@ -231,11 +234,11 @@ export function buildConfig(fields: ConfigFieldDef[], values: FormValues): Build
     } else {
       const rowsRaw = Array.isArray(values[field.name]) ? (values[field.name] as ItemRow[]) : [];
       const defs = field.itemFields ?? [];
-      const items: Record<string, string>[] = [];
+      const items: Record<string, string | string[]>[] = [];
 
       for (const [index, row] of rowsRaw.entries()) {
         if (isEmptyRow(row)) continue; // silently drop fully-empty rows
-        const item: Record<string, string> = {};
+        const item: Record<string, string | string[]> = {};
         let rowValid = true;
         for (const def of defs) {
           const trimmed = (row[def.name] ?? '').trim();
@@ -251,7 +254,13 @@ export function buildConfig(fields: ConfigFieldDef[], values: FormValues): Build
             rowValid = false;
             break;
           }
-          if (trimmed) item[def.name] = trimmed;
+          if (trimmed) {
+            if (def.kind === 'tags') {
+              item[def.name] = trimmed.split(',').map((t) => t.trim()).filter(Boolean);
+            } else {
+              item[def.name] = trimmed;
+            }
+          }
         }
         if (!rowValid) continue;
         items.push(item);

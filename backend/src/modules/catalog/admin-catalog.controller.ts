@@ -65,6 +65,16 @@ class ProductBodyDto {
   @IsOptional()
   @IsBoolean()
   featured?: boolean;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(10)
+  price?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(10)
+  compareAtPrice?: string;
 }
 
 /** One image in the replacement set for PUT /admin/products/:id/images. */
@@ -144,11 +154,13 @@ export class AdminCatalogController {
       slug,
       name: body.name ?? '',
       description: body.description ?? '',
-      categoryId: body.categoryId ?? '',
-      animeId: body.animeId,
-      characterId: body.characterId,
+      categoryId: body.categoryId || undefined,
+      animeId: body.animeId || null,
+      characterId: body.characterId || null,
       status: body.status ?? 'draft',
       featured: body.featured,
+      price: body.price,
+      compareAtPrice: body.compareAtPrice,
     });
   }
 

@@ -1,6 +1,6 @@
 import { Global, Module } from '@nestjs/common';
 import { CloudinaryAdapter } from './cloudinary.adapter';
-import { LocalMockAdapter } from './local-mock.adapter';
+import { LocalFileAdapter } from './local-file.adapter';
 import { AdminMediaController } from './admin-media.controller';
 import { PublicMediaController } from './public-media.controller';
 import { AdminMediaService } from './admin-media.service';
@@ -8,8 +8,7 @@ import { MEDIA_STORAGE, type StoragePort } from './storage.port';
 
 /**
  * Storage selection at boot: real Cloudinary when all three credentials are
- * present, otherwise the local mock (dev/test). MediaService only knows the
- * MEDIA_STORAGE token — identical pattern to PaymentsModule.
+ * present, otherwise the local file adapter (writes to public/media/).
  */
 @Global()
 @Module({
@@ -25,7 +24,7 @@ import { MEDIA_STORAGE, type StoragePort } from './storage.port';
         if (cloudName && apiKey && apiSecret) {
           return new CloudinaryAdapter({ cloudName, apiKey, apiSecret });
         }
-        return new LocalMockAdapter();
+        return new LocalFileAdapter();
       },
     },
   ],

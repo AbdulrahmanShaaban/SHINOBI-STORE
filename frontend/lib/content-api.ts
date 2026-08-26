@@ -106,6 +106,8 @@ export interface FeaturedCharacterItem {
   slug: string;
   imageUrl?: string;
   tagline?: string;
+  price?: string;
+  originalPrice?: string;
 }
 
 export interface FeaturedCharactersConfig {

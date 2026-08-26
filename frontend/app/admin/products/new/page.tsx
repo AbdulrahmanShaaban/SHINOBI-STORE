@@ -115,9 +115,9 @@ function ComboboxInput({ label, options, value, onChange, onCreateNew, placehold
               {filtered.length === 0 && !showCreate && (
                 <div className="px-4 py-2 text-sm text-[#6B6B80] font-inter">No results</div>
               )}
-              {filtered.map((opt) => (
+              {filtered.map((opt, idx) => (
                 <button
-                  key={opt.id}
+                  key={`${opt.id}-${idx}`}
                   type="button"
                   onClick={() => handleSelect(opt.id)}
                   className={`w-full text-left px-4 py-2 text-sm font-inter transition-colors ${
@@ -164,6 +164,8 @@ export default function NewProductPage() {
   const [characterId, setCharacterId] = useState('');
   const [status, setStatus] = useState<'draft' | 'active' | 'archived'>('draft');
   const [featured, setFeatured] = useState(false);
+  const [price, setPrice] = useState('');
+  const [compareAtPrice, setCompareAtPrice] = useState('');
 
   const [categories, setCategories] = useState<TaxonomyOption[]>([]);
   const [animes, setAnimes] = useState<TaxonomyOption[]>([]);
@@ -186,7 +188,7 @@ export default function NewProductPage() {
   }, []);
 
   const nameValid = name.trim().length >= NAME_MIN;
-  const canSubmit = nameValid && !saving;
+  const canSubmit = nameValid && !!categoryId && !saving;
 
   const handleAddImages = useCallback((files: FileList | null) => {
     if (!files) return;
@@ -260,6 +262,8 @@ export default function NewProductPage() {
         characterId: characterId || null,
         status,
         featured,
+        price: price.trim() || undefined,
+        compareAtPrice: compareAtPrice.trim() || undefined,
       };
       const { id } = await adminApi.createProduct(input);
 
@@ -322,16 +326,17 @@ export default function NewProductPage() {
         {/* CATEGORY */}
         <div className="flex flex-col gap-2">
           <label className="font-cinzel font-bold text-sm uppercase tracking-widest text-[#6B6B80]">
-            CATEGORY
+            CATEGORY <span className="text-[#CC0000]">*</span>
           </label>
           <select
             value={categoryId}
             onChange={(e) => setCategoryId(e.target.value)}
+            required
             className="bg-[#16161F] border border-[#2A2A3A] rounded-lg px-4 py-3 font-inter text-[#F0F0F0] focus:border-[#FF6B00] focus:outline-none transition-colors"
           >
             <option value="">— Select category —</option>
-            {categories.map((c) => (
-              <option key={c.id} value={c.id}>{c.name}</option>
+            {categories.map((c, i) => (
+              <option key={`${c.id}-${i}`} value={c.id}>{c.name}</option>
             ))}
           </select>
         </div>
@@ -361,6 +366,38 @@ export default function NewProductPage() {
             return created.id;
           }}
         />
+
+        {/* PRICE */}
+        <div className="flex flex-col sm:flex-row gap-4">
+          <div className="flex flex-col gap-2 flex-1">
+            <label className="font-cinzel font-bold text-sm uppercase tracking-widest text-[#6B6B80]">
+              PRICE (USD)
+            </label>
+            <input
+              type="number"
+              step="0.01"
+              min="0"
+              value={price}
+              onChange={(e) => setPrice(e.target.value)}
+              className="bg-[#16161F] border border-[#2A2A3A] rounded-lg px-4 py-3 font-inter text-[#F0F0F0] focus:border-[#FF6B00] focus:outline-none transition-colors"
+              placeholder="0.00"
+            />
+          </div>
+          <div className="flex flex-col gap-2 flex-1">
+            <label className="font-cinzel font-bold text-sm uppercase tracking-widest text-[#6B6B80]">
+              COMPARE AT PRICE
+            </label>
+            <input
+              type="number"
+              step="0.01"
+              min="0"
+              value={compareAtPrice}
+              onChange={(e) => setCompareAtPrice(e.target.value)}
+              className="bg-[#16161F] border border-[#2A2A3A] rounded-lg px-4 py-3 font-inter text-[#F0F0F0] focus:border-[#FF6B00] focus:outline-none transition-colors"
+              placeholder="0.00 (optional)"
+            />
+          </div>
+        </div>
 
         {/* IMAGES */}
         <div className="flex flex-col gap-2">

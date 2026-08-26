@@ -18,11 +18,13 @@ export interface ProductWriteInput {
   slug?: string;
   name: string;
   description: string;
-  categoryId: string;
+  categoryId?: string;
   animeId?: string | null;
   characterId?: string | null;
   status?: 'draft' | 'active' | 'archived';
   featured?: boolean;
+  price?: string;
+  compareAtPrice?: string;
 }
 
 export interface TaxonomyWriteInput {
@@ -43,7 +45,7 @@ export interface ProductImageWriteInput {
   isPrimary?: boolean;
 }
 
-const PRODUCT_FIELDS: readonly (keyof ProductWriteInput)[] = [
+const PRODUCT_FIELDS = [
   'slug',
   'name',
   'description',
@@ -52,7 +54,7 @@ const PRODUCT_FIELDS: readonly (keyof ProductWriteInput)[] = [
   'characterId',
   'status',
   'featured',
-];
+] as const;
 
 const TAXONOMY_FIELDS: readonly (keyof TaxonomyWriteInput)[] = [
   'slug',
@@ -82,8 +84,38 @@ export class AdminCatalogService {
   ) {}
 
   async createProduct(input: ProductWriteInput) {
-    const data = pick(input, PRODUCT_FIELDS) as Prisma.ProductUncheckedCreateInput;
+    const { price, compareAtPrice, ...productInput } = input;
+    const data = pick(productInput, PRODUCT_FIELDS) as Prisma.ProductUncheckedCreateInput;
+
+    // categoryId is required by the DB; throw a clear error if missing.
+    if (!data.categoryId) {
+      throw new BadRequestException({ code: 'VALIDATION_ERROR', message: 'categoryId is required' });
+    }
+
     const created = await this.prisma.product.create({ data });
+
+    // If a price was provided, create a default "Standard" variant so the
+    // product has a buyable price from the start.
+    if (price) {
+      const priceCents = Math.round(parseFloat(price) * 100);
+      if (!isNaN(priceCents) && priceCents > 0) {
+        const compareAtCents = compareAtPrice
+          ? Math.round(parseFloat(compareAtPrice) * 100)
+          : undefined;
+        const sku = `${created.slug}-std`.toUpperCase().slice(0, 40);
+        await this.prisma.productVariant.create({
+          data: {
+            productId: created.id,
+            sku,
+            priceCents,
+            compareAtPriceCents: compareAtCents && !isNaN(compareAtCents) ? compareAtCents : null,
+            stockOnHand: 0,
+            isActive: true,
+          },
+        });
+      }
+    }
+
     // New rows shift the featured/facet aggregates even though no stale
     // detail page exists yet (§16.1 targeted invalidation).
     await this.cache.invalidateProduct(created.slug);

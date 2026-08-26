@@ -17,6 +17,7 @@ import {
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 import type { Request } from 'express';
+import type { media_folder } from '@prisma/client';
 import { AdminGuard } from '../../common/guards/admin.guard';
 import { CurrentUser } from '../../common/rbac/current-user.decorator';
 import { RequirePermissions } from '../../common/rbac/require-permissions.decorator';

@@ -132,6 +132,16 @@ export class FeaturedCharacterItemDto {
   @IsString({ each: true })
   @MaxLength(40, { each: true })
   skills?: string[];
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(10)
+  price?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(10)
+  originalPrice?: string;
 }
 
 export class FeaturedCharactersConfigDto {
@@ -278,11 +288,20 @@ export function validateConfig(key: string, config: unknown): ConfigValidationRe
   const instance = plainToInstance(schema, config);
   const errors = validateSync(instance, { whitelist: true, forbidNonWhitelisted: true });
   if (errors.length > 0) {
-    const reasons = errors.map((e) => {
-      const constraints = Object.values(e.constraints ?? {});
-      if (constraints.length === 0) return `${e.property}: invalid`;
-      return `${e.property}: ${constraints.join('; ')}`;
-    });
+    const reasons: string[] = [];
+    function collect(errs: import('class-validator').ValidationError[], prefix: string) {
+      for (const e of errs) {
+        const constraints = Object.values(e.constraints ?? {});
+        if (constraints.length > 0) {
+          reasons.push(`${prefix}${e.property}: ${constraints.join('; ')}`);
+        } else if (e.children?.length) {
+          collect(e.children, `${prefix}${e.property}.`);
+        } else {
+          reasons.push(`${prefix}${e.property}: invalid`);
+        }
+      }
+    }
+    collect(errors, '');
     return { ok: false, error: reasons.join(' | ') };
   }
   return { ok: true, value: instance as Record<string, unknown> };

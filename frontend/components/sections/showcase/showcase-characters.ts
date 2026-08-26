@@ -15,6 +15,9 @@ export interface Character {
   image: string;
   alt: string;
   skills: string[];
+  slug: string;
+  price?: string;
+  originalPrice?: string;
 }
 
 /** Shape delivered by the featured_characters CMS schema (per item). */
@@ -24,6 +27,8 @@ export interface CmsShowcaseCharacter {
   imageUrl?: string;
   tagline?: string;
   skills?: string;
+  price?: string;
+  originalPrice?: string;
 }
 
 export const DEFAULT_CHARACTERS: Character[] = [
@@ -36,6 +41,7 @@ export const DEFAULT_CHARACTERS: Character[] = [
     image: "/characters/minato.png",
     alt: "Minato Namikaze",
     skills: ["Flying Thunder God", "Rasengan", "Fuinjutsu"],
+    slug: "minato-namikaze",
   },
   {
     number: "02",
@@ -46,6 +52,7 @@ export const DEFAULT_CHARACTERS: Character[] = [
     image: "/characters/pain.png",
     alt: "Pain Nagato",
     skills: ["Rinnegan", "Almighty Push", "Planetary Devastation"],
+    slug: "pain-nagato",
   },
   {
     number: "03",
@@ -56,6 +63,7 @@ export const DEFAULT_CHARACTERS: Character[] = [
     image: "/characters/obito-default.png",
     alt: "Obito Uchiha",
     skills: ["Kamui", "Sharingan", "Wood Release"],
+    slug: "obito-uchiha",
   },
 ];
 
@@ -77,6 +85,8 @@ function cmsItems(config: Record<string, unknown> | undefined): CmsShowcaseChara
       imageUrl: typeof entry.imageUrl === 'string' ? entry.imageUrl.trim() : '',
       tagline: typeof entry.tagline === 'string' ? entry.tagline.trim() : '',
       skills: typeof entry.skills === 'string' ? entry.skills.trim() : '',
+      price: typeof entry.price === 'string' ? entry.price.trim() : '',
+      originalPrice: typeof entry.originalPrice === 'string' ? entry.originalPrice.trim() : '',
     }))
     .filter((item) => item.name !== '');
 }
@@ -108,6 +118,9 @@ export function resolveShowcaseCharacters(
       image: item.imageUrl || base.image,
       subline: item.tagline || base.subline,
       skills: cmsSkills && cmsSkills.length > 0 ? cmsSkills : base.skills,
+      slug: item.slug || base.slug,
+      price: item.price || undefined,
+      originalPrice: item.originalPrice || undefined,
     };
   });
 }

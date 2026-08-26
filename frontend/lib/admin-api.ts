@@ -18,12 +18,12 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
   try {
     res = await fetch(`${BASE}${path}`, {
       credentials: 'include',
+      ...init,
       headers: {
-        'content-type': 'application/json',
+        ...(init?.body instanceof FormData ? {} : { 'content-type': 'application/json' }),
         'x-csrf-token': '1',
         ...init?.headers,
       },
-      ...init,
     });
   } catch {
     throw new AdminError(503, 'API_UNREACHABLE', 'Admin service is unreachable');
@@ -223,6 +223,8 @@ export interface ProductCreateInput {
   characterId?: string | null;
   status?: 'draft' | 'active' | 'archived';
   featured?: boolean;
+  price?: string;
+  compareAtPrice?: string;
 }
 
 export const adminApi = {
@@ -310,6 +312,16 @@ export const adminApi = {
       method: 'POST',
       body: JSON.stringify({ name }),
     }),
+
+  uploadMedia: (file: File, folder: string) => {
+    const form = new FormData();
+    form.append('file', file);
+    form.append('folder', folder);
+    return request<{ id: string; url: string }>('/admin/media', {
+      method: 'POST',
+      body: form,
+    } as RequestInit);
+  },
 
   setProductImages: (id: string, images: ProductImageInput[]) =>
     request<{ images: ProductImageRow[] }>(

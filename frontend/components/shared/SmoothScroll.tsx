@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from 'react';
+import { usePathname } from 'next/navigation';
 import LocomotiveScroll from 'locomotive-scroll';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -10,18 +11,15 @@ gsap.registerPlugin(ScrollTrigger);
 /**
  * Smooth scrolling via Locomotive Scroll v5.
  *
- * Note: Locomotive v5 is itself built ON TOP OF Lenis (it wraps a Lenis
- * instance internally) — this migration replaces our hand-rolled Lenis
- * integration with Locomotive's higher-level wrapper (viewport detection,
- * data-scroll attributes, managed RAF). The scroll feel is configured through
- * the same Lenis options as before.
- *
- * GSAP integration: ScrollTrigger is synced on every Lenis scroll event via
- * `scrollCallback`, and the render loop stays on the shared GSAP ticker via
- * the custom-ticker hooks so both engines run on a single rAF.
+ * Disabled on /admin routes — admin panels rely on native browser scroll
+ * for sidebar and content overflow containers.
  */
 export default function SmoothScroll() {
+  const pathname = usePathname();
+
   useEffect(() => {
+    // Disable on admin routes — native scroll is required
+    if (pathname.startsWith('/admin')) return;
     // Disable smooth scrolling on mobile — native touch scroll handles momentum
     if (window.matchMedia('(max-width: 767px)').matches) return;
 
@@ -44,7 +42,7 @@ export default function SmoothScroll() {
     return () => {
       locomotive.destroy();
     };
-  }, []);
+  }, [pathname]);
 
   return null;
 }

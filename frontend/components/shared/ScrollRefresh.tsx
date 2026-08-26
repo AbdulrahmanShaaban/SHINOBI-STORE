@@ -13,11 +13,14 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
  *   sections measured against the PREVIOUS page's layout (stale spacer
  *   heights are a prime suspect for "scroll sometimes freezes until
  *   refresh").
+ *
+ * Skipped on /admin routes — admin pages do not use GSAP scroll pins.
  */
 export default function ScrollRefresh() {
   const pathname = usePathname();
 
   useEffect(() => {
+    if (pathname.startsWith("/admin")) return;
     const refresh = () => ScrollTrigger.refresh();
 
     document.fonts.ready.then(refresh);
@@ -26,10 +29,10 @@ export default function ScrollRefresh() {
     return () => {
       window.removeEventListener("load", refresh);
     };
-  }, []);
+  }, [pathname]);
 
   useEffect(() => {
-    if (pathname === null) return;
+    if (pathname === null || pathname.startsWith("/admin")) return;
     // Two frames: let the new route's DOM commit and layout settle, then
     // re-measure every trigger (pin distances, start/end positions).
     const raf = requestAnimationFrame(() =>
