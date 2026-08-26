@@ -1,183 +1,163 @@
 # Shinobi Store
 
-Premium anime-inspired e-commerce platform built around the Naruto universe. Full-stack **storefront + admin CRM** with a demo payment system, email verification, community reviews, and cinematic GSAP-driven UI.
+**A full-stack, production-shaped e-commerce platform built around the Naruto universe** — storefront, admin back office, payments, reviews, and a CMS, built end-to-end as a portfolio/learning project rather than a real business.
 
-**Live demo:** [shinobi-store.vercel.app](https://shinobi-store.vercel.app)
+[![Live demo](https://img.shields.io/badge/live%20demo-shinobi--store.vercel.app-FF6B00?style=flat-square)](https://shinobi-store.vercel.app)
+![Next.js](https://img.shields.io/badge/Next.js-16-black?style=flat-square&logo=next.js)
+![NestJS](https://img.shields.io/badge/NestJS-11-E0234E?style=flat-square&logo=nestjs)
+![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178C6?style=flat-square&logo=typescript)
+![Prisma](https://img.shields.io/badge/Prisma-6-2D3748?style=flat-square&logo=prisma)
+![License](https://img.shields.io/badge/license-private-lightgrey?style=flat-square)
+
+> Live demo: **[shinobi-store.vercel.app](https://shinobi-store.vercel.app)** — admin panel at `/admin` (credentials on request).
+
+---
+
+## Why this project exists
+
+This isn't a real store — it's a deliberately full-scope build to demonstrate end-to-end product engineering: a real payment integration (with a safe demo mode so no one accidentally charges a card for a fictional hoodie), role-based access control, idempotent webhook handling, a schema-driven CMS, and a monorepo set up the way a small real team would run one — not just a CRUD demo.
+
+A few specific decisions worth a reviewer's attention:
+- **The app refuses to boot in production without a real payment provider configured.** `PAYMENT_PROVIDER` has three states — `demo` (simulated gateway with test cards, safe to run publicly), `mock` (instant-succeed, dev/tests only), or a real Stripe key. A boot-time env guard makes it *impossible* to accidentally deploy the instant-succeed mock to production.
+- **Stripe webhooks are handled idempotently** — signature-verified against the raw body, deduplicated by `eventId`, and state transitions are no-ops on stale/duplicate events (a webhook retried three times by Stripe can't double-confirm or double-cancel an order).
+- **RBAC is a single matrix, not scattered checks** — every role's permissions live in one file (`backend/src/common/rbac/permissions.ts`), so "can this role do this thing" is always answerable by reading one place, not grepping the codebase.
 
 ## Features
 
 ### Storefront
-- **Character Showcase** — horizontal-scroll gallery with GSAP ScrollTrigger, discount ribbons, and animated product cards
-- **Product Catalog** — filterable by anime, character, and category; grid/list views with lazy-loaded images
-- **Product Detail** — image gallery, variant selector (color/size), stock badge, size guide, reviews section
-- **Cart & Checkout** — persistent guest cart (Zustand + localStorage), merge on login, Stripe/Demo payment flow
-- **Community Reviews** — public review wall with star filtering; authenticated users can submit reviews (moderated before publishing)
+- Product catalog filterable by anime, character, category, and tags, with faceted counts
+- Product detail pages with an image gallery, cursor-tracking zoom, and a mobile zoom control
+- Cart (persistent guest cart, merges into the account on login) and checkout
+- Product reviews — public to read, submission restricted to signed-in customers, moderated before publishing
+- A CMS-driven homepage — hero, banner, featured characters/products, and collections are all editable from the admin panel, not hardcoded
 
-### Admin CRM
-- **Dashboard** — revenue stats, order pipeline, low-stock alerts
-- **Product Management** — CRUD with pricing, stock levels, variant management, Cloudinary image upload
-- **Order Management** — status tracking, timeline, notes
-- **Review Moderation** — approve/reject/delete reviews with aggregate recalculation
-- **Content Management** — homepage sections (hero, featured products, character showcase)
+### Admin back office
+- Dashboard with order/revenue charts and low-stock alerts
+- Product CRUD, including device file uploads for product images (not just pasted URLs)
+- Order management with status history
+- Review moderation (approve/reject), with rating aggregates recomputed from real approved reviews
+- Content editor for every CMS-driven storefront section, with its own device upload + duplicate-file detection
 
-### Auth & Security
-- Cookie-based session auth (`shinobi_session`) with CSRF protection
-- Email verification flow (Mailpit for dev, SMTP for production)
-- Password reset via email
-- Role-based access control (RBAC): `super_admin`, `admin`, `content_manager`, `order_manager`, `customer`
-- Rate limiting (ThrottlerGuard), Helmet security headers, input validation (class-validator)
+### Auth & security
+- Cookie-based session auth with CSRF protection, email verification required before login, password reset via email
+- Role-based access control: `super_admin`, `admin`, `content_manager`, `order_manager`, `customer` — one permission matrix, checked via a single guard
+- Rate limiting, Helmet security headers, `class-validator` input validation on every DTO
 
-### Payment System
-- **Demo Mode** (`PAYMENT_PROVIDER=demo`) — test cards: `4242...` (success), `4000...0002` (decline), `4000...3155` (3DS)
-- **Stripe Mode** — real Stripe integration with webhook signature verification
-- Idempotency keys, payment state machine, order reconciliation
+### Payments
+- `PAYMENT_PROVIDER=demo` — a simulated gateway with documented test cards (see [Testing](#testing)), safe to run in production for demo purposes
+- Real Stripe mode — full webhook signature verification, idempotent event handling, payment state machine
+- A boot-time guard makes it impossible to reach production without one of the above explicitly configured
 
-### UX Polish
-- Smooth scroll (Lenis) with route-aware disabling
-- GSAP page transitions and scroll-triggered animations
-- Dark theme with orange accent (`#FF6B00`) throughout
-- Responsive design (mobile-first, tested across viewports)
-- Custom SVG assets (kunai, sharingan, leaf village, scroll seal — all white variants)
-- Toast notifications, loading skeletons, error boundaries
+### Engineering details
+- Background jobs via BullMQ (Redis-backed) for scheduled/queued work
+- Structured logging with request correlation IDs
+- OpenAPI schema generated from the NestJS backend, consumed as typed contracts by the frontend (`packages/contracts`) — one source of truth for the API shape, not hand-maintained types on both sides
 
 ## Stack
 
 | Layer | Technology |
 |---|---|
-| Frontend | Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS v4, GSAP 3 + Lenis, Zustand |
-| Backend | NestJS 11 (modular monolith), Prisma 6, PostgreSQL 16 |
-| Auth | Cookie sessions, SHA-256 token hashing, Redis-cached sessions |
-| Email | Nodemailer + SMTP (Mailpit in dev, configurable SMTP in prod) |
-| Payments | Stripe / Demo provider with state machine |
-| Storage | Cloudinary (product images) |
-| Infra | Redis (cache / rate limit / BullMQ), Docker Compose (dev), Vercel (deployment) |
-| Testing | Jest (134 unit tests), Supertest (e2e) |
+| Frontend | Next.js 16 (App Router), React, TypeScript, Tailwind CSS, GSAP + Locomotive Scroll v5 |
+| Backend | NestJS 11 (modular monolith), Prisma 6, PostgreSQL |
+| Auth | Cookie sessions, hashed tokens, Redis-cached sessions |
+| Email | Nodemailer over SMTP (Mailpit in dev) |
+| Payments | Stripe adapter / demo provider, shared behind one interface |
+| Media | Cloudinary (falls back to a local mock adapter with no external I/O if unset) |
+| Jobs | BullMQ over Redis |
+| Infra | Docker Compose (local Postgres/Redis), Vercel (frontend + backend, deployed as separate projects) |
+| Testing | Jest (unit), Supertest (API/e2e) |
 
-## Repository Layout
+## Repository layout
 
 ```
-frontend/           Next.js storefront + admin panel
-  app/              App Router pages (shop, product, community, admin, auth)
-  components/       UI components (shared, product, sections, auth, checkout)
-  lib/              API clients, stores, auth helpers, utilities
-  public/           Static assets (SVGs, character renders, sections)
+frontend/            Next.js storefront + admin panel
+  app/                App Router pages — shop, product, checkout, account, admin
+  components/         UI components (shared, product, sections, admin, auth)
+  lib/                API clients, stores, utilities
+  public/             Static assets
 
-backend/            NestJS API (modular monolith)
-  src/modules/      Domain modules: auth, catalog, cart, orders, payments, reviews, ...
-  src/common/       Guards, filters, interceptors, RBAC, Redis, config
-  prisma/           Schema, migrations, seed data
+backend/             NestJS API (modular monolith)
+  src/modules/        Domain modules — auth, catalog, cart, orders, payments,
+                      reviews, content, media, queue, notifications, admin
+  src/common/         Guards, filters, interceptors, RBAC, Redis, config, logging
+  prisma/             Schema, migrations, seed data
 
-legacy/             Archived Express+MongoDB skeleton (reference only)
-docs/               Engineering documentation
+packages/contracts/  OpenAPI-generated TypeScript types, shared by both apps
 ```
 
-## Getting Started
+## Getting started
 
-**Prerequisites:** Node >= 20.9, pnpm, Docker (or local PostgreSQL + Redis)
+**Prerequisites:** Node ≥ 20.9, pnpm, Docker (or a local PostgreSQL + Redis)
 
 ```bash
-# 1. Start infrastructure (PostgreSQL :5432, Redis :6379, MailPit :8025)
+# 1. Start infrastructure — Postgres :5432, Redis :6379, Mailpit :8025
 docker compose -f docker-compose.dev.yml up -d
 
 # 2. Install dependencies
 pnpm install
 
-# 3. Set up database
+# 3. Set up the database
 pnpm --filter backend db:deploy
 pnpm --filter backend db:seed
 
-# 4. Run everything (frontend :3000 + API :5000)
+# 4. Run everything — frontend :3000, API :5000
 pnpm dev
 ```
 
-## Environment Variables
+## Environment variables
 
-### Backend (`backend/.env`)
+See `backend/.env.example` and `frontend/.env.example` for the full, commented list — the short version:
 
-```env
-# Database
-DATABASE_URL=postgresql://shinobi:shinobi_dev_password@localhost:5432/shinobi_store?schema=public
+**Backend** — `DATABASE_URL`, `REDIS_URL`, `CORS_ORIGIN`, one of `PAYMENT_PROVIDER=demo` / `PAYMENT_PROVIDER=mock` / a real `STRIPE_SECRET_KEY` + `STRIPE_WEBHOOK_SECRET`, Cloudinary credentials (optional — falls back to a local mock adapter), SMTP credentials.
 
-# Redis
-REDIS_URL=redis://localhost:6379
+**Frontend** — `API_URL` and `NEXT_PUBLIC_API_URL` are the **bare backend origin** (e.g. `http://localhost:5000`, no `/api/v1` suffix — the client code appends that itself), plus `NEXT_PUBLIC_SITE_URL` for metadata/JSON-LD.
 
-# Server
-PORT=5000
-NODE_ENV=development
-CORS_ORIGIN=http://localhost:3000
-
-# Payment Provider: "demo" | "mock" | "stripe"
-PAYMENT_PROVIDER=demo
-
-# Stripe (only if using stripe provider)
-# STRIPE_SECRET_KEY=sk_test_...
-
-# SMTP (Mailpit in dev)
-SMTP_HOST=localhost
-SMTP_PORT=1025
-BASE_URL=http://localhost:3000
-
-# Cloudinary (for image uploads)
-CLOUDINARY_CLOUD_NAME=...
-CLOUDINARY_API_KEY=...
-CLOUDINARY_API_SECRET=...
-```
-
-### Frontend (`frontend/.env.local`)
-
-```env
-NEXT_PUBLIC_API_URL=http://localhost:5000/api/v1
-API_URL=http://localhost:5000/api/v1
-```
+> Production note: the backend refuses to boot without `DATABASE_URL`, `REDIS_URL`, and one of the payment-provider options above set explicitly — this is intentional, not a bug, see [Why this project exists](#why-this-project-exists).
 
 ## Scripts
 
 | Command | Purpose |
 |---|---|
-| `pnpm dev` | Run frontend + backend in parallel (watch mode) |
+| `pnpm dev` | Run frontend + backend together (watch mode) |
 | `pnpm build` | Build all workspace packages |
-| `pnpm lint` / `pnpm typecheck` | Lint / typecheck all packages |
-| `pnpm test` | Backend unit tests (134 tests) |
+| `pnpm lint` / `pnpm typecheck` | Lint / typecheck every package |
+| `pnpm test` | Backend unit tests |
 | `pnpm test:e2e` | Backend API tests (full request pipeline) |
-
-### Backend-specific
 
 ```bash
 pnpm --filter backend db:deploy     # Run Prisma migrations
-pnpm --filter backend db:seed       # Seed 24 products + admin user
-pnpm --filter backend db:reset      # Reset and reseed database
+pnpm --filter backend db:seed       # Seed demo products + admin user
+pnpm --filter backend db:reset      # Reset and reseed
 ```
 
 ## API
 
-- **Health:** `GET /health` | `GET /health/ready`
-- **Swagger:** `/api-docs` (auto-generated OpenAPI docs)
-- **Base path:** `/api/v1`
+- **Health:** `GET /health` · `GET /health/ready` (unversioned, for platform health checks)
+- **Docs:** `GET /api-docs` (Swagger/OpenAPI, auto-generated from the NestJS decorators)
+- **Base path:** everything else lives under `/api/v1`
 
-Key endpoints:
-- `POST /auth/register` — Create account (sends verification email)
-- `POST /auth/login` — Sign in (requires verified email)
-- `GET /products` — List products with filters
-- `GET /products/:slug` — Product detail
-- `GET /products/:slug/reviews` — Product reviews (public)
-- `GET /reviews/recent` — Recent reviews across all products (public)
-- `POST /products/:slug/reviews` — Submit review (auth required)
-- `POST /payments/demo/process` — Process demo payment
+A few representative endpoints:
+- `POST /auth/register` / `POST /auth/login` — account creation and sign-in (email verification required)
+- `GET /products` · `GET /products/:slug` — catalog and product detail
+- `GET /products/:slug/reviews` (public) / `POST /products/:slug/reviews` (auth required, moderated)
+- `POST /payments/demo/process` — demo-mode payment processing
+- `POST /orders/webhooks/stripe` — Stripe webhook receiver (signature-verified, idempotent)
 
 ## Testing
 
 ```bash
-pnpm test                # Unit tests (Jest)
-pnpm test:e2e            # E2E tests (Supertest + full HTTP pipeline)
+pnpm test        # Jest unit tests
+pnpm test:e2e    # Supertest end-to-end tests, full HTTP pipeline
 ```
 
-Demo payment test cards:
-| Card | Result |
+Demo-mode test cards (only relevant when `PAYMENT_PROVIDER=demo`):
+
+| Card number | Result |
 |---|---|
-| `4242 4242 4242 4242` | Payment succeeds |
-| `4000 0000 0000 0002` | Payment declined |
-| `4000 0000 0000 3155` | Requires 3DS authentication |
+| `4242 4242 4242 4242` | Succeeds |
+| `4000 0000 0000 0002` | Declined |
+| `4000 0000 0000 3155` | Requires 3-D Secure |
 
 ## License
 
-Private — not for redistribution.
+Private — a personal/portfolio project, not for redistribution.
