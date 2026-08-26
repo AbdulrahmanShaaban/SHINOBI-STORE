@@ -24,7 +24,9 @@ export class EnvironmentVariables {
 
   @IsString()
   @IsOptional()
-  @Matches(/^redis:\/\//, { message: 'REDIS_URL must be a redis:// connection string' })
+  @Matches(/^rediss?:\/\//, {
+    message: 'REDIS_URL must be a redis:// or rediss:// connection string',
+  })
   REDIS_URL?: string;
 
   @IsString()
@@ -53,13 +55,25 @@ export function validateEnv(config: Record<string, unknown>): Record<string, unk
   }
 
   const provider = process.env.PAYMENT_PROVIDER?.toLowerCase();
+
   if (
     validated.NODE_ENV === 'production' &&
     provider !== 'demo' &&
     !process.env.STRIPE_SECRET_KEY
   ) {
     throw new Error(
-      'Invalid environment configuration:\n  - production requires STRIPE_SECRET_KEY or PAYMENT_PROVIDER=demo (mock payments are dev/test only)',
+      'Invalid environment configuration:\n' +
+        '  - production requires PAYMENT_PROVIDER=demo or STRIPE_SECRET_KEY',
+    );
+  }
+
+  if (
+    validated.NODE_ENV === 'production' &&
+    provider === 'mock'
+  ) {
+    throw new Error(
+      'Invalid environment configuration:\n' +
+        '  - PAYMENT_PROVIDER=mock is not allowed in production',
     );
   }
 
