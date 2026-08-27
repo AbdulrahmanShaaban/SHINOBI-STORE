@@ -104,6 +104,29 @@ export class ReviewsService {
     }
   }
 
+  async createGeneral(userId: string, dto: CreateReviewDto) {
+    try {
+      const review = await this.prisma.review.create({
+        data: {
+          userId,
+          rating: dto.rating,
+          title: dto.title?.trim() || undefined,
+          body: dto.body.trim(),
+        },
+        select: { id: true, status: true, createdAt: true },
+      });
+      return review;
+    } catch (err) {
+      if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2002') {
+        throw new ConflictException({
+          code: 'REVIEW_EXISTS',
+          message: 'You have already submitted a general review.',
+        });
+      }
+      throw err;
+    }
+  }
+
   async listRecentReviews(page = 1, limit = 20) {
     const where = { status: 'approved' as const };
     const [items, total] = await Promise.all([
@@ -127,8 +150,8 @@ export class ReviewsService {
         body: review.body,
         createdAt: review.createdAt,
         author: review.user.fullName,
-        productSlug: review.product.slug,
-        productName: review.product.name,
+        productSlug: review.product?.slug ?? null,
+        productName: review.product?.name ?? null,
       })),
       total,
     };
@@ -160,8 +183,8 @@ export class ReviewsService {
         createdAt: review.createdAt,
         author: review.user.fullName,
         authorEmail: review.user.email,
-        productSlug: review.product.slug,
-        productName: review.product.name,
+        productSlug: review.product?.slug ?? null,
+        productName: review.product?.name ?? null,
       })),
       meta: { page, limit, total, totalPages: Math.max(1, Math.ceil(total / limit)) },
     };
@@ -184,20 +207,26 @@ export class ReviewsService {
         throw new NotFoundException({ code: 'REVIEW_NOT_FOUND', message: 'Review not found' });
       }
       await tx.review.update({ where: { id }, data: { status } });
-      const aggregate = await tx.review.aggregate({
-        where: { productId: review.productId, status: 'approved' },
-        _avg: { rating: true },
-        _count: true,
-      });
-      await tx.product.update({
-        where: { id: review.productId },
-        data: {
-          ratingAvg: aggregate._avg.rating ? Number(aggregate._avg.rating.toFixed(2)) : 0,
-          reviewCount: aggregate._count,
-        },
-        select: { slug: true },
-      });
-      return { previousStatus: review.status, average: aggregate._avg.rating, count: aggregate._count };
+
+      // Only update product rating if the review is associated with a product
+      if (review.productId) {
+        const aggregate = await tx.review.aggregate({
+          where: { productId: review.productId, status: 'approved' },
+          _avg: { rating: true },
+          _count: true,
+        });
+        await tx.product.update({
+          where: { id: review.productId },
+          data: {
+            ratingAvg: aggregate._avg.rating ? Number(aggregate._avg.rating.toFixed(2)) : 0,
+            reviewCount: aggregate._count,
+          },
+          select: { slug: true },
+        });
+        return { previousStatus: review.status, average: aggregate._avg.rating, count: aggregate._count };
+      }
+
+      return { previousStatus: review.status, average: null, count: 0 };
     });
 
     // Audit AFTER commit; failures are swallowed by AuditService by design.
@@ -224,19 +253,23 @@ export class ReviewsService {
 
     await this.prisma.$transaction(async (tx) => {
       await tx.review.delete({ where: { id } });
-      const aggregate = await tx.review.aggregate({
-        where: { productId: review.productId, status: 'approved' },
-        _avg: { rating: true },
-        _count: true,
-      });
-      await tx.product.update({
-        where: { id: review.productId },
-        data: {
-          ratingAvg: aggregate._avg.rating ? Number(aggregate._avg.rating.toFixed(2)) : 0,
-          reviewCount: aggregate._count,
-        },
-        select: { slug: true },
-      });
+
+      // Only update product rating if the review is associated with a product
+      if (review.productId) {
+        const aggregate = await tx.review.aggregate({
+          where: { productId: review.productId, status: 'approved' },
+          _avg: { rating: true },
+          _count: true,
+        });
+        await tx.product.update({
+          where: { id: review.productId },
+          data: {
+            ratingAvg: aggregate._avg.rating ? Number(aggregate._avg.rating.toFixed(2)) : 0,
+            reviewCount: aggregate._count,
+          },
+          select: { slug: true },
+        });
+      }
     });
 
     await this.audit?.record(

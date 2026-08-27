@@ -31,7 +31,7 @@ export class ReviewsController {
   @Post(':slug/reviews')
   @HttpCode(HttpStatus.CREATED)
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Create a review (authenticated customers; enters pending moderation)' })
+  @ApiOperation({ summary: 'Create a review for a product (authenticated customers; enters pending moderation)' })
   create(@Param('slug') slug: string, @UserId() userId: string, @Body() body: CreateReviewDto) {
     return this.reviews.create(slug, userId, body);
   }

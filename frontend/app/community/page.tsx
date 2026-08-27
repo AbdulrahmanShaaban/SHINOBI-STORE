@@ -78,11 +78,11 @@ export default function CommunityPage() {
 
   const submit = async (e: FormEvent) => {
     e.preventDefault();
-    if (busy || !selectedSlug) return;
+    if (busy) return;
     setBusy(true);
     setFeedback(null);
     try {
-      await submitReview(selectedSlug, {
+      await submitReview(selectedSlug || undefined, {
         rating,
         title: title.trim() || undefined,
         body: body.trim(),
@@ -188,12 +188,14 @@ export default function CommunityPage() {
               </p>
               <div className="mt-4 pt-4 border-t border-[#2A2A3A] flex items-center justify-between">
                 <span className="font-inter text-xs text-[#6B6B80]">— {review.author}</span>
-                <Link
-                  href={`/products/${review.productSlug}`}
-                  className="font-inter text-xs text-[#FF6B00] hover:text-[#FF8433] transition-colors"
-                >
-                  {review.productName} →
-                </Link>
+                {review.productSlug && review.productName && (
+                  <Link
+                    href={`/products/${review.productSlug}`}
+                    className="font-inter text-xs text-[#FF6B00] hover:text-[#FF8433] transition-colors"
+                  >
+                    {review.productName} →
+                  </Link>
+                )}
               </div>
             </div>
           ))}
@@ -237,11 +239,10 @@ export default function CommunityPage() {
                 id="community-product"
                 value={selectedSlug}
                 onChange={(e) => setSelectedSlug(e.target.value)}
-                required
                 className="w-full bg-[#12121A] border border-[#2A2A3A] rounded-lg px-3 py-2 text-sm text-[#F0F0F0] focus:border-[#FF6B00] focus:outline-none cursor-pointer"
               >
-                <option value="" disabled>
-                  Select a product…
+                <option value="">
+                  No product (general review)
                 </option>
                 {products.map((p) => (
                   <option key={p.slug} value={p.slug}>
@@ -305,7 +306,7 @@ export default function CommunityPage() {
             ) : null}
             <button
               type="submit"
-              disabled={busy || !selectedSlug || body.trim().length < 3}
+              disabled={busy || body.trim().length < 3}
               className="min-h-[44px] w-full rounded-lg bg-[#FF6B00] px-4 font-cinzel text-xs font-bold uppercase tracking-wider text-[#160B02] transition-colors hover:bg-[#FF8433] disabled:cursor-not-allowed disabled:opacity-50"
             >
               {busy ? 'SUBMITTING…' : 'SUBMIT REVIEW'}

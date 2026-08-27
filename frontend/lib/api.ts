@@ -234,10 +234,13 @@ export function getProductReviews(slug: string): Promise<ProductReviewsPayload> 
 
 /** Browser-facing submission (session cookie). New reviews enter `pending` moderation. */
 export async function submitReview(
-  slug: string,
+  slug: string | undefined,
   payload: { rating: number; title?: string; body: string },
 ): Promise<{ id: string; status: string }> {
-  const res = await fetch(`${BROWSER_BASE}/products/${encodeURIComponent(slug)}/reviews`, {
+  const url = slug
+    ? `${BROWSER_BASE}/products/${encodeURIComponent(slug)}/reviews`
+    : `${BROWSER_BASE}/reviews`;
+  const res = await fetch(url, {
     method: 'POST',
     credentials: 'include',
     headers: { 'content-type': 'application/json', 'x-csrf-token': '1' },
@@ -261,34 +264,44 @@ export interface RecentReview {
   body: string;
   createdAt: string;
   author: string;
-  productSlug: string;
-  productName: string;
+  productSlug?: string | null;
+  productName?: string | null;
 }
 
-/** Server-facing (cached briefly); used by the community page. */
-export function getRecentReviews(
+/** Browser-facing recent reviews (community page). */
+export async function getRecentReviews(
   params: { page?: number; limit?: number } = {},
 ): Promise<{ items: RecentReview[]; total: number }> {
   const search = new URLSearchParams();
   if (params.page && params.page > 1) search.set('page', String(params.page));
   if (params.limit) search.set('limit', String(params.limit));
   const qs = search.toString();
-  return request<{ items: RecentReview[]; total: number }>(
-    `/reviews/recent${qs ? `?${qs}` : ''}`,
-    60,
-  );
+  const res = await fetch(`${BROWSER_BASE}/reviews/recent${qs ? `?${qs}` : ''}`, {
+    headers: { accept: 'application/json' },
+    signal: AbortSignal.timeout(10_000),
+  });
+  if (!res.ok) {
+    const body = (await res.json().catch(() => null)) as { message?: string } | null;
+    throw new ApiError(res.status, `HTTP_${res.status}`, body?.message ?? res.statusText);
+  }
+  return res.json() as Promise<{ items: RecentReview[]; total: number }>;
 }
 
-/** Lightweight product list for the review form selector. */
-export function getProductList(
+/** Browser-facing product list for the review form selector. */
+export async function getProductList(
   params: { limit?: number } = {},
 ): Promise<{ items: Array<{ id: string; name: string; slug: string }> }> {
   const search = new URLSearchParams();
   search.set('limit', String(params.limit ?? 50));
-  return request<{ items: Array<{ id: string; name: string; slug: string }> }>(
-    `/products?${search.toString()}`,
-    60,
-  );
+  const res = await fetch(`${BROWSER_BASE}/products?${search.toString()}`, {
+    headers: { accept: 'application/json' },
+    signal: AbortSignal.timeout(10_000),
+  });
+  if (!res.ok) {
+    const body = (await res.json().catch(() => null)) as { message?: string } | null;
+    throw new ApiError(res.status, `HTTP_${res.status}`, body?.message ?? res.statusText);
+  }
+  return res.json() as Promise<{ items: Array<{ id: string; name: string; slug: string }> }>;
 }
 
 export function getProduct(slug: string): Promise<ProductDetail> {
