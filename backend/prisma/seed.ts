@@ -8,7 +8,23 @@
  *
  * Run: pnpm --filter backend db:seed   (requires DATABASE_URL reachable)
  */
+import { createHash } from 'node:crypto';
 import { PrismaClient, product_status } from '@prisma/client';
+
+/**
+ * Deterministic UUID v5-like: generates a stable UUID from a namespace + name.
+ * Uses SHA-256 truncated to 16 bytes, formatted as UUID v4.
+ * Same input always produces the same UUID — safe for cart persistence across re-seeds.
+ */
+function deterministicUuid(namespace: string, name: string): string {
+  const raw = createHash('sha256').update(`${namespace}:${name}`).digest('hex').substring(0, 32);
+  // Set version 5 (byte 6 high nibble = 5) and variant 1 (byte 8 high 2 bits = 10)
+  const b6 = parseInt(raw.substring(12, 14), 16);
+  const b8 = parseInt(raw.substring(16, 18), 16);
+  const v6 = ((b6 & 0x0f) | 0x50).toString(16).padStart(2, '0');
+  const v8 = ((b8 & 0x3f) | 0x80).toString(16).padStart(2, '0');
+  return `${raw.substring(0, 8)}-${raw.substring(8, 12)}-${v6}${raw.substring(14, 16)}-${v8}${raw.substring(18, 20)}-${raw.substring(20, 32)}`;
+}
 
 const prisma = new PrismaClient();
 
@@ -271,39 +287,44 @@ async function main(): Promise<void> {
   console.log('Seeding taxonomies…');
   const categoryIds = new Map<string, string>();
   for (const c of categories) {
+    const id = deterministicUuid('category', c.slug);
     const row = await prisma.category.upsert({
       where: { slug: c.slug },
       update: { name: c.name, sortOrder: c.sortOrder, isActive: true },
-      create: c,
+      create: { ...c, id },
     });
     categoryIds.set(c.slug, row.id);
   }
 
   const animeIds = new Map<string, string>();
   for (const a of animes) {
-    const row = await prisma.anime.upsert({ where: { slug: a.slug }, update: {}, create: a });
+    const id = deterministicUuid('anime', a.slug);
+    const row = await prisma.anime.upsert({ where: { slug: a.slug }, update: {}, create: { ...a, id } });
     animeIds.set(a.slug, row.id);
   }
 
   const characterIds = new Map<string, string>();
   for (const ch of characters) {
     const { anime, ...data } = ch;
+    const id = deterministicUuid('character', ch.slug);
     const row = await prisma.character.upsert({
       where: { slug: ch.slug },
       update: {},
-      create: { ...data, animeId: animeIds.get(anime) },
+      create: { ...data, id, animeId: animeIds.get(anime) },
     });
     characterIds.set(ch.slug, row.id);
   }
 
   const tagIds = new Map<string, string>();
   for (const t of tags) {
-    const row = await prisma.tag.upsert({ where: { slug: t.slug }, update: {}, create: t });
+    const id = deterministicUuid('tag', t.slug);
+    const row = await prisma.tag.upsert({ where: { slug: t.slug }, update: {}, create: { ...t, id } });
     tagIds.set(t.slug, row.id);
   }
 
   console.log('Seeding products…');
   for (const p of products) {
+    const productId = deterministicUuid('product', p.slug);
     const product = await prisma.product.upsert({
       where: { slug: p.slug },
       update: {
@@ -318,6 +339,7 @@ async function main(): Promise<void> {
         reviewCount: p.reviewCount,
       },
       create: {
+        id: productId,
         slug: p.slug,
         name: p.name,
         description: p.description,
@@ -349,8 +371,10 @@ async function main(): Promise<void> {
     }
 
     for (const v of p.variants) {
+      const sku = skuOf(p.slug, v);
+      const variantId = deterministicUuid('variant', sku);
       await prisma.productVariant.upsert({
-        where: { sku: skuOf(p.slug, v) },
+        where: { sku },
         update: {
           optionSize: v.optionSize ?? null,
           priceCents: v.priceCents,
@@ -359,8 +383,9 @@ async function main(): Promise<void> {
           reserved: v.reserved ?? 0,
         },
         create: {
+          id: variantId,
           productId: product.id,
-          sku: skuOf(p.slug, v),
+          sku,
           optionSize: v.optionSize ?? null,
           priceCents: v.priceCents,
           compareAtPriceCents: v.compareAtPriceCents ?? null,

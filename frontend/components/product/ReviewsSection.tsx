@@ -52,7 +52,7 @@ export default function ReviewsSection({
       await submitReview(slug, { rating, title: title.trim() || undefined, body: body.trim() });
       setFeedback({
         kind: 'ok',
-        message: 'Review submitted — it will appear once a moderator approves it.',
+        message: 'Review submitted — it is now live!',
       });
       setTitle('');
       setBody('');
@@ -207,7 +207,7 @@ export default function ReviewsSection({
                 {busy ? 'SUBMITTING…' : 'SUBMIT REVIEW'}
               </button>
               <p className="font-inter text-xs text-[#6B6B80]">
-                Reviews are moderated before they appear publicly.
+                Reviews are public. You can ask an admin to remove yours.
               </p>
             </form>
           )}

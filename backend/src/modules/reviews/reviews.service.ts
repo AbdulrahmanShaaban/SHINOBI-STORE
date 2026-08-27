@@ -81,16 +81,34 @@ export class ReviewsService {
     }
 
     try {
-      const review = await this.prisma.review.create({
-        data: {
-          productId: product.id,
-          userId,
-          rating: dto.rating,
-          title: dto.title?.trim() || undefined,
-          body: dto.body.trim(),
-          // status defaults to `pending` — staff approval gates visibility.
-        },
-        select: { id: true, status: true, createdAt: true },
+      const review = await this.prisma.$transaction(async (tx) => {
+        const r = await tx.review.create({
+          data: {
+            productId: product.id,
+            userId,
+            rating: dto.rating,
+            title: dto.title?.trim() || undefined,
+            body: dto.body.trim(),
+            status: 'approved',
+          },
+          select: { id: true, status: true, createdAt: true },
+        });
+
+        // Recalculate product rating immediately
+        const aggregate = await tx.review.aggregate({
+          where: { productId: product.id, status: 'approved' },
+          _avg: { rating: true },
+          _count: true,
+        });
+        await tx.product.update({
+          where: { id: product.id },
+          data: {
+            ratingAvg: aggregate._avg.rating ? Number(aggregate._avg.rating.toFixed(2)) : 0,
+            reviewCount: aggregate._count,
+          },
+        });
+
+        return r;
       });
       return review;
     } catch (err) {
@@ -112,6 +130,7 @@ export class ReviewsService {
           rating: dto.rating,
           title: dto.title?.trim() || undefined,
           body: dto.body.trim(),
+          status: 'approved',
         },
         select: { id: true, status: true, createdAt: true },
       });

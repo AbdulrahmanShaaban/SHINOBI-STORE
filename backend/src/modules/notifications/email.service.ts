@@ -20,6 +20,7 @@ export class EmailService {
 
   async sendVerificationEmail(to: string, token: string, baseUrl: string): Promise<void> {
     const url = `${baseUrl}/account/verify-email?token=${token}`;
+    this.logger.log(`Sending verification email to ${to} via ${process.env.SMTP_HOST}:${process.env.SMTP_PORT}`);
     await this.transporter.sendMail({
       from: '"Shinobi Store" <noreply@shinobistore.local>',
       to,
