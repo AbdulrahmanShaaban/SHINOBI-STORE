@@ -15,12 +15,12 @@ async function main() {
   const existing = await prisma.user.findUnique({ where: { email }, select: { id: true } });
   if (!existing) {
     const passwordHash = await argon2id({ password, salt: randomBytes(16), ...ARGON_OPTS });
-    await prisma.user.create({ data: { email, passwordHash, fullName, role: 'admin' } });
+    await prisma.user.create({ data: { email, passwordHash, fullName, role: 'admin', emailVerifiedAt: new Date() } });
     console.log(`created admin ${email}`);
   } else {
     // Promote + reset password to the given credentials.
     const passwordHash = await argon2id({ password, salt: randomBytes(16), ...ARGON_OPTS });
-    await prisma.user.update({ where: { email }, data: { passwordHash, role: 'admin', isActive: true, deletedAt: null } });
+    await prisma.user.update({ where: { email }, data: { passwordHash, role: 'admin', emailVerifiedAt: new Date(), isActive: true, deletedAt: null } });
     console.log(`promoted existing user ${email} to admin (password reset)`);
   }
 }
