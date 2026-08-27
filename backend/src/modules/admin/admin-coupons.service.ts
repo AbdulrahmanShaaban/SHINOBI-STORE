@@ -56,6 +56,7 @@ export class AdminCouponsService {
           perUserLimit: input.perUserLimit,
           startsAt: input.startsAt ? new Date(input.startsAt) : undefined,
           endsAt: input.endsAt ? new Date(input.endsAt) : undefined,
+          isActive: input.isActive ?? true,
         },
       });
       await this.audit.record(

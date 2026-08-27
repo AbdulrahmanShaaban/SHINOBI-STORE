@@ -14,10 +14,11 @@ const AUTH_THROTTLE = {
 };
 
 function cookieOptions() {
+  const isProduction = process.env.NODE_ENV === 'production';
   return {
     httpOnly: true,
-    secure: true,
-    sameSite: 'none' as const,
+    secure: isProduction,
+    sameSite: (isProduction ? 'none' : 'lax') as 'none' | 'lax',
     path: '/',
     expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
   };

@@ -115,6 +115,11 @@ export class AdminCatalogService {
             isActive: true,
           },
         });
+        // Sync priceFromCents (PG trigger may not fire on PgBouncer/Neon).
+        await this.prisma.product.update({
+          where: { id: created.id },
+          data: { priceFromCents: priceCents },
+        });
       }
     }
 
@@ -273,10 +278,22 @@ export class AdminCatalogService {
       data.compareAtPriceCents = compareAtCents && !isNaN(compareAtCents) ? compareAtCents : null;
     }
 
-    return this.prisma.productVariant.update({
+    const updated = await this.prisma.productVariant.update({
       where: { id: variant.id },
       data,
     });
+
+    // Recalculate product.priceFromCents (PG trigger may not fire on PgBouncer/Neon).
+    const minPrice = await this.prisma.productVariant.aggregate({
+      where: { productId, isActive: true },
+      _min: { priceCents: true },
+    });
+    await this.prisma.product.update({
+      where: { id: productId },
+      data: { priceFromCents: minPrice._min.priceCents ?? null },
+    });
+
+    return updated;
   }
 
   /** Update the first active variant's stock for a product. */

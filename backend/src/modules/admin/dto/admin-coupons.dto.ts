@@ -45,6 +45,9 @@ export class CreateCouponDto {
   @ApiPropertyOptional({ format: 'date-time' })
   @IsOptional() @IsISO8601()
   endsAt?: string;
+
+  @IsOptional() @IsBoolean()
+  isActive?: boolean;
 }
 
 export class ListCouponsQueryDto {

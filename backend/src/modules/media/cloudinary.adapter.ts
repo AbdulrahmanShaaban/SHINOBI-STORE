@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { BadGatewayException, Injectable, Logger } from '@nestjs/common';
 import { v2 as cloudinary } from 'cloudinary';
 import type { UploadApiResponse } from 'cloudinary';
 import type { media_folder } from '@prisma/client';
@@ -37,19 +37,28 @@ export class CloudinaryAdapter implements StoragePort {
     _mime: string,
     folder: media_folder,
   ): Promise<UploadedMedia> {
-    const result = await this.withTimeout(
-      new Promise<UploadApiResponse>((resolve, reject) => {
-        // Server-side signature: api_secret is configured above, so the SDK
-        // signs the upload — the client never participates in auth.
-        // public_id is provider-generated (random) to avoid collisions.
-        const stream = cloudinary.uploader.upload_stream(
-          { folder: `shinobi/${folder}` },
-          (error, res) => (error || !res ? reject(error ?? new Error('empty upload response')) : resolve(res)),
-        );
-        stream.end(buffer);
-      }),
-      'upload',
-    );
+    let result: UploadApiResponse;
+    try {
+      result = await this.withTimeout(
+        new Promise<UploadApiResponse>((resolve, reject) => {
+          // Server-side signature: api_secret is configured above, so the SDK
+          // signs the upload — the client never participates in auth.
+          // public_id is provider-generated (random) to avoid collisions.
+          const stream = cloudinary.uploader.upload_stream(
+            { folder: `shinobi/${folder}` },
+            (error, res) => (error || !res ? reject(error ?? new Error('empty upload response')) : resolve(res)),
+          );
+          stream.end(buffer);
+        }),
+        'upload',
+      );
+    } catch (err) {
+      this.logger.error({ err: (err as Error).message }, 'cloudinary upload failed');
+      throw new BadGatewayException({
+        code: 'STORAGE_UPSTREAM_ERROR',
+        message: 'Image storage provider rejected the upload — check credentials or try again later',
+      });
+    }
 
     return {
       publicId: result.public_id,
