@@ -25,6 +25,13 @@ export async function configureApp(app: NestExpressApplication): Promise<AppConf
   const requestContext = new RequestContextMiddleware();
   app.use((req: unknown, res: unknown, next: () => void) => requestContext.use(req as never, res as never, next));
 
+  // Prevent caching of API responses — avoids stale 304s from Vercel edge cache.
+  app.use((req: unknown, res: unknown, next: () => void) => {
+    const r = res as { setHeader: (name: string, value: string) => void };
+    r.setHeader('Cache-Control', 'private, no-store');
+    next();
+  });
+
   // Security headers. CSP is intentionally not set here: this is a JSON API;
   // browser-facing CSP belongs to the frontend/edge layer.
   // HSTS only makes sense behind TLS in production; maxAge is in SECONDS
