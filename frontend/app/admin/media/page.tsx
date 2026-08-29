@@ -35,6 +35,7 @@ export default function AdminMediaPage() {
   );
 
   const [uploadFolder, setUploadFolder] = useState<MediaFolder>('general');
+  const [uploadAltText, setUploadAltText] = useState('');
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [flash, setFlash] = useState<string | null>(null);
@@ -65,9 +66,10 @@ export default function AdminMediaPage() {
     setUploading(true);
     setUploadError(null);
     try {
-      await contentApi.uploadMedia(file, uploadFolder);
+      await contentApi.uploadMedia(file, uploadFolder, uploadAltText.trim() || undefined);
       setFlash(`Uploaded ${file.name}.`);
       if (fileInputRef.current) fileInputRef.current.value = '';
+      setUploadAltText('');
       setPage(1);
       list.reload();
     } catch (err: unknown) {
@@ -110,7 +112,7 @@ export default function AdminMediaPage() {
             e.preventDefault();
             void handleUpload();
           }}
-          className="grid gap-4 sm:grid-cols-[1fr_180px_auto] sm:items-end"
+          className="grid gap-4 sm:grid-cols-[1fr_1fr_180px_auto] sm:items-end"
         >
           <div>
             <label htmlFor="media-file" className={labelClass}>
@@ -123,6 +125,21 @@ export default function AdminMediaPage() {
               accept="image/*"
               disabled={uploading}
               className={`${inputClass} min-h-[44px] py-2 file:mr-3 file:rounded-md file:border-0 file:bg-[#FF6B00]/15 file:px-3 file:py-1.5 file:font-cinzel file:text-xs file:font-bold file:text-[#FF6B00]`}
+            />
+          </div>
+          <div>
+            <label htmlFor="media-alt-text" className={labelClass}>
+              IMAGE NAME
+            </label>
+            <input
+              id="media-alt-text"
+              type="text"
+              value={uploadAltText}
+              onChange={(e) => setUploadAltText(e.target.value)}
+              placeholder="e.g. naruto-hero-banner"
+              maxLength={200}
+              disabled={uploading}
+              className={inputClass}
             />
           </div>
           <div>
@@ -147,12 +164,12 @@ export default function AdminMediaPage() {
             {uploading ? 'UPLOADING…' : 'UPLOAD'}
           </button>
           {uploadError ? (
-            <p role="alert" className="rounded-lg border border-[#CC0000]/50 bg-[#CC0000]/10 px-4 py-2.5 text-sm text-[#F0F0F0] sm:col-span-3">
+            <p role="alert" className="rounded-lg border border-[#CC0000]/50 bg-[#CC0000]/10 px-4 py-2.5 text-sm text-[#F0F0F0] sm:col-span-4">
               {uploadError}
             </p>
           ) : (
-            <p className={`hidden sm:col-span-3 sm:block ${helpClass}`}>
-              Uploaded images are served straight from the media CDN path.
+            <p className={`hidden sm:col-span-4 sm:block ${helpClass}`}>
+              Uploaded images are served straight from the media CDN path. Leave name blank for auto-generated.
             </p>
           )}
         </form>

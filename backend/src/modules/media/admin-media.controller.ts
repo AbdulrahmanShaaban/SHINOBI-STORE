@@ -53,6 +53,7 @@ export class AdminMediaController {
       properties: {
         file: { type: 'string', format: 'binary' },
         folder: { type: 'string', enum: ['products', 'characters', 'hero', 'banners', 'collections', 'general'] },
+        altText: { type: 'string', description: 'Optional image name/alt text. Auto-generated if omitted.' },
       },
       required: ['file'],
     },
@@ -61,11 +62,11 @@ export class AdminMediaController {
   upload(
     @UploadedFile() file: UploadedFilePayload | undefined,
     @Query() query: MediaFolderDto,
-    @Body() body: MediaFolderDto,
+    @Body() body: MediaFolderDto & { altText?: string },
     @CurrentUser() actor: AuthenticatedUser,
     @Req() req: Request,
   ) {
-    return this.adminMedia.upload(actor.id, file, query.folder ?? body.folder, req.ip);
+    return this.adminMedia.upload(actor.id, file, query.folder ?? body.folder, body.altText, req.ip);
   }
 
   @Get()

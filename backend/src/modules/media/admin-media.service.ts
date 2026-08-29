@@ -50,6 +50,7 @@ export class AdminMediaService {
     actorId: string | null,
     file: UploadedFilePayload | undefined,
     folder: media_folder | undefined,
+    altText?: string,
     ip?: string,
   ): Promise<MediaEntry> {
     if (!file || !Buffer.isBuffer(file.buffer) || file.buffer.length === 0) {
@@ -86,6 +87,10 @@ export class AdminMediaService {
       folder,
     );
 
+    const resolvedAltText =
+      altText?.trim() ||
+      `${file.originalname.replace(/\.[^.]+$/, '')}-${stored.publicId.slice(0, 8)}`;
+
     const entry = await this.prisma.mediaEntry.create({
       data: {
         provider: this.storage.name,
@@ -96,6 +101,7 @@ export class AdminMediaService {
         format: stored.format,
         bytes: stored.bytes,
         folder,
+        altText: resolvedAltText,
         uploadedByAdminId: actorId ?? undefined,
       },
     });

@@ -108,6 +108,8 @@ export default function AdminProductEditPage() {
   const [imagesFlash, setImagesFlash] = useState(false);
   const imageFileInputRef = useRef<HTMLInputElement>(null);
 
+  const [pendingFiles, setPendingFiles] = useState<{ file: File; altText: string }[]>([]);
+
   const [variant, setVariant] = useState<ProductVariantRow | null>(null);
   const [editPrice, setEditPrice] = useState('');
   const [editCompareAt, setEditCompareAt] = useState('');
@@ -214,26 +216,25 @@ export default function AdminProductEditPage() {
     setImageDraft((draft) => draft.map((row) => ({ ...row, isPrimary: row.key === key })));
   };
 
-  const uploadImageFiles = async (files: File[]): Promise<void> => {
+  const uploadImageFiles = async (files: { file: File; altText: string }[]): Promise<void> => {
     setImagesError(null);
     setImagesUploading(true);
     try {
       for (let i = 0; i < files.length; i += 1) {
-        const file = files[i];
-        if (!file) continue;
+        const { file, altText } = files[i];
         setImagesUploadStep(`Uploading ${i + 1} of ${files.length}…`);
         if (file.size > MAX_UPLOAD_BYTES) {
           throw new Error(`${file.name} exceeds the 10 MB limit.`);
         }
-        const entry = await contentApi.uploadMedia(file, 'products');
+        const entry = await contentApi.uploadMedia(file, 'products', altText.trim() || undefined);
         setImageDraft((draft) => [
           ...draft,
-          { key: nextDraftKey(), url: entry.url, mediaId: entry.id, altText: '', isPrimary: false },
+          { key: nextDraftKey(), url: entry.url, mediaId: entry.id, altText: altText.trim() || entry.altText || '', isPrimary: false },
         ]);
       }
+      setPendingFiles([]);
       if (imageFileInputRef.current) imageFileInputRef.current.value = '';
     } catch (err: unknown) {
-      // Already-uploaded files stay in the draft — only the failure surfaces.
       setImagesError(err instanceof Error ? err.message : 'Upload failed.');
     } finally {
       setImagesUploading(false);
@@ -254,7 +255,7 @@ export default function AdminProductEditPage() {
       );
       return;
     }
-    void uploadImageFiles(files);
+    setPendingFiles(files.map((f) => ({ file: f, altText: '' })));
   };
 
   const saveImages = async (): Promise<void> => {
@@ -590,12 +591,61 @@ export default function AdminProductEditPage() {
             </p>
           </div>
 
-          {imageDraft.length === 0 && !imagesUploading ? (
+          {imageDraft.length === 0 && !imagesUploading && pendingFiles.length === 0 ? (
             <p className="rounded-lg border border-dashed border-[#2A2A3A] bg-[#16161F] px-4 py-6 text-center text-sm text-[#6B6B80]">
               No images yet — add product shots so storefront cards and the detail page have
               visuals.
             </p>
           ) : null}
+
+          {pendingFiles.length > 0 && (
+            <div className="rounded-lg border border-[#FFB800]/30 bg-[#FFB800]/5 p-4 space-y-3">
+              <p className="font-cinzel text-xs font-bold uppercase tracking-wider text-[#FFB800]">
+                {pendingFiles.length} image{pendingFiles.length > 1 ? 's' : ''} ready — set a name for each, then upload
+              </p>
+              {pendingFiles.map((pf, i) => (
+                <div key={`${pf.file.name}-${i}`} className="flex items-center gap-3">
+                  <span className="shrink-0 w-10 h-10 rounded overflow-hidden border border-[#2A2A3A] bg-[#12121A]">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={URL.createObjectURL(pf.file)} alt="" className="w-full h-full object-cover" />
+                  </span>
+                  <span className="min-w-0 flex-1 truncate text-xs text-[#B8B8CC] font-mono">{pf.file.name}</span>
+                  <input
+                    type="text"
+                    value={pf.altText}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      setPendingFiles((prev) => prev.map((item, idx) => idx === i ? { ...item, altText: val } : item));
+                    }}
+                    placeholder="Image name (optional)"
+                    maxLength={200}
+                    className="w-48 bg-[#16161F] border border-[#2A2A3A] rounded-lg px-3 py-2 font-inter text-xs text-[#F0F0F0] focus:border-[#FF6B00] focus:outline-none"
+                  />
+                </div>
+              ))}
+              <div className="flex gap-2 pt-1">
+                <button
+                  type="button"
+                  disabled={imagesUploading}
+                  onClick={() => void uploadImageFiles(pendingFiles)}
+                  className={btnPrimary}
+                >
+                  {imagesUploading ? 'UPLOADING…' : `UPLOAD ${pendingFiles.length} IMAGE${pendingFiles.length > 1 ? 'S' : ''}`}
+                </button>
+                <button
+                  type="button"
+                  disabled={imagesUploading}
+                  onClick={() => {
+                    setPendingFiles([]);
+                    if (imageFileInputRef.current) imageFileInputRef.current.value = '';
+                  }}
+                  className="h-[44px] px-4 rounded-lg border border-[#2A2A3A] font-cinzel text-xs font-bold uppercase tracking-wider text-[#B8B8CC] hover:border-[#FF6B00] hover:text-[#F0F0F0] transition-colors"
+                >
+                  CANCEL
+                </button>
+              </div>
+            </div>
+          )}
 
           {imageDraft.length > 0 ? (
             <ul className="space-y-3">

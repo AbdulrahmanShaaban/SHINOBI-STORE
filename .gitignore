@@ -54,6 +54,15 @@ Thumbs.db
 # Misc
 *.log
 
+# Local media uploads (use ImageKit/Cloudinary in production)
+frontend/public/media/
+
+# Screenshots (dev artifacts, not source)
+backend/screenshot-*.png
+
+# npm lock file (project uses pnpm)
+package-lock.json
+
 # AI agent scratchpads / tooling artifacts
 .agent/
 .playwright-mcp/

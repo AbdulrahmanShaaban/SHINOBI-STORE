@@ -267,7 +267,7 @@ export default function AdminSectionEditPage() {
   const handleImageUpload = async (field: ConfigFieldDef, file: File) => {
     setUploadingField(field.name);
     try {
-      const entry = await contentApi.uploadMedia(file, 'general');
+      const entry = await contentApi.uploadMedia(file, 'general', file.name.replace(/\.[^.]+$/, ''));
       setScalar(field.name, entry.url);
     } catch (err: unknown) {
       pushToast({ title: 'UPLOAD FAILED', description: err instanceof Error ? err.message : 'Unknown error', variant: 'error' });
@@ -471,7 +471,7 @@ export default function AdminSectionEditPage() {
                                 setUploadingField(upKey);
                                 try {
                                   const folder: MediaFolder = key === 'collections' ? 'collections' : 'characters';
-                                  const entry = await contentApi.uploadMedia(file, folder);
+                                  const entry = await contentApi.uploadMedia(file, folder, file.name.replace(/\.[^.]+$/, ''));
                                   setItemField(field, index, def.name, entry.url);
                                 } catch (err: unknown) {
                                   console.error('[MediaUpload]', err);

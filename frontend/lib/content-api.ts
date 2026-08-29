@@ -204,10 +204,11 @@ export const contentApi = {
   listMedia: (folder?: string, page?: number) =>
     request<MediaListResult>(withQuery('/admin/media', { folder, page })),
 
-  uploadMedia: (file: File, folder: MediaFolder) => {
+  uploadMedia: (file: File, folder: MediaFolder, altText?: string) => {
     const form = new FormData();
     form.append('file', file);
     form.append('folder', folder);
+    if (altText) form.append('altText', altText);
     return request<MediaEntry>('/admin/media', { method: 'POST', body: form });
   },
 

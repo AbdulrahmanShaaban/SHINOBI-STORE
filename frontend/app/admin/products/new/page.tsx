@@ -151,6 +151,7 @@ interface ImageItem {
   file: File;
   preview: string;
   uploading: boolean;
+  altText: string;
   uploaded?: MediaEntry;
 }
 
@@ -197,6 +198,7 @@ export default function NewProductPage() {
       file,
       preview: URL.createObjectURL(file),
       uploading: false,
+      altText: '',
     }));
     setImages((prev) => [...prev, ...newItems]);
   }, []);
@@ -227,19 +229,19 @@ export default function NewProductPage() {
         results.push({
           url: item.uploaded.url,
           mediaId: item.uploaded.id,
-          altText: name.trim(),
+          altText: item.altText.trim() || item.uploaded.altText || name.trim(),
           isPrimary: i === 0,
         });
         continue;
       }
       setImages((prev) => prev.map((img, idx) => idx === i ? { ...img, uploading: true } : img));
       try {
-        const entry = await contentApi.uploadMedia(item.file, 'products');
+        const entry = await contentApi.uploadMedia(item.file, 'products', item.altText.trim() || undefined);
         setImages((prev) => prev.map((img, idx) => idx === i ? { ...img, uploading: false, uploaded: entry } : img));
         results.push({
           url: entry.url,
           mediaId: entry.id,
-          altText: name.trim(),
+          altText: item.altText.trim() || entry.altText || name.trim(),
           isPrimary: i === 0,
         });
       } catch {
@@ -426,7 +428,7 @@ export default function NewProductPage() {
                 className="relative w-24 h-24 rounded-lg overflow-hidden border border-[#2A2A3A] group"
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={item.preview} alt="" className="w-full h-full object-cover" />
+                <img src={item.preview} alt={item.altText || ''} className="w-full h-full object-cover" />
                 {item.uploading && (
                   <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
                     <div className="w-5 h-5 border-2 border-[#FF6B00] border-t-transparent rounded-full animate-spin" />
@@ -464,6 +466,17 @@ export default function NewProductPage() {
                     PRIMARY
                   </div>
                 )}
+                <input
+                  type="text"
+                  value={item.altText}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    setImages((prev) => prev.map((img, idx) => idx === i ? { ...img, altText: val } : img));
+                  }}
+                  placeholder="Image name"
+                  maxLength={200}
+                  className="absolute bottom-0 left-0 right-0 bg-black/70 text-[#F0F0F0] text-[10px] px-1.5 py-1 font-inter placeholder:text-[#6B6B80] focus:outline-none focus:bg-black/90 border-t border-[#2A2A3A]"
+                />
               </div>
             ))}
             <label className="w-24 h-24 rounded-lg border-2 border-dashed border-[#2A2A3A] hover:border-[#FF6B00] transition-colors cursor-pointer flex flex-col items-center justify-center gap-1 text-[#6B6B80] hover:text-[#FF6B00]">
