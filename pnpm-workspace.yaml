@@ -23,3 +23,8 @@ verifyDepsBeforeRun: false
 onlyBuiltDependencies:
   - msgpackr-extract
 
+overrides:
+  standardwebhooks: ^1.1.1
+
+minimumReleaseAgeExclude:
+  - standardwebhooks@1.1.1
