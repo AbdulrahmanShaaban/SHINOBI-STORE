@@ -2,9 +2,15 @@ import HeroSection from '@/components/sections/hero/HeroSection';
 import CardStack from '@/components/sections/cards/CardStack';
 import ChooseShinobi from '@/components/sections/cards/ChooseShinobi';
 import ShinobiCharacterCards from '@/components/sections/cards/ShinobiCharacterCards';
-import MadaraSpecialCard from '@/components/sections/madara/MadaraSpecialCard';
+import dynamic from "next/dynamic";
+
+const MadaraSpecialCard = dynamic(() => import("@/components/sections/madara/MadaraSpecialCard"), {
+  loading: () => null,
+});
+const CharacterShowcase = dynamic(() => import("@/components/sections/showcase/CharacterShowcase"), {
+  loading: () => null,
+});
 import QuoteSection from '@/components/sections/showcase/QuoteSection';
-import CharacterShowcase from '@/components/sections/showcase/CharacterShowcase';
 import { resolveShowcaseCharacters } from '@/components/sections/showcase/showcase-characters';
 import StoreFooter from '@/components/shared/StoreFooter';
 import ScrollToTop from '@/components/shared/ScrollToTop';

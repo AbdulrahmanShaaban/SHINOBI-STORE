@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, useEffect } from "react";
+import { useRef, useSyncExternalStore } from "react";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -11,16 +11,37 @@ gsap.registerPlugin(ScrollTrigger);
 const MOBILE_SAND_COUNT = 16;
 const MOBILE_DUST_COUNT = 20;
 
+const FLAME_SHAPES = [
+  {
+    clipPath: "polygon(49% 100%, 34% 92%, 27% 81%, 14% 75%, 20% 63%, 6% 56%, 17% 47%, 9% 34%, 24% 37%, 20% 22%, 35% 29%, 42% 8%, 49% 22%, 56% 4%, 61% 26%, 76% 14%, 72% 35%, 91% 30%, 82% 46%, 97% 52%, 84% 60%, 94% 75%, 78% 73%, 74% 88%, 61% 91%)",
+    background: "linear-gradient(180deg, rgba(142,84,255,.72) 0%, rgba(102,49,222,.56) 38%, rgba(213,187,255,.62) 68%, rgba(255,255,255,.42) 100%)",
+    blur: "blur(9px)",
+    opacity: 0.76,
+  },
+  {
+    clipPath: "polygon(50% 100%, 38% 86%, 22% 88%, 28% 72%, 7% 76%, 20% 59%, 2% 55%, 22% 46%, 10% 31%, 29% 37%, 27% 17%, 42% 29%, 50% 0%, 58% 28%, 70% 10%, 71% 34%, 91% 24%, 81% 45%, 100% 48%, 82% 61%, 94% 78%, 75% 72%, 76% 91%, 60% 85%)",
+    background: "linear-gradient(180deg, rgba(83,36,190,.58) 0%, rgba(132,76,255,.48) 36%, rgba(217,193,255,.50) 66%, rgba(255,255,255,.22) 100%)",
+    blur: "blur(15px)",
+    opacity: 0.58,
+  },
+  {
+    clipPath: "polygon(50% 100%, 30% 90%, 20% 74%, 4% 70%, 17% 53%, 3% 42%, 19% 37%, 15% 19%, 32% 29%, 43% 5%, 51% 25%, 61% 3%, 66% 27%, 84% 18%, 78% 36%, 97% 42%, 83% 53%, 96% 67%, 77% 71%, 70% 88%, 58% 89%)",
+    background: "radial-gradient(ellipse at 50% 58%, rgba(255,255,255,.54) 0%, rgba(203,173,255,.46) 26%, rgba(132,74,248,.42) 52%, rgba(74,30,176,.18) 74%, transparent 88%)",
+    blur: "blur(20px)",
+    opacity: 0.48,
+  },
+];
+
 function useIsMobile() {
-  const [isMobile, setIsMobile] = useState(false);
-  useEffect(() => {
-    const mql = window.matchMedia("(max-width: 767px)");
-    setIsMobile(mql.matches);
-    const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches);
-    mql.addEventListener("change", handler);
-    return () => mql.removeEventListener("change", handler);
-  }, []);
-  return isMobile;
+  return useSyncExternalStore(
+    (callback) => {
+      const mql = window.matchMedia("(max-width: 767px)");
+      mql.addEventListener("change", callback);
+      return () => mql.removeEventListener("change", callback);
+    },
+    () => window.matchMedia("(max-width: 767px)").matches,
+    () => false
+  );
 }
 
 const SAND_ORBIT_COUNT = 42;
@@ -97,11 +118,7 @@ export default function MadaraSpecialCard({
   const sixPathsImgRef = useRef<HTMLImageElement>(null);
   const chakraAuraRef = useRef<HTMLDivElement>(null);
   const chakraCoreRef = useRef<HTMLDivElement>(null);
-  const chakraRingRefs = [
-    useRef<HTMLDivElement>(null),
-    useRef<HTMLDivElement>(null),
-    useRef<HTMLDivElement>(null),
-  ];
+  const chakraRingsRef = useRef<HTMLDivElement[]>([]);
   const sandOrbitRef = useRef<HTMLDivElement>(null);
 
   // Hover tweens are created in event handlers (outside any GSAP context), so
@@ -122,7 +139,7 @@ export default function MadaraSpecialCard({
       const crater = craterRef.current;
       const chakraAura = chakraAuraRef.current;
       const chakraCore = chakraCoreRef.current;
-      const chakraRings = chakraRingRefs.map((ref) => ref.current);
+      const chakraRings = chakraRingsRef.current;
 
       if (!section || !stage || !card || !coffin || !coffinBody || !coffinDoor || !chakraAura || !chakraCore || chakraRings.some((el) => !el)) {
         return;
@@ -675,7 +692,7 @@ export default function MadaraSpecialCard({
       })
     );
     trackHoverTween(
-      gsap.to(chakraRingRefs.map((ref) => ref.current), {
+      gsap.to(chakraRingsRef.current, {
         opacity: 1,
         scale: 1.035,
         duration: 0.28,
@@ -731,7 +748,7 @@ export default function MadaraSpecialCard({
       })
     );
     trackHoverTween(
-      gsap.to(chakraRingRefs.map((ref) => ref.current), {
+      gsap.to(chakraRingsRef.current, {
         opacity: 0,
         duration: 0.24,
         overwrite: "auto",
@@ -888,32 +905,15 @@ export default function MadaraSpecialCard({
             />
 
             {/* Large irregular flame sheets. Their jagged silhouettes are closer to anime chakra than perfect rings. */}
-            {chakraRingRefs.map((ref, index) => {
-              const flameShapes = [
-                {
-                  clipPath: "polygon(49% 100%, 34% 92%, 27% 81%, 14% 75%, 20% 63%, 6% 56%, 17% 47%, 9% 34%, 24% 37%, 20% 22%, 35% 29%, 42% 8%, 49% 22%, 56% 4%, 61% 26%, 76% 14%, 72% 35%, 91% 30%, 82% 46%, 97% 52%, 84% 60%, 94% 75%, 78% 73%, 74% 88%, 61% 91%)",
-                  background: "linear-gradient(180deg, rgba(142,84,255,.72) 0%, rgba(102,49,222,.56) 38%, rgba(213,187,255,.62) 68%, rgba(255,255,255,.42) 100%)",
-                  blur: "blur(9px)",
-                  opacity: 0.76,
-                },
-                {
-                  clipPath: "polygon(50% 100%, 38% 86%, 22% 88%, 28% 72%, 7% 76%, 20% 59%, 2% 55%, 22% 46%, 10% 31%, 29% 37%, 27% 17%, 42% 29%, 50% 0%, 58% 28%, 70% 10%, 71% 34%, 91% 24%, 81% 45%, 100% 48%, 82% 61%, 94% 78%, 75% 72%, 76% 91%, 60% 85%)",
-                  background: "linear-gradient(180deg, rgba(83,36,190,.58) 0%, rgba(132,76,255,.48) 36%, rgba(217,193,255,.50) 66%, rgba(255,255,255,.22) 100%)",
-                  blur: "blur(15px)",
-                  opacity: 0.58,
-                },
-                {
-                  clipPath: "polygon(50% 100%, 30% 90%, 20% 74%, 4% 70%, 17% 53%, 3% 42%, 19% 37%, 15% 19%, 32% 29%, 43% 5%, 51% 25%, 61% 3%, 66% 27%, 84% 18%, 78% 36%, 97% 42%, 83% 53%, 96% 67%, 77% 71%, 70% 88%, 58% 89%)",
-                  background: "radial-gradient(ellipse at 50% 58%, rgba(255,255,255,.54) 0%, rgba(203,173,255,.46) 26%, rgba(132,74,248,.42) 52%, rgba(74,30,176,.18) 74%, transparent 88%)",
-                  blur: "blur(20px)",
-                  opacity: 0.48,
-                },
-              ][index];
+            {[0, 1, 2].map((index) => {
+                  const flameShapes = FLAME_SHAPES[index];
 
               return (
                 <div
                   key={index}
-                  ref={ref}
+                  ref={(el) => {
+                    if (el) chakraRingsRef.current[index] = el;
+                  }}
                   className="absolute inset-[5%]"
                   style={{
                     clipPath: flameShapes.clipPath,

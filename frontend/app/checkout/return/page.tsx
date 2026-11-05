@@ -12,14 +12,11 @@ import { useSearchParams } from 'next/navigation';
 function ReturnInner() {
   const searchParams = useSearchParams();
   const orderNumber = searchParams.get('order') ?? '';
-  const [status, setStatus] = useState<'polling' | 'confirmed' | 'pending_payment' | 'cancelled' | 'unknown'>('polling');
+  const [status, setStatus] = useState<'polling' | 'confirmed' | 'pending_payment' | 'cancelled' | 'unknown'>(orderNumber ? 'polling' : 'unknown');
   const attempts = useRef(0);
 
   useEffect(() => {
-    if (!orderNumber) {
-      setStatus('unknown');
-      return;
-    }
+    if (!orderNumber) return;
     let alive = true;
     const poll = async () => {
       try {

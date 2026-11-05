@@ -12,6 +12,13 @@ const FOCUSABLE = [
   '[tabindex]:not([tabindex="-1"])',
 ].join(',');
 
+let focusTrapCounter = 0;
+
+function nextFocusTrapKey() {
+  focusTrapCounter += 1;
+  return `focus-trap-${focusTrapCounter}`;
+}
+
 function focusableIn(root: HTMLElement): HTMLElement[] {
   return Array.from(root.querySelectorAll<HTMLElement>(FOCUSABLE)).filter(
     (el) => !el.hasAttribute('aria-hidden') || el.getAttribute('aria-hidden') === 'false',
@@ -28,7 +35,7 @@ export function useFocusTrap<T extends HTMLElement>(
 ): React.RefObject<T | null> {
   const ref = useRef<T>(null);
   const onCloseRef = useRef(onClose);
-  const lockKeyRef = useRef(`focus-trap-${Math.random().toString(36).slice(2, 9)}`);
+  const lockKeyRef = useRef("");
 
   useEffect(() => {
     onCloseRef.current = onClose;
@@ -38,6 +45,8 @@ export function useFocusTrap<T extends HTMLElement>(
     if (!active) return;
     const node = ref.current;
     if (!node) return;
+
+    if (!lockKeyRef.current) lockKeyRef.current = nextFocusTrapKey();
 
     const previousFocused = document.activeElement as HTMLElement | null;
     acquireScrollLock(lockKeyRef.current);
