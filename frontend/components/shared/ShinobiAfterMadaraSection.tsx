@@ -687,7 +687,7 @@ export default function ShinobiAfterMadaraSection() {
   );
 
   return (
-    <section ref={sectionRef} className="relative w-full overflow-hidden bg-[#101014] [contain:layout] will-change-transform">
+    <section ref={sectionRef} className="relative w-full overflow-hidden bg-[#101014]">
       {/* Marquees */}
       <div className="pt-[clamp(96px,12vh,180px)]">
         {MARQUEE_ROWS.map((row) => (
