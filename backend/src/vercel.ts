@@ -1,6 +1,7 @@
 import 'reflect-metadata';
 import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
+import type { Request, Response } from 'express';
 
 import { AppModule } from './app.module';
 import { configureApp } from './app.setup';
@@ -20,7 +21,7 @@ async function getApp(): Promise<NestExpressApplication> {
   return cachedApp;
 }
 
-export default async function handler(req: any, res: any) {
+export default async function handler(req: Request, res: Response) {
   const app = await getApp();
   const expressInstance = app.getHttpAdapter().getInstance();
   return expressInstance(req, res);

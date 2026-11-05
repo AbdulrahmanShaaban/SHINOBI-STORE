@@ -4,7 +4,6 @@ import {
   CreatePaymentInput,
   CreatedPayment,
   PaymentProvider,
-  ProviderPaymentStatus,
   RetrievedPayment,
 } from './payment-provider.port';
 
