@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { formatPrice } from '@/lib/money';
 
 interface DemoPaymentFormProps {
@@ -35,10 +34,8 @@ export default function DemoPaymentForm({
   orderNumber,
   clientSecret,
   totalCents,
-  currency,
   onDone,
 }: DemoPaymentFormProps) {
-  const router = useRouter();
   const [cardholderName, setCardholderName] = useState('');
   const [cardNumber, setCardNumber] = useState('');
   const [expiry, setExpiry] = useState('');

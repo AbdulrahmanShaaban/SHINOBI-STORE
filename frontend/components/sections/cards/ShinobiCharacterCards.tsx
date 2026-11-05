@@ -8,36 +8,6 @@ import Link from "next/link";
 
 gsap.registerPlugin(ScrollTrigger);
 
-const CHARACTERS = [
-  {
-    name: "NARUTO",
-    id: "naruto",
-    price: 29.99,
-    defaultImg: "/characters/naruto-default.png",
-    jutsuImg: "/characters/naruto-rasengan.png",
-    borderColor: "var(--primary) 0px 0px 10px",
-    accentVar: "var(--primary)",
-  },
-  {
-    name: "ITACHI",
-    id: "itachi",
-    price: 34.99,
-    defaultImg: "/characters/itachi-default.png",
-    jutsuImg: "/characters/itachi-mangekyou.png",
-    borderColor: "var(--red) 0px 0px 10px",
-    accentVar: "var(--red)",
-  },
-  {
-    name: "SASUKE",
-    id: "sasuke",
-    price: 31.99,
-    defaultImg: "/characters/sasuke-default.png",
-    jutsuImg: "/characters/sasuke-chidori.png",
-    borderColor: "var(--sasuke-accent) 0px 0px 10px",
-    accentVar: "var(--sasuke-accent)",
-  },
-];
-
 export default function ShinobiCharacterCards() {
   const sectionRef = useRef<HTMLElement>(null);
   const narutoRef = useRef<HTMLDivElement>(null);

@@ -25,7 +25,7 @@ interface ComboboxProps {
   placeholder?: string;
 }
 
-function ComboboxInput({ label, options, value, onChange, onCreateNew, placeholder }: ComboboxProps) {
+function ComboboxInput({ label, options, value, onChange, onCreateNew }: ComboboxProps) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');
   const [creating, setCreating] = useState(false);

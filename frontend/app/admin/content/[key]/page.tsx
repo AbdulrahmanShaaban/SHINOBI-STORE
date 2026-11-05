@@ -9,7 +9,6 @@ import {
   type MediaEntry,
   type MediaFolder,
 } from '@/lib/content-api';
-import { adminApi } from '@/lib/admin-api';
 import {
   buildConfig,
   initialValues,

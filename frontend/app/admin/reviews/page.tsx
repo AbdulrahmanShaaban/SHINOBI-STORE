@@ -12,7 +12,7 @@ import StatusBadge from '@/components/admin/StatusBadge';
 import { useAdminList } from '@/components/admin/use-admin-list';
 import { formatDateTime } from '@/components/admin/format';
 import { pushToast } from '@/components/shared/Toast';
-import { btnPrimary, btnRow, tdClass } from '@/components/admin/ui';
+import { btnPrimary, tdClass } from '@/components/admin/ui';
 
 type FilterStatus = 'all' | 'pending' | 'approved' | 'rejected';
 

@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Image from 'next/image';
 
 export const metadata: Metadata = {
   title: 'About Us — Shinobi Store',
@@ -36,7 +37,7 @@ export default function AboutPage() {
         </div>
         <div className="rounded-xl border border-[#2A2A3A] bg-[#12121A] p-8 flex items-center justify-center">
           <div className="text-center">
-            <img src="/sections/kunai-white.svg" alt="" className="w-24 h-24 mx-auto mb-4" />
+            <Image src="/sections/kunai-white.svg" alt="" width={96} height={96} unoptimized className="w-24 h-24 mx-auto mb-4" />
             <p className="font-inter text-sm text-[#6B6B80] mt-2 tracking-wider">SHINOBI — THE HIDDEN ONE</p>
           </div>
         </div>
@@ -82,7 +83,7 @@ export default function AboutPage() {
               key={item.title}
               className="rounded-xl border border-[#2A2A3A] bg-[#12121A] p-6 hover:border-[#FF6B00]/40 transition-colors"
             >
-              <img src={item.icon} alt="" className="w-12 h-12 mb-3" />
+              <Image src={item.icon} alt="" width={48} height={48} unoptimized className="w-12 h-12 mb-3" />
               <h3 className="font-cinzel text-sm font-bold text-[#F0F0F0] uppercase tracking-wider mb-2">
                 {item.title}
               </h3>

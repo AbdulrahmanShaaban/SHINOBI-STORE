@@ -138,10 +138,13 @@ export default function HeroSection({
 
       {/* CMS-provided art layer (decorative, sits under petals/clouds) */}
       {imageUrl ? (
-        <img
+        <Image
           src={imageUrl}
           alt=""
           aria-hidden="true"
+          fill
+          unoptimized
+          sizes="100vw"
           className="absolute inset-0 z-[4] h-full w-full object-cover"
         />
       ) : null}

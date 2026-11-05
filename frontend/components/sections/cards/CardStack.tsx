@@ -3,6 +3,7 @@
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import Image from "next/image";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -139,7 +140,7 @@ export default function CardStack() {
             </div>
             <div className="card-body bg-[#1A1A1A] rounded-b-xl p-5 md:p-8 flex flex-col items-center text-center pb-[12vh] md:pb-[35vh]">
               <div className="card-content flex flex-col items-center text-center">
-                <img src="/sections/kunai-white.svg" alt="" className="w-14 h-14 md:w-20 md:h-20 mb-4 md:mb-6" />
+                <Image src="/sections/kunai-white.svg" alt="" width={80} height={80} unoptimized className="w-14 h-14 md:w-20 md:h-20 mb-4 md:mb-6" />
                 <p className="text-[#F0F0F0] text-base md:text-lg leading-relaxed max-w-md">
                   Hard work beats talent when talent doesn&apos;t work hard. We don&apos;t rely on forbidden jutsu, just pure training and dedication.
                 </p>
@@ -166,7 +167,7 @@ export default function CardStack() {
             </div>
             <div className="card-body bg-[#1A1A1A] rounded-b-xl p-5 md:p-8 flex flex-col items-center text-center pb-[12vh] md:pb-[35vh]">
               <div className="card-content flex flex-col items-center text-center">
-                <img src="/sections/sharingan-white.svg" alt="" className="w-16 h-16 md:w-24 md:h-24 mb-4 md:mb-6" />
+                <Image src="/sections/sharingan-white.svg" alt="" width={96} height={96} unoptimized className="w-16 h-16 md:w-24 md:h-24 mb-4 md:mb-6" />
                 <p className="text-[#F0F0F0] text-base md:text-lg leading-relaxed max-w-md">
                   We never go back on our word. That is our ninja way. If it doesn&apos;t align with the village&apos;s mission, it doesn&apos;t make the cut.
                 </p>
@@ -193,7 +194,7 @@ export default function CardStack() {
             </div>
             <div className="card-body bg-[#1A1A1A] rounded-b-xl p-5 md:p-8 flex flex-col items-center text-center pb-[12vh] md:pb-[35vh]">
               <div className="card-content flex flex-col items-center text-center">
-                <img src="/sections/leaf-village-white.svg" alt="" className="w-16 h-16 md:w-24 md:h-24 mb-4 md:mb-6" />
+                <Image src="/sections/leaf-village-white.svg" alt="" width={96} height={96} unoptimized className="w-16 h-16 md:w-24 md:h-24 mb-4 md:mb-6" />
                 <p className="text-[#F0F0F0] text-base md:text-lg leading-relaxed max-w-md">
                   Perfect chakra control. No unnecessary ingredients, no fillers. Just the essential energy needed to complete the mission.
                 </p>
@@ -220,7 +221,7 @@ export default function CardStack() {
             </div>
             <div className="card-body bg-[#1A1A1A] rounded-b-xl p-5 md:p-8 flex flex-col items-center text-center pb-[12vh] md:pb-[35vh]">
               <div className="card-content flex flex-col items-center text-center">
-                <img src="/sections/scroll-seal-white.svg" alt="" className="w-16 h-16 md:w-24 md:h-24 mb-4 md:mb-6" />
+                <Image src="/sections/scroll-seal-white.svg" alt="" width={96} height={96} unoptimized className="w-16 h-16 md:w-24 md:h-24 mb-4 md:mb-6" />
                 <p className="text-[#F0F0F0] text-base md:text-lg leading-relaxed max-w-md">
                   Loyalty above all. A bond that cannot be broken by rogue elements. We stay true to our allies and our creed.
                 </p>

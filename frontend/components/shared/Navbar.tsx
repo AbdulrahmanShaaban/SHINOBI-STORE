@@ -250,7 +250,7 @@ export default function Navbar() {
 
 /** Account entry — expressive user icon that adapts to session state. */
 function AccountLink({ iconOnly = false }: { iconOnly?: boolean }) {
-  const { user, loading } = useUser();
+  const { user } = useUser();
   const href = user ? '/account' : '/account/login';
   const label = user ? `Account: ${user.fullName}` : 'Sign in';
 

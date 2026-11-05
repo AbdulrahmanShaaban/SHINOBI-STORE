@@ -1,4 +1,5 @@
 import HeroSection from '@/components/sections/hero/HeroSection';
+import Image from 'next/image';
 import CardStack from '@/components/sections/cards/CardStack';
 import ChooseShinobi from '@/components/sections/cards/ChooseShinobi';
 import ShinobiCharacterCards from '@/components/sections/cards/ShinobiCharacterCards';
@@ -61,10 +62,13 @@ function CmsBannerStrip({ config }: { config: Record<string, unknown> }) {
   return (
     <section className="relative overflow-hidden border-y border-white/10 bg-[#16161F]">
       {imageUrl ? (
-        <img
+        <Image
           src={imageUrl}
           alt=""
           aria-hidden="true"
+          fill
+          unoptimized
+          sizes="100vw"
           className="absolute inset-0 h-full w-full object-cover opacity-30"
         />
       ) : null}
