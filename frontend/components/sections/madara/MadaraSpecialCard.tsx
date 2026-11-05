@@ -759,7 +759,7 @@ export default function MadaraSpecialCard({
   return (
     <section
       ref={sectionRef}
-      className="w-full py-12 md:py-16 min-h-auto md:min-h-[90vh] flex flex-col items-center"
+      className="w-full py-12 md:py-16 min-h-auto md:min-h-[90vh] flex flex-col items-center [contain:layout]"
     >
       <div className="w-full max-w-[1900px] px-4 md:px-6 lg:px-8">
         <div ref={titleRef} className="flex justify-center mb-10 md:mb-14">
@@ -771,7 +771,7 @@ export default function MadaraSpecialCard({
           </div>
         </div>
 
-        <div ref={stageRef} className="relative flex justify-center isolate">
+        <div ref={stageRef} className="relative flex justify-center isolate will-change-transform">
           {/* Ground plane: the coffin visually breaks through this layer. */}
           <div
             ref={groundRef}

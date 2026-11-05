@@ -75,7 +75,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className="min-h-full flex flex-col bg-[#0A0A0F] text-[#F0F0F0] [font-family:var(--font-belanosima),sans-serif]">
+      <body className="min-h-full flex flex-col bg-[#0A0A0F] text-[#F0F0F0] [font-family:var(--font-belanosima),sans-serif] overflow-x-hidden">
         <UserProvider>
           <SmoothScroll />
           <ScrollRefresh />
